@@ -58,17 +58,21 @@ func (p *AdminPresenter) RenderDashboard(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
+	i18nBundle := GetI18n(r)
+
 	data := map[string]interface{}{
 		"Quizzes":        quizzes,
 		"TotalStudents":  totalStudents,
 		"GroupSummaries": groupSummaries,
+		"I18n":           i18nBundle,
 	}
 
 	_ = p.templates.ExecuteTemplate(w, "admin_dashboard.html", data)
 }
 
 func (p *AdminPresenter) RenderCreateQuiz(w http.ResponseWriter, r *http.Request) {
-	_ = p.templates.ExecuteTemplate(w, "admin_create_quiz.html", nil)
+	i18nBundle := GetI18n(r)
+	_ = p.templates.ExecuteTemplate(w, "admin_create_quiz.html", map[string]interface{}{"I18n": i18nBundle})
 }
 
 func (p *AdminPresenter) HandleCreateQuiz(w http.ResponseWriter, r *http.Request) {
@@ -197,12 +201,15 @@ func (p *AdminPresenter) RenderQuizAnalytics(w http.ResponseWriter, r *http.Requ
 		avgScore = float64(total) / float64(len(results))
 	}
 
+	i18nBundle := GetI18n(r)
+
 	data := map[string]interface{}{
 		"Quiz":         quiz,
 		"Results":      results,
 		"TotalTakers":  len(results),
 		"AverageScore": fmt.Sprintf("%.1f", avgScore),
 		"MaxScore":     maxScore,
+		"I18n":         i18nBundle,
 	}
 
 	_ = p.templates.ExecuteTemplate(w, "admin_analytics.html", data)
