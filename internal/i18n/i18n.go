@@ -115,6 +115,14 @@ var translations = map[Language]map[string]string{
 		"table_target_level":   "Target Level",
 		"table_status":         "Status",
 		"all_levels":           "All Levels",
+		"admin_preview_title":  "Review Imported Students",
+		"admin_preview_sub":    "Verify or edit student information before confirming import to the database",
+		"admin_confirm_import": "Confirm & Import Students",
+		"admin_cancel_import":  "Cancel",
+		"admin_remove_row":     "Remove",
+		"admin_preview_btn":    "Review & Import",
+		"admin_preview_count":  "Students to Import",
+		"admin_preview_notice": "You can modify student code, name, level, or group inline before confirming import.",
 	},
 	LangAR: {
 		// Navbar & General
@@ -212,6 +220,14 @@ var translations = map[Language]map[string]string{
 		"table_target_level":   "المستوى المستهدف",
 		"table_status":         "الحالة",
 		"all_levels":           "كافة المستويات",
+		"admin_preview_title":  "مراجعة بيانات الطلاب قبل الاستيراد",
+		"admin_preview_sub":    "يمكنك مراجعة وتعديل بيانات الطلاب قبل تأكيد حفظها في النظام",
+		"admin_confirm_import": "تأكيد واستيراد الطلاب",
+		"admin_cancel_import":  "إلغاء",
+		"admin_remove_row":     "حذف",
+		"admin_preview_btn":    "معاينة واستيراد",
+		"admin_preview_count":  "عدد الطلاب الجاهزين للاستيراد",
+		"admin_preview_notice": "يمكنك تعديل الرقم الجامعي، الاسم، المستوى، والمجموعة مباشرة في الجدول أدناه قبل الضغط على تأكيد الاستيراد.",
 	},
 }
 
