@@ -20,7 +20,7 @@ services:
       - mongo
 
   mongo:
-    image: mongo:7.0
+    image: mongo:latest
     container_name: quiz_mongo
     restart: unless-stopped
     ports:
