@@ -240,3 +240,106 @@ func (p *AdminPresenter) RenderQuizAnalytics(w http.ResponseWriter, r *http.Requ
 
 	_ = p.templates.ExecuteTemplate(w, "admin_analytics.html", data)
 }
+
+func (p *AdminPresenter) RenderStudentsList(w http.ResponseWriter, r *http.Request) {
+	levelID, _ := strconv.Atoi(r.URL.Query().Get("level_id"))
+	groupID := strings.ToUpper(strings.TrimSpace(r.URL.Query().Get("group_id")))
+
+	students, err := p.studentRepo.GetAll(r.Context(), levelID, groupID, 200, 0)
+	if err != nil {
+		students = nil
+	}
+
+	cohorts, _ := p.studentRepo.GetCohortDistribution(r.Context())
+	totalStudents, _ := p.studentRepo.Count(r.Context())
+
+	i18nBundle := GetI18n(r)
+	successMsg := r.URL.Query().Get("success")
+	errMsg := r.URL.Query().Get("error")
+
+	data := map[string]interface{}{
+		"Students":       students,
+		"Cohorts":        cohorts,
+		"TotalStudents":  totalStudents,
+		"SelectedLevel":  levelID,
+		"SelectedGroup":  groupID,
+		"Success":        successMsg,
+		"Error":          errMsg,
+		"I18n":           i18nBundle,
+	}
+
+	_ = p.templates.ExecuteTemplate(w, "admin_students.html", data)
+}
+
+func (p *AdminPresenter) RenderCreateStudent(w http.ResponseWriter, r *http.Request) {
+	i18nBundle := GetI18n(r)
+	data := map[string]interface{}{
+		"I18n": i18nBundle,
+	}
+	_ = p.templates.ExecuteTemplate(w, "admin_student_create.html", data)
+}
+
+func (p *AdminPresenter) HandleCreateStudent(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid form data", http.StatusBadRequest)
+		return
+	}
+
+	code := strings.ToUpper(strings.TrimSpace(r.FormValue("student_code")))
+	name := strings.TrimSpace(r.FormValue("name"))
+	levelID, _ := strconv.Atoi(r.FormValue("level_id"))
+	groupID := strings.ToUpper(strings.TrimSpace(r.FormValue("group_id")))
+
+	if code == "" || name == "" {
+		http.Redirect(w, r, "/admin/students/create?error=Student+code+and+name+are+required", http.StatusSeeOther)
+		return
+	}
+	if levelID < 1 || levelID > 5 {
+		levelID = 1
+	}
+	if groupID == "" {
+		groupID = "A"
+	}
+
+	student := &model.Student{
+		StudentCode: code,
+		Name:        name,
+		LevelID:     levelID,
+		GroupID:     groupID,
+		IsActive:    true,
+	}
+
+	if err := p.studentRepo.CreateOrUpdate(r.Context(), student); err != nil {
+		http.Redirect(w, r, "/admin/students/create?error=Failed+to+save+student", http.StatusSeeOther)
+		return
+	}
+
+	http.Redirect(w, r, "/admin/students?success=Student+saved+successfully", http.StatusSeeOther)
+}
+
+func (p *AdminPresenter) RenderStudentProfile(w http.ResponseWriter, r *http.Request) {
+	studentIDHex := strings.TrimPrefix(r.URL.Path, "/admin/students/")
+
+	stuObjID, err := primitive.ObjectIDFromHex(studentIDHex)
+	if err != nil {
+		http.Error(w, "Invalid Student ID", http.StatusBadRequest)
+		return
+	}
+
+	student, err := p.studentRepo.FindByID(r.Context(), stuObjID)
+	if err != nil || student == nil {
+		http.Error(w, "Student not found", http.StatusNotFound)
+		return
+	}
+
+	history, _ := p.resultService.GetStudentHistory(r.Context(), stuObjID)
+	i18nBundle := GetI18n(r)
+
+	data := map[string]interface{}{
+		"Student": student,
+		"History": history,
+		"I18n":    i18nBundle,
+	}
+
+	_ = p.templates.ExecuteTemplate(w, "admin_student_profile.html", data)
+}
