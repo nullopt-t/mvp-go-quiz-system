@@ -21,9 +21,9 @@ type TranslationBundle struct {
 var translations = map[Language]map[string]string{
 	LangEN: {
 		// General & Navbar
-		"app_title":       "College Quiz System",
-		"nav_stateless":   "Stateless JWT Auth",
-		"admin_portal":    "College Administration Portal",
+		"app_title":       "College Assessment Portal",
+		"nav_stateless":   "Official Portal",
+		"admin_portal":    "Staff & Administration Portal",
 		"logout":          "Log Out",
 		"dashboard":       "Dashboard",
 		"back_dashboard":  "Back to Dashboard",
@@ -33,80 +33,80 @@ var translations = map[Language]map[string]string{
 
 		// Login
 		"welcome_back":        "Welcome Back",
-		"login_subtitle":      "Enter your Student ID to access your level and group quizzes",
-		"student_id_label":    "Student ID Code",
-		"student_id_hint":     "Format: Level 1-5, Group 1-4 (e.g. L1G1-001 to L5G4-500)",
-		"login_btn":           "Log In",
+		"login_subtitle":      "Enter your Student ID to access your scheduled examinations",
+		"student_id_label":    "Student ID",
+		"student_id_hint":     "Format: Level 1-5, Group 1-4 (e.g. L1G1-001)",
+		"login_btn":           "Sign In",
 		"admin_login_title":   "Staff & Faculty Portal",
-		"admin_login_sub":     "Enter administrator credentials to manage college quizzes and cohorts",
-		"admin_pin_label":     "Staff Access PIN",
-		"admin_pin_btn":       "Access Admin Portal",
-		"footer_info":         "Append-Only Quiz Engine • 5 Levels • 20 Groups • 10,000 Students",
+		"admin_login_sub":     "Enter administrator credentials to access faculty controls",
+		"admin_pin_label":     "Access PIN",
+		"admin_pin_btn":       "Sign In to Portal",
+		"footer_info":         "College Academic Assessment System",
 
 		// Student Dashboard
-		"assigned_quizzes":    "Assigned Quizzes",
-		"dashboard_subtitle":  "Quizzes designated for your academic cohort",
+		"assigned_quizzes":    "Assigned Assessments",
+		"dashboard_subtitle":  "Examinations assigned to your cohort",
 		"level":               "Level",
 		"group":               "Group",
 		"duration":            "Duration",
 		"minutes":             "minutes",
 		"questions":           "Questions",
-		"start_time":          "Start Time",
+		"start_time":          "Scheduled Start",
 		"status_live":         "LIVE",
 		"status_upcoming":     "Upcoming",
 		"status_completed":    "Completed",
-		"status_expired":      "Expired",
-		"btn_enter_live":      "Enter Live Quiz",
+		"status_expired":      "Ended",
+		"btn_enter_live":      "Start Assessment",
 		"btn_starts_at":       "Starts at",
-		"btn_ended":           "Quiz Ended",
-		"btn_view_report":     "View Result Report",
-		"no_quizzes":          "No Quizzes Currently Available",
-		"no_quizzes_desc":     "Check back later or contact your college department instructor.",
-		"past_results":        "Your Past Assessment Results",
-		"table_quiz_id":       "Quiz ID",
+		"btn_ended":           "Assessment Ended",
+		"btn_view_report":     "View Score Report",
+		"no_quizzes":          "No Assessments Currently Available",
+		"no_quizzes_desc":     "There are no scheduled assessments for your section at this time.",
+		"past_results":        "Your Assessment History",
+		"table_quiz_name":     "Assessment Title",
 		"table_score":         "Score",
 		"table_correct":       "Correct Answers",
-		"table_percentage":    "Percentage",
-		"table_submitted_at":  "Submitted At",
-		"table_action":        "Action",
-		"view_btn":            "View",
+		"table_percentage":    "Grade",
+		"table_submitted_at":  "Submission Date",
+		"table_action":        "Details",
+		"view_btn":            "View Report",
 
 		// Live Quiz Room
 		"question_of":         "Question",
 		"of":                  "of",
 		"points":              "Points",
 		"pts":                 "pts",
-		"saved_notice":        "Answers are saved automatically to the append-only log on progression",
+		"saved_notice":        "Your answers are saved automatically as you proceed",
 		"btn_next":            "Next Question",
-		"btn_submit_final":    "Submit Quiz",
-		"time_expired_alert":  "Time limit reached. Submitting your quiz now.",
+		"btn_submit_final":    "Submit Assessment",
+		"time_expired_alert":  "Time limit reached. Your assessment is being submitted automatically.",
 
 		// Quiz Result
-		"result_title":        "Quiz Submitted Successfully",
-		"total_score":         "Total Score",
+		"result_title":        "Assessment Submitted Successfully",
+		"total_score":         "Final Score",
 		"accuracy":            "Accuracy",
 		"student_label":       "Student",
-		"cohort_label":        "Cohort",
+		"cohort_label":        "Academic Cohort",
 		"return_dashboard":    "Return to Dashboard",
 
 		// Admin
 		"admin_total_students": "Total Enrolled Students",
-		"admin_active_quizzes": "Active Quizzes",
-		"admin_create_quiz":    "Create New Quiz",
-		"admin_hierarchy_title":"College Structure (5 Levels x 4 Groups, 500 Capacity Each)",
-		"admin_hierarchy_sub":  "Real-time cohort distribution across all 20 academic sections",
-		"admin_enrolled":       "Enrolled",
-		"admin_managed_quizzes":"Managed Quizzes",
-		"analytics_btn":        "View Analytics",
+		"admin_active_quizzes": "Active Assessments",
+		"admin_create_quiz":    "Create New Assessment",
+		"admin_hierarchy_title":"College Cohort Overview (5 Levels, 4 Groups)",
+		"admin_hierarchy_sub":  "Student enrollment distribution across all academic sections",
+		"admin_enrolled":       "Enrolled Students",
+		"admin_managed_quizzes":"Active and Scheduled Assessments",
+		"analytics_btn":        "View Results",
 		"table_target_level":   "Target Level",
 		"table_status":         "Status",
 		"all_levels":           "All Levels",
 	},
 	LangAR: {
 		// General & Navbar
-		"app_title":       "نظام اختبارات الكلية",
-		"nav_stateless":   "مصادقة JWT بدون خادم تخزين مؤقت",
-		"admin_portal":    "بوابة إدارة الكلية والأساتذة",
+		"app_title":       "بوابة الاختبارات الأكاديمية",
+		"nav_stateless":   "البوابة الرسمية",
+		"admin_portal":    "بوابة أعضاء هيئة التدريس والإدارة",
 		"logout":          "تسجيل الخروج",
 		"dashboard":       "لوحة التحكم",
 		"back_dashboard":  "العودة إلى لوحة التحكم",
@@ -116,57 +116,57 @@ var translations = map[Language]map[string]string{
 
 		// Login
 		"welcome_back":        "مرحبًا بك",
-		"login_subtitle":      "أدخل الرقم الجامعي للوصول إلى اختبارات مستواك ومجموعتك الدراسية",
+		"login_subtitle":      "أدخل الرقم الجامعي للوصول إلى الاختبارات المقررة لمستواك ومجموعتك",
 		"student_id_label":    "الرقم الجامعي للطالب",
-		"student_id_hint":     "الصيغة: المستوى 1-5، المجموعة 1-4 (مثال: L1G1-001 إلى L5G4-500)",
+		"student_id_hint":     "الصيغة: المستوى 1-5، المجموعة 1-4 (مثال: L1G1-001)",
 		"login_btn":           "تسجيل الدخول",
 		"admin_login_title":   "بوابة أعضاء هيئة التدريس والإدارة",
-		"admin_login_sub":     "أدخل رمز المرور الإداري لإدارة الاختبارات وتتبع نتائج الطلاب",
-		"admin_pin_label":     "رمز مرور الإدارة (PIN)",
-		"admin_pin_btn":       "دخول لوحة الإدارة",
-		"footer_info":         "محرك اختبارات متزامن • 5 مستويات • 20 مجموعة • 10,000 طالب",
+		"admin_login_sub":     "أدخل رمز المرور للوصول إلى أدوات إدارة الاختبارات",
+		"admin_pin_label":     "رمز المرور",
+		"admin_pin_btn":       "دخول البوابة",
+		"footer_info":         "نظام التقييم والاختبارات الجامعية",
 
 		// Student Dashboard
 		"assigned_quizzes":    "الاختبارات المقررة",
-		"dashboard_subtitle":  "الاختبارات المخصصة لمستواك الدراسي ومجموعتك الأكاديمية",
+		"dashboard_subtitle":  "الاختبارات المخصصة لمستواك الدراسي ومجموعتك",
 		"level":               "المستوى",
 		"group":               "المجموعة",
 		"duration":            "المدة",
 		"minutes":             "دقيقة",
-		"questions":           "الأسئلة",
-		"start_time":          "وقت البدء",
+		"questions":           "عدد الأسئلة",
+		"start_time":          "موعد البدء",
 		"status_live":         "جاري الآن",
 		"status_upcoming":     "قادم",
 		"status_completed":    "مكتمل",
 		"status_expired":      "منتهي",
-		"btn_enter_live":      "دخول الاختبار المباشر",
+		"btn_enter_live":      "بدء الاختبار",
 		"btn_starts_at":       "يبدأ في",
 		"btn_ended":           "انتهى الاختبار",
 		"btn_view_report":     "عرض تقرير النتيجة",
 		"no_quizzes":          "لا توجد اختبارات متاحة حالياً",
-		"no_quizzes_desc":     "يرجى مراجعة القسم الأكاديمي أو أستاذ المادة لاحقاً.",
-		"past_results":        "نتائج اختباراتك السابقة",
-		"table_quiz_id":       "معرّف الاختبار",
+		"no_quizzes_desc":     "لا توجد اختبارات مجدولة لمجموعتك في الوقت الحالي.",
+		"past_results":        "سجل الاختبارات السابقة",
+		"table_quiz_name":     "عنوان الاختبار",
 		"table_score":         "الدرجة",
 		"table_correct":       "الإجابات الصحيحة",
 		"table_percentage":    "النسبة المئوية",
 		"table_submitted_at":  "تاريخ التسليم",
-		"table_action":        "الإجراء",
-		"view_btn":            "عرض",
+		"table_action":        "التفاصيل",
+		"view_btn":            "عرض التقرير",
 
 		// Live Quiz Room
 		"question_of":         "السؤال",
 		"of":                  "من",
 		"points":              "الدرجات",
 		"pts":                 "درجة",
-		"saved_notice":        "يتم حفظ الإجابات تلقائياً وبشكل فوري عند الانتقال للسؤال التالي",
+		"saved_notice":        "يتم حفظ إجاباتك تلقائياً عند الانتقال بين الأسئلة",
 		"btn_next":            "السؤال التالي",
 		"btn_submit_final":    "تسليم الاختبار",
-		"time_expired_alert":  "انتهى الوقت المحدد. جاري تسليم إجاباتك تلقائياً.",
+		"time_expired_alert":  "انتهى الوقت المحدد للاختبار. جاري تسليم إجاباتك تلقائياً.",
 
 		// Quiz Result
 		"result_title":        "تم تسليم الاختبار بنجاح",
-		"total_score":         "مجموع الدرجات",
+		"total_score":         "الدرجة النهائية",
 		"accuracy":            "نسبة النجاح",
 		"student_label":       "الطالب",
 		"cohort_label":        "المستوى والمجموعة",
@@ -176,11 +176,11 @@ var translations = map[Language]map[string]string{
 		"admin_total_students": "إجمالي الطلاب المسجلين",
 		"admin_active_quizzes": "الاختبارات النشطة",
 		"admin_create_quiz":    "إنشاء اختبار جديد",
-		"admin_hierarchy_title":"هيكل الكلية (5 مستويات x 4 مجموعات، سعة 500 طالب لكل مجموعة)",
-		"admin_hierarchy_sub":  "توزيع الطلاب الفعلي عبر كافة الأقسام العشرين",
-		"admin_enrolled":       "المسجلون",
-		"admin_managed_quizzes":"الاختبارات المسجلة",
-		"analytics_btn":        "عرض الإحصائيات",
+		"admin_hierarchy_title":"هيكل الكلية (5 مستويات، 4 مجموعات)",
+		"admin_hierarchy_sub":  "توزيع الطلاب الفعلي عبر كافة الأقسام الدراسية",
+		"admin_enrolled":       "الطلاب المقيدون",
+		"admin_managed_quizzes":"الاختبارات المسجلة والمجدولة",
+		"analytics_btn":        "عرض النتائج",
 		"table_target_level":   "المستوى المستهدف",
 		"table_status":         "الحالة",
 		"all_levels":           "كافة المستويات",
@@ -188,7 +188,6 @@ var translations = map[Language]map[string]string{
 }
 
 func GetLanguage(r *http.Request) Language {
-	// 1. Query parameter preference
 	if qLang := r.URL.Query().Get("lang"); qLang != "" {
 		if strings.ToLower(qLang) == "ar" {
 			return LangAR
@@ -196,7 +195,6 @@ func GetLanguage(r *http.Request) Language {
 		return LangEN
 	}
 
-	// 2. Cookie preference
 	if cookie, err := r.Cookie("lang_pref"); err == nil && cookie != nil {
 		if cookie.Value == "ar" {
 			return LangAR
@@ -206,7 +204,6 @@ func GetLanguage(r *http.Request) Language {
 		}
 	}
 
-	// 3. Accept-Language header fallback
 	acceptLang := r.Header.Get("Accept-Language")
 	if strings.HasPrefix(strings.ToLower(acceptLang), "ar") {
 		return LangAR
