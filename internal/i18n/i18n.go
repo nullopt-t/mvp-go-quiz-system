@@ -125,6 +125,9 @@ var translations = map[Language]map[string]string{
 		"admin_preview_notice": "You can modify student code, name, level, or group inline before confirming import.",
 		"admin_preview_showing": "Showing sample of %d students out of %d total in file.",
 		"admin_confirm_all_import": "Import All %d Students from File",
+		"admin_search_preview_placeholder": "Search by ID or name...",
+		"admin_search_filter_btn": "Search & Filter",
+		"admin_clear_filter": "Reset",
 	},
 	LangAR: {
 		// Navbar & General
@@ -232,6 +235,9 @@ var translations = map[Language]map[string]string{
 		"admin_preview_notice": "يمكنك تعديل الرقم الجامعي، الاسم، المستوى، والمجموعة مباشرة في الجدول أدناه قبل الضغط على تأكيد الاستيراد.",
 		"admin_preview_showing": "يتم عرض عينة مكونة من %d طالباً من إجمالي %d طالباً في الملف.",
 		"admin_confirm_all_import": "استيراد كافة الطلاب من الملف (%d طالب)",
+		"admin_search_preview_placeholder": "بحث بالرقم الجامعي أو الاسم...",
+		"admin_search_filter_btn": "بحث وتصفية",
+		"admin_clear_filter": "إلغاء التصفية",
 	},
 }
 
