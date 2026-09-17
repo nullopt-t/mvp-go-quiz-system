@@ -5,13 +5,19 @@ import (
 	"strings"
 )
 
-// RegisterAdminRoutes configures protected routes specific to staff and administrator users
+// RegisterAdminRoutes configures routes specific to staff and administrator users
 func RegisterAdminRoutes(
 	mux *http.ServeMux,
 	authMiddleware func(http.Handler) http.Handler,
+	authPres *AuthPresenter,
 	adminPres *AdminPresenter,
 ) {
-	// Guard admin routes with admin role check
+	// 1. Dedicated Admin Authentication Endpoints (Hidden from student login)
+	mux.HandleFunc("GET /admin/login", authPres.RenderAdminLogin)
+	mux.HandleFunc("POST /admin/login", authPres.HandleAdminLogin)
+	mux.HandleFunc("POST /admin/logout", authPres.HandleAdminLogout)
+
+	// 2. Guard Protected Admin Routes
 	adminAuth := func(h http.Handler) http.Handler {
 		return authMiddleware(RequireRole("admin")(h))
 	}
