@@ -154,20 +154,39 @@ func (p *AdminPresenter) HandlePreviewImportStudents(w http.ResponseWriter, r *h
 	}
 
 	i18nBundle := GetI18n(r)
+
+	var previewNotice string
+	if isTruncated {
+		previewNotice = fmt.Sprintf(indexT(i18nBundle.T, "admin_preview_showing", "Showing %d of %d students"), len(displayStudents), len(filtered), len(students))
+	} else {
+		previewNotice = indexT(i18nBundle.T, "admin_preview_notice", "You can modify student information before confirming import.")
+	}
+
+	confirmAllBtnText := fmt.Sprintf(indexT(i18nBundle.T, "admin_confirm_all_import", "Import All %d Students"), len(students))
+
 	data := map[string]interface{}{
-		"Students":        displayStudents,
-		"TotalCount":      len(students),
-		"FilteredCount":   len(filtered),
-		"DisplayedCount":  len(displayStudents),
-		"IsTruncated":     isTruncated,
-		"FileToken":       fileToken,
-		"SearchQuery":     searchQuery,
-		"FilterLevel":     filterLevel,
-		"FilterGroup":     filterGroup,
-		"I18n":            i18nBundle,
+		"Students":          displayStudents,
+		"TotalCount":        len(students),
+		"FilteredCount":     len(filtered),
+		"DisplayedCount":    len(displayStudents),
+		"IsTruncated":       isTruncated,
+		"FileToken":         fileToken,
+		"SearchQuery":       searchQuery,
+		"FilterLevel":       filterLevel,
+		"FilterGroup":       filterGroup,
+		"PreviewNotice":     previewNotice,
+		"ConfirmAllBtnText": confirmAllBtnText,
+		"I18n":              i18nBundle,
 	}
 
 	_ = p.templates.ExecuteTemplate(w, "admin_import_preview.html", data)
+}
+
+func indexT(m map[string]string, key, fallback string) string {
+	if val, ok := m[key]; ok && val != "" {
+		return val
+	}
+	return fallback
 }
 
 func (p *AdminPresenter) HandleConfirmImportStudents(w http.ResponseWriter, r *http.Request) {
