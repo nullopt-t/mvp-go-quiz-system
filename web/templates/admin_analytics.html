@@ -9,10 +9,10 @@
 <body>
   <nav class="navbar">
     <a href="/admin" class="nav-brand">
-      <span>College Administration Portal</span>
+      <span>{{ if .I18n }}{{ index .I18n.T "admin_portal" }}{{ else }}Admin Portal{{ end }}</span>
     </a>
     <div class="nav-user">
-      <a href="/admin" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">Back to Dashboard</a>
+      <a href="/admin" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">{{ if .I18n }}{{ index .I18n.T "back_dashboard" }}{{ else }}Back to Dashboard{{ end }}</a>
     </div>
   </nav>
 
@@ -20,27 +20,27 @@
     <div class="card">
       <h2>{{ .Quiz.Title }}</h2>
       <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem;">
-        Performance Breakdown and Leaderboard
+        {{ if .I18n }}{{ index .I18n.T "analytics_sub" }}{{ else }}Performance Breakdown and Leaderboard{{ end }}
       </p>
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
       <div class="card" style="margin-bottom: 0;">
-        <div style="font-size: 0.85rem; color: var(--text-muted);">Completed Submissions</div>
+        <div style="font-size: 0.85rem; color: var(--text-muted);">{{ if .I18n }}{{ index .I18n.T "analytics_submissions" }}{{ else }}Completed Submissions{{ end }}</div>
         <div style="font-size: 2rem; font-weight: 800; color: var(--primary); margin-top: 0.25rem;">
           {{ .TotalTakers }}
         </div>
       </div>
 
       <div class="card" style="margin-bottom: 0;">
-        <div style="font-size: 0.85rem; color: var(--text-muted);">Average Score</div>
+        <div style="font-size: 0.85rem; color: var(--text-muted);">{{ if .I18n }}{{ index .I18n.T "analytics_avg_score" }}{{ else }}Average Score{{ end }}</div>
         <div style="font-size: 2rem; font-weight: 800; color: var(--success); margin-top: 0.25rem;">
           {{ .AverageScore }}
         </div>
       </div>
 
       <div class="card" style="margin-bottom: 0;">
-        <div style="font-size: 0.85rem; color: var(--text-muted);">Highest Score</div>
+        <div style="font-size: 0.85rem; color: var(--text-muted);">{{ if .I18n }}{{ index .I18n.T "analytics_top_score" }}{{ else }}Highest Score{{ end }}</div>
         <div style="font-size: 2rem; font-weight: 800; color: var(--warning); margin-top: 0.25rem;">
           {{ .MaxScore }}
         </div>
@@ -48,18 +48,18 @@
     </div>
 
     <div class="card">
-      <h3 style="margin-bottom: 1rem;">Student Submissions Leaderboard</h3>
+      <h3 style="margin-bottom: 1rem;">{{ if .I18n }}{{ index .I18n.T "analytics_leaderboard" }}{{ else }}Student Submissions Leaderboard{{ end }}</h3>
 
       <table>
         <thead>
           <tr>
-            <th>Rank</th>
-            <th>Student ID</th>
-            <th>Name</th>
-            <th>Cohort</th>
-            <th>Score</th>
-            <th>Correct / Total</th>
-            <th>Completion Timestamp</th>
+            <th>{{ if .I18n }}{{ index .I18n.T "analytics_rank" }}{{ else }}Rank{{ end }}</th>
+            <th>{{ if .I18n }}{{ index .I18n.T "student_id_label" }}{{ else }}Student ID{{ end }}</th>
+            <th>{{ if .I18n }}{{ index .I18n.T "student_label" }}{{ else }}Name{{ end }}</th>
+            <th>{{ if .I18n }}{{ index .I18n.T "cohort_label" }}{{ else }}Cohort{{ end }}</th>
+            <th>{{ if .I18n }}{{ index .I18n.T "table_score" }}{{ else }}Score{{ end }}</th>
+            <th>{{ if .I18n }}{{ index .I18n.T "analytics_correct_total" }}{{ else }}Correct / Total{{ end }}</th>
+            <th>{{ if .I18n }}{{ index .I18n.T "analytics_submitted_at" }}{{ else }}Completion Timestamp{{ end }}</th>
           </tr>
         </thead>
         <tbody>
@@ -75,7 +75,7 @@
           </tr>
           {{ else }}
           <tr>
-            <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No submissions recorded yet for this quiz.</td>
+            <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">{{ if .I18n }}{{ index .I18n.T "analytics_no_submissions" }}{{ else }}No submissions recorded yet for this quiz.{{ end }}</td>
           </tr>
           {{ end }}
         </tbody>

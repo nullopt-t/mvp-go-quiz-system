@@ -159,6 +159,37 @@ var translations = map[Language]map[string]string{
 		"quiz_add_question_btn": "Add Another Question",
 		"quiz_remove_question_btn": "Delete Question",
 		"quiz_save_publish_btn": "Save & Publish Assessment",
+
+		// Status badges
+		"status_active":   "Active",
+		"status_inactive": "Inactive",
+
+		// Analytics page
+		"analytics_sub":            "Performance Breakdown and Leaderboard",
+		"analytics_submissions":    "Completed Submissions",
+		"analytics_avg_score":      "Average Score",
+		"analytics_top_score":      "Highest Score",
+		"analytics_leaderboard":    "Student Submissions Leaderboard",
+		"analytics_rank":           "Rank",
+		"analytics_correct_total":  "Correct / Total",
+		"analytics_submitted_at":   "Completion Time",
+		"analytics_no_submissions": "No submissions recorded yet for this quiz.",
+
+		// Admin dashboard
+		"admin_no_cohorts":  "No student cohorts registered yet. Upload a CSV roster to populate cohorts.",
+		"admin_quizzes_sub": "Overview of assessments, active timeframes, and results tracking",
+		"admin_no_quizzes":  "No quizzes created yet.",
+
+		// Admin student management
+		"admin_add_student_sub":         "Register a new student or update an existing record by student code.",
+		"admin_student_name_placeholder": "Full Student Name",
+		"admin_registered_at":            "Registered At",
+		"admin_completed_quizzes":        "Completed Quizzes",
+		"admin_no_student_submissions":   "No quiz submissions recorded for this student yet.",
+		"admin_no_students_filter":       "No students found for the selected filters.",
+
+		// Quiz creation
+		"quiz_questions_bank_sub": "Configure multiple choice questions, individual point weights, and correct options.",
 	},
 	LangAR: {
 		// Navbar & General
@@ -300,6 +331,37 @@ var translations = map[Language]map[string]string{
 		"quiz_add_question_btn": "إضافة سؤال جديد",
 		"quiz_remove_question_btn": "حذف السؤال",
 		"quiz_save_publish_btn": "حفظ ونشر الاختبار",
+
+		// Status badges
+		"status_active":   "نشط",
+		"status_inactive": "غير نشط",
+
+		// Analytics page
+		"analytics_sub":            "تحليل الأداء وترتيب الطلاب",
+		"analytics_submissions":    "إجمالي التسليمات",
+		"analytics_avg_score":      "متوسط الدرجات",
+		"analytics_top_score":      "أعلى درجة",
+		"analytics_leaderboard":    "ترتيب الطلاب حسب الدرجات",
+		"analytics_rank":           "الترتيب",
+		"analytics_correct_total":  "الصحيح / الإجمالي",
+		"analytics_submitted_at":   "وقت التسليم",
+		"analytics_no_submissions": "لا توجد تسليمات مسجلة لهذا الاختبار بعد.",
+
+		// Admin dashboard
+		"admin_no_cohorts":  "لا توجد مجموعات مسجلة بعد. قم برفع ملف CSV لتسجيل الطلاب.",
+		"admin_quizzes_sub": "نظرة عامة على الاختبارات والجداول الزمنية وتتبع النتائج",
+		"admin_no_quizzes":  "لا توجد اختبارات بعد.",
+
+		// Admin student management
+		"admin_add_student_sub":         "تسجيل طالب جديد أو تحديث بيانات طالب موجود عن طريق الرقم الجامعي.",
+		"admin_student_name_placeholder": "الاسم الكامل للطالب",
+		"admin_registered_at":            "تاريخ التسجيل",
+		"admin_completed_quizzes":        "الاختبارات المكتملة",
+		"admin_no_student_submissions":   "لا توجد تسليمات مسجلة لهذا الطالب بعد.",
+		"admin_no_students_filter":       "لا يوجد طلاب مطابقون للتصفية المحددة.",
+
+		// Quiz creation
+		"quiz_questions_bank_sub": "أضف أسئلة الاختيار من متعدد مع الدرجات ومفاتيح الإجابات الصحيحة.",
 	},
 }
 

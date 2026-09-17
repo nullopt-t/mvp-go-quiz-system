@@ -58,7 +58,7 @@
               <textarea id="description" name="description" rows="2" placeholder="{{ index .I18n.T "quiz_desc_placeholder" }}" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;"></textarea>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem;">
               <div class="form-group">
                 <label for="level_id" style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "quiz_target_level" }}</label>
                 <select id="level_id" name="level_id" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.85rem;">
@@ -90,15 +90,6 @@
               </label>
               <input type="number" id="duration_minutes" name="duration_minutes" value="30" min="1" max="360" required style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.85rem;">
             </div>
-
-            <div style="display: flex; flex-direction: column; gap: 0.65rem;">
-              <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem 1rem; font-size: 0.95rem; font-weight: 700;">
-                <i class="fa-solid fa-floppy-disk" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "quiz_save_publish_btn" }}
-              </button>
-              <button type="button" onclick="addQuestion()" class="btn btn-secondary" style="width: 100%; padding: 0.6rem 1rem; font-size: 0.85rem; font-weight: 600; border-color: var(--primary); color: var(--primary); background: #eff6ff;">
-                <i class="fa-solid fa-plus" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "quiz_add_question_btn" }}
-              </button>
-            </div>
           </div>
         </div>
 
@@ -111,7 +102,7 @@
                 {{ index .I18n.T "quiz_questions_bank" }}
               </h3>
               <p style="color: var(--text-muted); font-size: 0.8rem; margin: 0.2rem 0 0 0;">
-                Configure multiple choice questions, individual point weights, and correct options.
+                {{ index .I18n.T "quiz_questions_bank_sub" }}
               </p>
             </div>
             <button type="button" onclick="addQuestion()" class="btn btn-secondary" style="padding: 0.45rem 1rem; font-size: 0.85rem; font-weight: 600; border-color: var(--primary); color: var(--primary); background: #eff6ff;">
@@ -121,11 +112,15 @@
 
           <div id="questions-container">
             <!-- Question 1 -->
-            <div class="card question-block" id="question-card-1" style="background: var(--surface); margin-bottom: 1.25rem; border: 1px solid var(--border); padding: 1.25rem;">
+            <div class="card question-block" id="question-card-1" style="background: var(--surface); margin-bottom: 1.25rem; border: 1px solid var(--border); padding: 0;">
               <input type="hidden" name="q_index[]" value="1">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                <strong class="q-title" style="font-size: 0.95rem; color: var(--primary);">{{ printf (index .I18n.T "quiz_question_num") 1 }}</strong>
-                <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <div class="q-header" onclick="toggleQuestion(this)" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; cursor: pointer; user-select: none; border-radius: 4px; transition: background 0.15s;">
+                <div style="display: flex; align-items: center; gap: 0.65rem; min-width: 0; flex: 1; overflow: hidden;">
+                  <i class="fa-solid fa-chevron-down q-chevron" style="color: var(--primary); font-size: 0.8rem; transition: transform 0.2s; flex-shrink: 0;"></i>
+                  <strong class="q-title" style="font-size: 0.95rem; color: var(--primary); white-space: nowrap; flex-shrink: 0;">{{ printf (index .I18n.T "quiz_question_num") 1 }}</strong>
+                  <span class="q-preview" style="font-size: 0.8rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: none;"></span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0;" onclick="event.stopPropagation()">
                   <div style="display: flex; align-items: center; gap: 0.4rem;">
                     <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">{{ index .I18n.T "quiz_points_label" }}:</span>
                     <input type="number" name="q_1_points" value="10" style="width: 70px; padding: 0.35rem 0.5rem; font-size: 0.85rem;" min="1">
@@ -135,35 +130,37 @@
                   </button>
                 </div>
               </div>
-              <div class="form-group" style="margin-bottom: 0.75rem;">
-                <input type="text" name="q_1_text" placeholder="{{ index .I18n.T "quiz_statement_placeholder" }}" required style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
-              </div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                <div>
-                  <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 1 }}</label>
-                  <input type="text" name="q_1_opt_1" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "A" }}" required style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
+              <div class="q-body" style="padding: 0 1.25rem 1.25rem; border-top: 1px solid var(--border);">
+                <div class="form-group" style="margin-bottom: 0.75rem; padding-top: 1rem;">
+                  <input type="text" name="q_1_text" placeholder="{{ index .I18n.T "quiz_statement_placeholder" }}" required style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;" oninput="updatePreview(this)">
                 </div>
-                <div>
-                  <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 2 }}</label>
-                  <input type="text" name="q_1_opt_2" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "B" }}" required style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                  <div>
+                    <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 1 }}</label>
+                    <input type="text" name="q_1_opt_1" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "A" }}" required style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
+                  </div>
+                  <div>
+                    <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 2 }}</label>
+                    <input type="text" name="q_1_opt_2" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "B" }}" required style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
+                  </div>
+                  <div>
+                    <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 3 }}</label>
+                    <input type="text" name="q_1_opt_3" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "C" }}" style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
+                  </div>
+                  <div>
+                    <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 4 }}</label>
+                    <input type="text" name="q_1_opt_4" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "D" }}" style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
+                  </div>
                 </div>
-                <div>
-                  <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 3 }}</label>
-                  <input type="text" name="q_1_opt_3" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "C" }}" style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
+                <div style="margin-top: 0.75rem;">
+                  <label style="font-size: 0.85rem; color: var(--primary); font-weight: 600;">{{ index .I18n.T "quiz_correct_key" }}</label>
+                  <select name="q_1_correct" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.85rem;">
+                    <option value="1">{{ printf (index .I18n.T "quiz_option_num") 1 }}</option>
+                    <option value="2">{{ printf (index .I18n.T "quiz_option_num") 2 }}</option>
+                    <option value="3">{{ printf (index .I18n.T "quiz_option_num") 3 }}</option>
+                    <option value="4">{{ printf (index .I18n.T "quiz_option_num") 4 }}</option>
+                  </select>
                 </div>
-                <div>
-                  <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 4 }}</label>
-                  <input type="text" name="q_1_opt_4" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "D" }}" style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
-                </div>
-              </div>
-              <div style="margin-top: 0.75rem;">
-                <label style="font-size: 0.85rem; color: var(--primary); font-weight: 600;">{{ index .I18n.T "quiz_correct_key" }}</label>
-                <select name="q_1_correct" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.85rem;">
-                  <option value="1">{{ printf (index .I18n.T "quiz_option_num") 1 }}</option>
-                  <option value="2">{{ printf (index .I18n.T "quiz_option_num") 2 }}</option>
-                  <option value="3">{{ printf (index .I18n.T "quiz_option_num") 3 }}</option>
-                  <option value="4">{{ printf (index .I18n.T "quiz_option_num") 4 }}</option>
-                </select>
               </div>
             </div>
           </div>
@@ -198,6 +195,32 @@
     const correctKeyText = "{{ index .I18n.T "quiz_correct_key" }}";
     const removeBtnTitle = "{{ index .I18n.T "quiz_remove_question_btn" }}";
 
+    // ── Collapse / expand ──────────────────────────────────────────────────────
+    function toggleQuestion(headerEl) {
+      const card = headerEl.closest('.question-block');
+      const body = card.querySelector('.q-body');
+      const chevron = headerEl.querySelector('.q-chevron');
+      const preview = headerEl.querySelector('.q-preview');
+      const isOpen = body.style.display !== 'none';
+
+      if (isOpen) {
+        body.style.display = 'none';
+        chevron.style.transform = 'rotate(-90deg)';
+        if (preview) preview.style.display = 'inline';
+      } else {
+        body.style.display = '';
+        chevron.style.transform = 'rotate(0deg)';
+        if (preview) preview.style.display = 'none';
+      }
+    }
+
+    // Update the collapsed preview text as the user types the question
+    function updatePreview(inputEl) {
+      const card = inputEl.closest('.question-block');
+      const preview = card.querySelector('.q-preview');
+      if (preview) preview.textContent = inputEl.value ? '— ' + inputEl.value : '';
+    }
+
     function formatQuestionTitle(num) {
       return questionTemplateText.replace('%d', num);
     }
@@ -207,16 +230,32 @@
       const id = questionCounter;
       const container = document.getElementById('questions-container');
 
+      // Collapse all existing open cards first
+      container.querySelectorAll('.question-block').forEach(existing => {
+        const body = existing.querySelector('.q-body');
+        const chevron = existing.querySelector('.q-chevron');
+        const preview = existing.querySelector('.q-preview');
+        if (body && body.style.display !== 'none') {
+          body.style.display = 'none';
+          if (chevron) chevron.style.transform = 'rotate(-90deg)';
+          if (preview) preview.style.display = 'inline';
+        }
+      });
+
       const card = document.createElement('div');
       card.className = 'card question-block';
       card.id = 'question-card-' + id;
-      card.style = 'background: var(--bg); margin-bottom: 1.25rem; border: 1px solid var(--border); padding: 1.25rem;';
+      card.style = 'background: var(--bg); margin-bottom: 1.25rem; border: 1px solid var(--border); padding: 0;';
 
       card.innerHTML = `
         <input type="hidden" name="q_index[]" value="${id}">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-          <strong class="q-title" style="font-size: 0.95rem;">${formatQuestionTitle(id)}</strong>
-          <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div class="q-header" onclick="toggleQuestion(this)" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; cursor: pointer; user-select: none; border-radius: 4px; transition: background 0.15s;">
+          <div style="display: flex; align-items: center; gap: 0.65rem; min-width: 0; flex: 1; overflow: hidden;">
+            <i class="fa-solid fa-chevron-down q-chevron" style="color: var(--primary); font-size: 0.8rem; transition: transform 0.2s; flex-shrink: 0;"></i>
+            <strong class="q-title" style="font-size: 0.95rem; color: var(--primary); white-space: nowrap; flex-shrink: 0;">${formatQuestionTitle(id)}</strong>
+            <span class="q-preview" style="font-size: 0.8rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: none;"></span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0;" onclick="event.stopPropagation()">
             <div style="display: flex; align-items: center; gap: 0.4rem;">
               <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${pointsText}:</span>
               <input type="number" name="q_${id}_points" value="10" style="width: 70px; padding: 0.35rem 0.5rem; font-size: 0.85rem;" min="1">
@@ -226,39 +265,42 @@
             </button>
           </div>
         </div>
-        <div class="form-group" style="margin-bottom: 0.75rem;">
-          <input type="text" name="q_${id}_text" placeholder="${statementPlaceholder}" required style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem;">
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-          <div>
-            <label style="font-size: 0.8rem; font-weight: 600;">${opt1Label}</label>
-            <input type="text" name="q_${id}_opt_1" placeholder="${optAPlaceholder}" required style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
+        <div class="q-body" style="padding: 0 1.25rem 1.25rem; border-top: 1px solid var(--border);">
+          <div class="form-group" style="margin-bottom: 0.75rem; padding-top: 1rem;">
+            <input type="text" name="q_${id}_text" placeholder="${statementPlaceholder}" required style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem;" oninput="updatePreview(this)">
           </div>
-          <div>
-            <label style="font-size: 0.8rem; font-weight: 600;">${opt2Label}</label>
-            <input type="text" name="q_${id}_opt_2" placeholder="${optBPlaceholder}" required style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600;">${opt1Label}</label>
+              <input type="text" name="q_${id}_opt_1" placeholder="${optAPlaceholder}" required style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
+            </div>
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600;">${opt2Label}</label>
+              <input type="text" name="q_${id}_opt_2" placeholder="${optBPlaceholder}" required style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
+            </div>
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600;">${opt3Label}</label>
+              <input type="text" name="q_${id}_opt_3" placeholder="${optCPlaceholder}" style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
+            </div>
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600;">${opt4Label}</label>
+              <input type="text" name="q_${id}_opt_4" placeholder="${optDPlaceholder}" style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
+            </div>
           </div>
-          <div>
-            <label style="font-size: 0.8rem; font-weight: 600;">${opt3Label}</label>
-            <input type="text" name="q_${id}_opt_3" placeholder="${optCPlaceholder}" style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
+          <div style="margin-top: 0.75rem;">
+            <label style="font-size: 0.85rem; color: var(--primary); font-weight: 600;">${correctKeyText}</label>
+            <select name="q_${id}_correct" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.85rem;">
+              <option value="1">${opt1Label}</option>
+              <option value="2">${opt2Label}</option>
+              <option value="3">${opt3Label}</option>
+              <option value="4">${opt4Label}</option>
+            </select>
           </div>
-          <div>
-            <label style="font-size: 0.8rem; font-weight: 600;">${opt4Label}</label>
-            <input type="text" name="q_${id}_opt_4" placeholder="${optDPlaceholder}" style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
-          </div>
-        </div>
-        <div style="margin-top: 0.75rem;">
-          <label style="font-size: 0.85rem; color: var(--primary); font-weight: 600;">${correctKeyText}</label>
-          <select name="q_${id}_correct" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.85rem;">
-            <option value="1">${opt1Label}</option>
-            <option value="2">${opt2Label}</option>
-            <option value="3">${opt3Label}</option>
-            <option value="4">${opt4Label}</option>
-          </select>
         </div>
       `;
 
       container.appendChild(card);
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       updateQuestionTitlesAndControls();
     }
 
@@ -274,13 +316,9 @@
       const blocks = document.querySelectorAll('.question-block');
       blocks.forEach((block, index) => {
         const titleEl = block.querySelector('.q-title');
-        if (titleEl) {
-          titleEl.textContent = formatQuestionTitle(index + 1);
-        }
+        if (titleEl) titleEl.textContent = formatQuestionTitle(index + 1);
         const removeBtn = block.querySelector('.remove-q-btn');
-        if (removeBtn) {
-          removeBtn.style.display = blocks.length > 1 ? 'inline-flex' : 'none';
-        }
+        if (removeBtn) removeBtn.style.display = blocks.length > 1 ? 'inline-flex' : 'none';
       });
     }
 

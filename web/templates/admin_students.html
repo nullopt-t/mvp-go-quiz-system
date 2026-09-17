@@ -101,9 +101,9 @@
             <td><span class="badge badge-muted">{{ index $.I18n.T "group" }} {{ .GroupID }}</span></td>
             <td>
               {{ if .IsActive }}
-                <span class="badge badge-success">Active</span>
+                <span class="badge badge-success">{{ index $.I18n.T "status_active" }}</span>
               {{ else }}
-                <span class="badge badge-muted">Inactive</span>
+                <span class="badge badge-muted">{{ index $.I18n.T "status_inactive" }}</span>
               {{ end }}
             </td>
             <td>
@@ -115,7 +115,7 @@
           {{ else }}
           <tr>
             <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
-              No students found for the selected filters.
+              {{ index $.I18n.T "admin_no_students_filter" }}
             </td>
           </tr>
           {{ end }}

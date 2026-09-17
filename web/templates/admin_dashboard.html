@@ -16,16 +16,6 @@
     </a>
 
     <div class="nav-user" style="display: flex; align-items: center; gap: 0.75rem;">
-      <a href="/admin/quizzes/create" class="btn btn-primary" style="padding: 0.45rem 0.95rem; font-size: 0.85rem; font-weight: 600;">
-        <i class="fa-solid fa-plus" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "admin_create_quiz" }}
-      </a>
-      <a href="/admin/students/create" class="btn btn-secondary" style="padding: 0.45rem 0.95rem; font-size: 0.85rem; font-weight: 600;">
-        <i class="fa-solid fa-user-plus" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "admin_add_student" }}
-      </a>
-      <div style="width: 1px; height: 24px; background: var(--border); margin: 0 0.25rem;"></div>
-      <a href="/admin/students" class="btn btn-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.85rem; font-weight: 600;">
-        <i class="fa-solid fa-users" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "admin_students_title" }}
-      </a>
       <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.85rem; font-weight: 700;">
         <i class="fa-solid fa-globe" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "lang_switch" }}
       </a>
@@ -151,7 +141,7 @@
 
       <!-- Cohorts Distribution Grid -->
       <div class="card" style="margin-bottom: 0;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
           <div>
             <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.2rem; color: var(--text-main);">
               <i class="fa-solid fa-sitemap" style="color: var(--primary); margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_hierarchy_title" }}
@@ -160,9 +150,14 @@
               {{ index .I18n.T "admin_hierarchy_sub" }}
             </p>
           </div>
-          <a href="/admin/students" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.35rem 0.75rem;">
-            <i class="fa-solid fa-list" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "admin_students_title" }}
-          </a>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <a href="/admin/students/create" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.4rem 0.85rem; font-weight: 600;">
+              <i class="fa-solid fa-user-plus" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "admin_add_student" }}
+            </a>
+            <a href="/admin/students" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.4rem 0.85rem;">
+              <i class="fa-solid fa-list" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "admin_students_title" }}
+            </a>
+          </div>
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 0.65rem; max-height: 240px; overflow-y: auto; padding-right: 0.25rem;">
@@ -177,12 +172,13 @@
           </a>
           {{ else }}
           <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 2rem; background: var(--bg); border-radius: 4px; font-size: 0.9rem;">
-            No student cohorts registered yet. Upload a CSV roster to populate cohorts.
+            {{ index $.I18n.T "admin_no_cohorts" }}
           </div>
           {{ end }}
         </div>
       </div>
     </div>
+
 
     <!-- Active Assessments Management Table -->
     <div class="card">
@@ -192,7 +188,7 @@
             <i class="fa-solid fa-clipboard-list" style="color: var(--primary); margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_managed_quizzes" }}
           </h3>
           <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
-            Overview of assessments, active timeframes, and results tracking
+            {{ index .I18n.T "admin_quizzes_sub" }}
           </p>
         </div>
         <a href="/admin/quizzes/create" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.5rem 1.15rem; font-weight: 700;">
@@ -249,7 +245,7 @@
             {{ else }}
             <tr>
               <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
-                No quizzes created yet. Click "+ {{ index .I18n.T "admin_create_quiz" }}" above to create your first quiz.
+                {{ index .I18n.T "admin_no_quizzes" }}
               </td>
             </tr>
             {{ end }}

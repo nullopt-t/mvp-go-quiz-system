@@ -26,7 +26,7 @@
     <div class="card">
       <h2 style="margin-bottom: 0.5rem;">{{ index .I18n.T "admin_add_student" }}</h2>
       <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
-        Register a new student or update an existing record by student code.
+        {{ index .I18n.T "admin_add_student_sub" }}
       </p>
 
       {{ if .Error }}
@@ -43,18 +43,18 @@
 
         <div class="form-group">
           <label for="name">{{ index .I18n.T "student_label" }} (Name)</label>
-          <input type="text" id="name" name="name" placeholder="Full Student Name" required>
+          <input type="text" id="name" name="name" placeholder="{{ index .I18n.T "admin_student_name_placeholder" }}" required>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
           <div class="form-group">
             <label for="level_id">{{ index .I18n.T "level" }}</label>
             <select id="level_id" name="level_id" required>
-              <option value="1">Level 1</option>
-              <option value="2">Level 2</option>
-              <option value="3">Level 3</option>
-              <option value="4">Level 4</option>
-              <option value="5">Level 5</option>
+              <option value="1">{{ index .I18n.T "level" }} 1</option>
+              <option value="2">{{ index .I18n.T "level" }} 2</option>
+              <option value="3">{{ index .I18n.T "level" }} 3</option>
+              <option value="4">{{ index .I18n.T "level" }} 4</option>
+              <option value="5">{{ index .I18n.T "level" }} 5</option>
             </select>
           </div>
 

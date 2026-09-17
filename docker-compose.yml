@@ -7,6 +7,8 @@ services:
       dockerfile: Dockerfile
     container_name: quiz_app
     restart: unless-stopped
+    volumes:
+      - ./web:/app/web
     ports:
       - "8090:8080"
     environment:

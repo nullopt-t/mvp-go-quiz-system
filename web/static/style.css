@@ -6,9 +6,7 @@
   --primary-hover: #1d4ed8;
   --primary-light: #eff6ff;
   --secondary: #475569;
-  --success: #16a34a;
   --danger: #dc2626;
-  --warning: #d97706;
   --bg: #f4f6f8;
   --surface: #fdfdfd;
   --border: #e2e8f0;
@@ -89,9 +87,9 @@ body {
 }
 
 .badge-primary { background: #dbeafe; color: #1e40af; }
-.badge-success { background: #dcfce7; color: #15803d; }
-.badge-warning { background: #fef3c7; color: #92400e; }
-.badge-muted { background: #f1f5f9; color: #475569; }
+.badge-success { background: #f1f5f9; color: #334155; }
+.badge-warning { background: #f1f5f9; color: #334155; }
+.badge-muted   { background: #f1f5f9; color: #475569; }
 
 /* Main Container */
 .container,
@@ -193,8 +191,8 @@ input:focus, select:focus, textarea:focus {
 }
 
 .timer-box {
-  background: #fee2e2;
-  color: #991b1b;
+  background: #f1f5f9;
+  color: var(--text-main);
   font-weight: 700;
   font-size: 1.2rem;
   padding: 0.5rem 1rem;
@@ -202,6 +200,7 @@ input:focus, select:focus, textarea:focus {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  border: 1px solid var(--border);
 }
 
 .progress-bar-container {
@@ -296,9 +295,9 @@ th {
 }
 
 .alert-info {
-  background-color: #e0f2fe;
-  color: #0369a1;
-  border: 1px solid #bae6fd;
+  background-color: #f8fafc;
+  color: var(--text-main);
+  border: 1px solid var(--border);
 }
 
 /* Login Page - Minimalist Modern Light Design */
@@ -393,8 +392,8 @@ th {
   width: 42px;
   height: 42px;
   border-radius: var(--radius);
-  background: #eff6ff;
-  color: var(--primary);
+  background: #f1f5f9;
+  color: var(--secondary);
   display: flex;
   align-items: center;
   justify-content: center;
