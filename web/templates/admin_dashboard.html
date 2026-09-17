@@ -12,7 +12,7 @@
   <nav class="navbar" style="padding: 1rem 2rem; border-bottom: 1px solid var(--border); background: #ffffff;">
     <a href="/admin" class="nav-brand" style="display: flex; align-items: center; gap: 0.75rem;">
       <div style="background: var(--primary); color: #fff; width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; box-shadow: 0 2px 4px rgba(37,99,235,0.25);">
-        🎓
+        <i class="fa-solid fa-graduation-cap"></i>
       </div>
       <div>
         <div style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); line-height: 1.2;">{{ index .I18n.T "admin_portal" }}</div>
@@ -21,14 +21,14 @@
     </a>
     <div class="nav-user" style="display: flex; align-items: center; gap: 0.75rem;">
       <a href="/admin/students" class="btn btn-secondary" style="padding: 0.45rem 0.95rem; font-size: 0.85rem; font-weight: 600;">
-        👥 {{ index .I18n.T "admin_students_title" }}
+        <i class="fa-solid fa-users" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_students_title" }}
       </a>
       <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.45rem 0.9rem; font-size: 0.85rem; font-weight: 700;">
-        {{ index .I18n.T "lang_switch" }}
+        <i class="fa-solid fa-globe" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "lang_switch" }}
       </a>
       <form action="/admin/logout" method="POST" style="display:inline; margin: 0;">
         <button type="submit" class="btn btn-secondary" style="padding: 0.45rem 0.9rem; font-size: 0.85rem; color: var(--danger); border-color: #fecaca; background: #fff5f5;">
-          {{ index .I18n.T "logout" }}
+          <i class="fa-solid fa-arrow-right-from-bracket" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "logout" }}
         </button>
       </form>
     </div>
@@ -39,7 +39,7 @@
     <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff; border-radius: 14px; padding: 2rem 2.25rem; margin-bottom: 2rem; box-shadow: 0 10px 25px -5px rgba(15,23,42,0.15); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
       <div>
         <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; color: #93c5fd; margin-bottom: 0.75rem;">
-          🏛️ {{ index .I18n.T "admin_dashboard_badge" }}
+          <i class="fa-solid fa-building-columns"></i> {{ index .I18n.T "admin_dashboard_badge" }}
         </div>
         <h1 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 0.35rem; color: #ffffff;">
           {{ index .I18n.T "admin_dashboard_welcome" }}
@@ -51,31 +51,31 @@
 
       <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
         <a href="/admin/quizzes/create" class="btn btn-primary" style="background: #2563eb; padding: 0.65rem 1.35rem; font-size: 0.95rem; font-weight: 700; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(37,99,235,0.4);">
-          + {{ index .I18n.T "admin_create_quiz" }}
+          <i class="fa-solid fa-plus" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_create_quiz" }}
         </a>
         <a href="/admin/students/create" class="btn btn-secondary" style="background: rgba(255,255,255,0.1); color: #ffffff; border-color: rgba(255,255,255,0.2); padding: 0.65rem 1.15rem; font-size: 0.95rem; font-weight: 600; border-radius: 8px;">
-          + {{ index .I18n.T "admin_add_student" }}
+          <i class="fa-solid fa-user-plus" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_add_student" }}
         </a>
       </div>
     </div>
 
     {{ if .ImportSuccess }}
     <div class="alert alert-info" style="background-color: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; font-weight: 600;">
-      <span>✓</span> {{ .ImportSuccess }}
+      <i class="fa-solid fa-circle-check"></i> {{ .ImportSuccess }}
     </div>
     {{ end }}
 
     {{ if .ImportError }}
     <div class="alert alert-danger" style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; font-weight: 600;">
-      <span>⚠</span> {{ .ImportError }}
+      <i class="fa-solid fa-triangle-exclamation"></i> {{ .ImportError }}
     </div>
     {{ end }}
 
     <!-- Key Metrics Cards -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
       <div class="card" style="margin-bottom: 0; display: flex; align-items: center; gap: 1.25rem; padding: 1.5rem;">
-        <div style="width: 52px; height: 52px; border-radius: 12px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0;">
-          👥
+        <div style="width: 52px; height: 52px; border-radius: 12px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0;">
+          <i class="fa-solid fa-users"></i>
         </div>
         <div style="flex: 1;">
           <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">{{ index .I18n.T "admin_total_students" }}</div>
@@ -83,14 +83,16 @@
             {{ .TotalStudents }}
           </div>
           <div style="font-size: 0.8rem; color: #2563eb; margin-top: 0.35rem; font-weight: 600;">
-            <a href="/admin/students" style="color: inherit; text-decoration: none;">{{ index .I18n.T "admin_view_roster_btn" }} →</a>
+            <a href="/admin/students" style="color: inherit; text-decoration: none;">
+              {{ index .I18n.T "admin_view_roster_btn" }} <i class="fa-solid fa-arrow-right" style="font-size: 0.75rem; margin-inline-start: 0.25rem;"></i>
+            </a>
           </div>
         </div>
       </div>
 
       <div class="card" style="margin-bottom: 0; display: flex; align-items: center; gap: 1.25rem; padding: 1.5rem;">
-        <div style="width: 52px; height: 52px; border-radius: 12px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0;">
-          📝
+        <div style="width: 52px; height: 52px; border-radius: 12px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0;">
+          <i class="fa-solid fa-file-pen"></i>
         </div>
         <div style="flex: 1;">
           <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">{{ index .I18n.T "admin_active_quizzes" }}</div>
@@ -104,8 +106,8 @@
       </div>
 
       <div class="card" style="margin-bottom: 0; display: flex; align-items: center; gap: 1.25rem; padding: 1.5rem;">
-        <div style="width: 52px; height: 52px; border-radius: 12px; background: #fef3c7; color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0;">
-          🏛️
+        <div style="width: 52px; height: 52px; border-radius: 12px; background: #fef3c7; color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0;">
+          <i class="fa-solid fa-layer-group"></i>
         </div>
         <div style="flex: 1;">
           <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">{{ index .I18n.T "admin_cohort_summary" }}</div>
@@ -126,7 +128,7 @@
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
           <div>
             <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--text-main);">
-              📥 {{ index .I18n.T "admin_import_title" }}
+              <i class="fa-solid fa-file-import" style="color: var(--primary); margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_import_title" }}
             </h3>
             <p style="color: var(--text-muted); font-size: 0.85rem;">
               {{ index .I18n.T "admin_import_sub" }}
@@ -144,10 +146,10 @@
 
           <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem;">
             <a href="/admin/students/sample-csv" style="font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 600;">
-              📄 {{ index .I18n.T "admin_sample_csv" }}
+              <i class="fa-solid fa-file-arrow-down" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "admin_sample_csv" }}
             </a>
             <button type="submit" class="btn btn-primary" style="padding: 0.55rem 1.35rem; font-size: 0.9rem; font-weight: 700; border-radius: 6px;">
-              {{ index .I18n.T "admin_preview_btn" }} →
+              {{ index .I18n.T "admin_preview_btn" }} <i class="fa-solid fa-arrow-right" style="font-size: 0.75rem; margin-inline-start: 0.25rem;"></i>
             </button>
           </div>
         </form>
@@ -158,14 +160,14 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
           <div>
             <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.2rem; color: var(--text-main);">
-              🏛️ {{ index .I18n.T "admin_hierarchy_title" }}
+              <i class="fa-solid fa-sitemap" style="color: var(--primary); margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_hierarchy_title" }}
             </h3>
             <p style="color: var(--text-muted); font-size: 0.85rem;">
               {{ index .I18n.T "admin_hierarchy_sub" }}
             </p>
           </div>
           <a href="/admin/students" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.35rem 0.75rem;">
-            {{ index .I18n.T "admin_students_title" }}
+            <i class="fa-solid fa-list" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "admin_students_title" }}
           </a>
         </div>
 
@@ -193,14 +195,14 @@
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
         <div>
           <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.2rem;">
-            📋 {{ index .I18n.T "admin_managed_quizzes" }}
+            <i class="fa-solid fa-clipboard-list" style="color: var(--primary); margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_managed_quizzes" }}
           </h3>
           <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
             Overview of assessments, active timeframes, and results tracking
           </p>
         </div>
         <a href="/admin/quizzes/create" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.5rem 1.15rem; font-weight: 700;">
-          + {{ index .I18n.T "admin_create_quiz" }}
+          <i class="fa-solid fa-plus" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_create_quiz" }}
         </a>
       </div>
 
@@ -246,7 +248,7 @@
               </td>
               <td style="padding: 0.85rem 1rem; text-align: center;">
                 <a href="/admin/quizzes/{{ .ID.Hex }}/analytics" class="btn btn-secondary" style="padding: 0.4rem 0.85rem; font-size: 0.85rem; font-weight: 600;">
-                  📊 {{ index $.I18n.T "analytics_btn" }}
+                  <i class="fa-solid fa-chart-simple" style="margin-inline-end: 0.25rem;"></i> {{ index $.I18n.T "analytics_btn" }}
                 </a>
               </td>
             </tr>
