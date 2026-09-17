@@ -38,5 +38,14 @@
       </form>
     </div>
   </main>
+
+  <script>
+    if (window.location.search.includes('error=')) {
+      const url = new URL(window.location);
+      url.searchParams.delete('error');
+      const cleanUrl = url.pathname + (url.searchParams.toString() ? '?' + url.searchParams.toString() : '');
+      window.history.replaceState({}, document.title, cleanUrl);
+    }
+  </script>
 </body>
 </html>
