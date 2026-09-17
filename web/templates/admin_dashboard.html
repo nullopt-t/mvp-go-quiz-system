@@ -253,6 +253,83 @@
         </table>
       </div>
     </div>
+
+    <!-- Recent Students Table -->
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.2rem;">
+            <i class="fa-solid fa-user-graduate" style="color: var(--primary); margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "recent_students" }}
+          </h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
+            {{ index .I18n.T "recent_students_sub" }}
+          </p>
+        </div>
+        <a href="/admin/students" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.5rem 1.15rem; font-weight: 600;">
+          <i class="fa-solid fa-users" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_view_roster_btn" }}
+        </a>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; margin-top: 0;">
+          <thead>
+            <tr style="background: #f8fafc; border-bottom: 2px solid var(--border);">
+              <th style="padding: 0.85rem 1rem;">{{ index .I18n.T "student_id_label" }}</th>
+              <th style="padding: 0.85rem 1rem;">{{ index .I18n.T "student_label" }}</th>
+              <th style="padding: 0.85rem 1rem;">{{ index .I18n.T "level" }}</th>
+              <th style="padding: 0.85rem 1rem;">{{ index .I18n.T "group" }}</th>
+              <th style="padding: 0.85rem 1rem;">{{ index .I18n.T "table_status" }}</th>
+              <th style="padding: 0.85rem 1rem; text-align: center;">{{ index .I18n.T "table_action" }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ range .RecentStudents }}
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 0.85rem 1rem;"><code>{{ .StudentCode }}</code></td>
+              <td style="padding: 0.85rem 1rem;"><strong style="color: var(--text-main);">{{ .Name }}</strong></td>
+              <td style="padding: 0.85rem 1rem;"><span class="badge badge-primary">{{ index $.I18n.T "level" }} {{ .LevelID }}</span></td>
+              <td style="padding: 0.85rem 1rem;"><span class="badge badge-muted">{{ index $.I18n.T "group" }} {{ .GroupID }}</span></td>
+              <td style="padding: 0.85rem 1rem;">
+                {{ if .IsActive }}
+                  <span class="badge badge-success">{{ index $.I18n.T "status_active" }}</span>
+                {{ else }}
+                  <span class="badge badge-muted">{{ index $.I18n.T "status_inactive" }}</span>
+                {{ end }}
+              </td>
+              <td style="padding: 0.85rem 1rem; text-align: center; white-space: nowrap;">
+                <div style="display: inline-flex; gap: 0.5rem; align-items: center;">
+                  <a href="/admin/students/{{ .ID.Hex }}" class="btn btn-secondary btn-sm" title="{{ index $.I18n.T "view_btn" }}">
+                    <i class="fa-solid fa-id-card" style="margin-inline-end: 0.25rem;"></i> {{ index $.I18n.T "view_btn" }}
+                  </a>
+                  <form action="/admin/students/toggle-active" method="POST" style="display: inline; margin: 0;">
+                    <input type="hidden" name="student_id" value="{{ .ID.Hex }}">
+                    <input type="hidden" name="redirect_to" value="/admin">
+                    {{ if .IsActive }}
+                      <input type="hidden" name="is_active" value="false">
+                      <button type="submit" class="btn btn-outline-danger btn-sm" title="{{ index $.I18n.T "btn_deactivate" }}">
+                        <i class="fa-solid fa-ban" style="margin-inline-end: 0.25rem;"></i> {{ index $.I18n.T "btn_deactivate" }}
+                      </button>
+                    {{ else }}
+                      <input type="hidden" name="is_active" value="true">
+                      <button type="submit" class="btn btn-outline-primary btn-sm" title="{{ index $.I18n.T "btn_activate" }}">
+                        <i class="fa-solid fa-check" style="margin-inline-end: 0.25rem;"></i> {{ index $.I18n.T "btn_activate" }}
+                      </button>
+                    {{ end }}
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {{ else }}
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                {{ index .I18n.T "admin_no_students_filter" }}
+              </td>
+            </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <script>

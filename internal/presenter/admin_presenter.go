@@ -52,6 +52,9 @@ func (p *AdminPresenter) RenderDashboard(w http.ResponseWriter, r *http.Request)
 		groupSummaries = nil
 	}
 
+	// Fetch recent students for the dashboard table
+	recentStudents, _ := p.studentRepo.GetAll(r.Context(), 0, "", 10, 0)
+
 	i18nBundle := GetI18n(r)
 	successMsg := r.URL.Query().Get("import_success")
 	errMsg := r.URL.Query().Get("import_error")
@@ -60,6 +63,7 @@ func (p *AdminPresenter) RenderDashboard(w http.ResponseWriter, r *http.Request)
 		"Quizzes":        quizzes,
 		"TotalStudents":  totalStudents,
 		"GroupSummaries": groupSummaries,
+		"RecentStudents": recentStudents,
 		"ImportSuccess":  successMsg,
 		"ImportError":    errMsg,
 		"I18n":           i18nBundle,
