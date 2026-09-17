@@ -13,15 +13,14 @@
       <span>{{ index .I18n.T "admin_portal" }}</span>
     </a>
     <div class="nav-user">
-      <span class="badge badge-warning">{{ index .I18n.T "admin_mode" }}</span>
-      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 700;">
+      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 600;">
         {{ index .I18n.T "lang_switch" }}
       </a>
     </div>
   </nav>
 
-  <div class="container" style="max-width: 460px; margin-top: 4.5rem;">
-    <div class="card" style="border-top: 4px solid var(--warning);">
+  <div class="container" style="max-width: 440px; margin-top: 5rem;">
+    <div class="card">
       <h2 style="margin-bottom: 0.5rem; text-align: center;">{{ index .I18n.T "admin_login_title" }}</h2>
       <p style="color: var(--text-muted); text-align: center; margin-bottom: 1.5rem; font-size: 0.9rem;">
         {{ index .I18n.T "admin_login_sub" }}
@@ -36,7 +35,7 @@
       <form action="/admin/login" method="POST">
         <div class="form-group">
           <label for="pin">{{ index .I18n.T "admin_pin_label" }}</label>
-          <input type="password" id="pin" name="pin" placeholder="Enter Admin PIN" autofocus required>
+          <input type="password" id="pin" name="pin" placeholder="••••••••" autofocus required>
         </div>
         <button type="submit" class="btn btn-primary btn-block" style="padding: 0.85rem; margin-top: 1.25rem;">
           {{ index .I18n.T "admin_pin_btn" }}
