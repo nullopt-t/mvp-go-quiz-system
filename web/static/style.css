@@ -298,3 +298,59 @@ th {
   color: #0369a1;
   border: 1px solid #bae6fd;
 }
+
+/* Login Page Reframing & Background */
+.login-body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.55), rgba(15, 23, 42, 0.4)), url('/static/bg.jpg') center center / cover no-repeat fixed;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-nav {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1.5rem 2rem;
+  background: transparent;
+}
+
+.login-nav .btn-lang {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--text-main);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 0.45rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.login-nav .btn-lang:hover {
+  background: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.15);
+}
+
+.login-center-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem 4rem 1rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 20px 35px -5px rgba(0, 0, 0, 0.25), 0 10px 15px -5px rgba(0, 0, 0, 0.1);
+  padding: 2.5rem 2.25rem;
+}
