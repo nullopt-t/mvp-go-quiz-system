@@ -10,12 +10,12 @@
 <body>
   <nav class="navbar">
     <a href="/admin" class="nav-brand">
-      🎓 <span>{{ index .I18n.T "admin_portal" }}</span>
+      <span>{{ index .I18n.T "admin_portal" }}</span>
     </a>
     <div class="nav-user">
       <span class="badge badge-warning">{{ index .I18n.T "admin_mode" }}</span>
       <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 700;">
-        🌐 {{ index .I18n.T "lang_switch" }}
+        {{ index .I18n.T "lang_switch" }}
       </a>
       <form action="/admin/logout" method="POST" style="display:inline;">
         <button type="submit" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">{{ index .I18n.T "logout" }}</button>
@@ -43,7 +43,7 @@
       </div>
 
       <div class="card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center;">
-        <a href="/admin/quizzes/create" class="btn btn-primary" style="padding: 0.85rem;">{{ index .I18n.T "admin_create_quiz" }}</a>
+        <a href="/admin/quizzes/create" class="btn btn-primary" style="padding: 0.85rem;">+ {{ index .I18n.T "admin_create_quiz" }}</a>
       </div>
     </div>
 

@@ -10,13 +10,13 @@
 <body>
   <nav class="navbar">
     <a href="/dashboard" class="nav-brand">
-      🎓 <span>{{ index .I18n.T "app_title" }}</span>
+      <span>{{ index .I18n.T "app_title" }}</span>
     </a>
     <div class="nav-user">
       <span class="badge badge-primary">{{ index .I18n.T "level" }} {{ .Student.LevelID }} • {{ index .I18n.T "group" }} {{ .Student.GroupID }}</span>
       <span style="font-weight: 600;">{{ .Student.Name }}</span>
       <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 700;">
-        🌐 {{ index .I18n.T "lang_switch" }}
+        {{ index .I18n.T "lang_switch" }}
       </a>
     </div>
   </nav>
@@ -33,7 +33,7 @@
 
       <!-- Real-time Countdown Timer -->
       <div class="timer-box" id="timer-display">
-        ⏱️ <span id="countdown">--:--</span>
+        <span id="countdown">--:--</span>
       </div>
     </div>
 

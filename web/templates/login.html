@@ -10,12 +10,12 @@
 <body>
   <nav class="navbar">
     <a href="/login" class="nav-brand">
-      🎓 <span>{{ index .I18n.T "app_title" }}</span>
+      <span>{{ index .I18n.T "app_title" }}</span>
     </a>
     <div class="nav-user">
       <span class="badge badge-primary">{{ index .I18n.T "nav_stateless" }}</span>
       <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 700;">
-        🌐 {{ index .I18n.T "lang_switch" }}
+        {{ index .I18n.T "lang_switch" }}
       </a>
     </div>
   </nav>
@@ -29,7 +29,7 @@
 
       {{ if .Error }}
       <div class="alert alert-danger">
-        ⚠️ {{ .Error }}
+        {{ .Error }}
       </div>
       {{ end }}
 

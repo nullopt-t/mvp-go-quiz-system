@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ if .I18n }}{{ .I18n.Lang }}{{ else }}en{{ end }}" dir="{{ if .I18n }}{{ .I18n.Dir }}{{ else }}ltr{{ end }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,10 +9,10 @@
 <body>
   <nav class="navbar">
     <a href="/admin" class="nav-brand">
-      🎓 <span>College Administration Portal</span>
+      <span>College Administration Portal</span>
     </a>
     <div class="nav-user">
-      <a href="/admin" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">← Back to Dashboard</a>
+      <a href="/admin" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">Back to Dashboard</a>
     </div>
   </nav>
 
@@ -20,7 +20,7 @@
     <div class="card">
       <h2>{{ .Quiz.Title }}</h2>
       <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem;">
-        Performance Breakdown & Leaderboard
+        Performance Breakdown and Leaderboard
       </p>
     </div>
 

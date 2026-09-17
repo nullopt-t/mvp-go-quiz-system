@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ if .I18n }}{{ .I18n.Lang }}{{ else }}en{{ end }}" dir="{{ if .I18n }}{{ .I18n.Dir }}{{ else }}ltr{{ end }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,10 +9,10 @@
 <body>
   <nav class="navbar">
     <a href="/admin" class="nav-brand">
-      🎓 <span>College Administration Portal</span>
+      <span>College Administration Portal</span>
     </a>
     <div class="nav-user">
-      <a href="/admin" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">← Back to Dashboard</a>
+      <a href="/admin" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">Back to Dashboard</a>
     </div>
   </nav>
 
@@ -189,7 +189,7 @@
         </div>
 
         <button type="submit" class="btn btn-primary btn-block" style="padding: 0.85rem; font-size: 1rem;">
-          Save & Publish Quiz
+          Save and Publish Quiz
         </button>
       </form>
     </div>

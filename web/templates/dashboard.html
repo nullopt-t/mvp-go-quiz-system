@@ -10,13 +10,13 @@
 <body>
   <nav class="navbar">
     <a href="/dashboard" class="nav-brand">
-      🎓 <span>{{ index .I18n.T "app_title" }}</span>
+      <span>{{ index .I18n.T "app_title" }}</span>
     </a>
     <div class="nav-user">
       <span class="badge badge-primary">{{ index .I18n.T "level" }} {{ .Student.LevelID }} • {{ index .I18n.T "group" }} {{ .Student.GroupID }}</span>
       <span style="font-weight: 600;">{{ .Student.Name }} ({{ .Student.StudentCode }})</span>
       <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 700;">
-        🌐 {{ index .I18n.T "lang_switch" }}
+        {{ index .I18n.T "lang_switch" }}
       </a>
       <form action="/logout" method="POST" style="display:inline;">
         <button type="submit" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">{{ index .I18n.T "logout" }}</button>
@@ -54,9 +54,9 @@
             {{ .Quiz.Description }}
           </p>
           <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.35rem;">
-            <div>📅 <strong>{{ index $.I18n.T "start_time" }}:</strong> {{ .Quiz.StartTime.Format "15:04:05 MST" }}</div>
-            <div>⏱️ <strong>{{ index $.I18n.T "duration" }}:</strong> {{ .Quiz.DurationMinutes }} {{ index $.I18n.T "minutes" }}</div>
-            <div>❓ <strong>{{ index $.I18n.T "questions" }}:</strong> {{ len .Quiz.Questions }}</div>
+            <div><strong>{{ index $.I18n.T "start_time" }}:</strong> {{ .Quiz.StartTime.Format "15:04:05 MST" }}</div>
+            <div><strong>{{ index $.I18n.T "duration" }}:</strong> {{ .Quiz.DurationMinutes }} {{ index $.I18n.T "minutes" }}</div>
+            <div><strong>{{ index $.I18n.T "questions" }}:</strong> {{ len .Quiz.Questions }}</div>
           </div>
         </div>
 
