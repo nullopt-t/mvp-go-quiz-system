@@ -93,14 +93,7 @@ body {
 .badge-muted { background: #f1f5f9; color: #475569; }
 
 /* Main Container */
-.container {
-  max-width: 1050px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-  width: 100%;
-  flex: 1;
-}
-
+.container,
 .container-fluid {
   max-width: 96%;
   margin: 1.5rem auto;
