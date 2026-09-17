@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"quiz-system/internal/model"
@@ -50,14 +49,10 @@ func (s *answerService) RecordAnswer(ctx context.Context, quizID, studentID prim
 		return ErrQuizNotFound
 	}
 
-	session, err := s.sessionRepo.GetSession(ctx, quizID, studentID)
-	if err != nil || session == nil {
-		return errors.New("quiz session not found")
-	}
-
-	allowedDuration := time.Duration(quiz.DurationMinutes) * time.Minute
+	now := time.Now().UTC()
+	quizEnd := quiz.StartTime.Add(time.Duration(quiz.DurationMinutes) * time.Minute)
 	// Add 30 seconds grace period for network latency
-	if time.Since(session.StartedAt) > (allowedDuration + 30*time.Second) {
+	if now.After(quizEnd.Add(30 * time.Second)) {
 		return ErrQuizExpired
 	}
 
@@ -69,7 +64,7 @@ func (s *answerService) RecordAnswer(ctx context.Context, quizID, studentID prim
 		StudentCode: studentCode,
 		QuestionID:  questionID,
 		AnswerID:    answerID,
-		SubmittedAt: time.Now().UTC(),
+		SubmittedAt: now,
 	}
 
 	return s.answerRepo.AppendAnswer(ctx, answerDoc)

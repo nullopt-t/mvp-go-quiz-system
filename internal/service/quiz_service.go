@@ -88,6 +88,7 @@ func (s *quizService) GetAvailableQuizzesForStudent(ctx context.Context, student
 		return nil, err
 	}
 
+	now := time.Now().UTC()
 	summaries := make([]StudentQuizSummary, 0, len(quizzes))
 	for _, q := range quizzes {
 		summary := StudentQuizSummary{
@@ -102,16 +103,13 @@ func (s *quizService) GetAvailableQuizzesForStudent(ctx context.Context, student
 			summary.Score = res.Score
 			summary.TotalPoints = res.TotalPoints
 		} else {
-			// Check if session started
-			sess, err := s.sessionRepo.GetSession(ctx, q.ID, studentID)
-			if err == nil && sess != nil {
-				elapsed := time.Since(sess.StartedAt)
-				totalAllowed := time.Duration(q.DurationMinutes) * time.Minute
-				if elapsed > totalAllowed {
-					summary.Status = "EXPIRED"
-				} else {
-					summary.Status = "IN_PROGRESS"
-				}
+			quizEnd := q.StartTime.Add(time.Duration(q.DurationMinutes) * time.Minute)
+			if now.Before(q.StartTime) {
+				summary.Status = "UPCOMING"
+			} else if now.After(quizEnd) {
+				summary.Status = "EXPIRED"
+			} else {
+				summary.Status = "LIVE"
 			}
 		}
 
@@ -133,6 +131,16 @@ func (s *quizService) StartOrResumeQuiz(ctx context.Context, quizID, studentID p
 		return nil, ErrQuizInactive
 	}
 
+	now := time.Now().UTC()
+	quizEnd := quiz.StartTime.Add(time.Duration(quiz.DurationMinutes) * time.Minute)
+
+	if now.Before(quiz.StartTime) {
+		return nil, fmt.Errorf("quiz will start at %s for all students", quiz.StartTime.Format("15:04:05 MST"))
+	}
+	if now.After(quizEnd) {
+		return nil, ErrQuizExpired
+	}
+
 	// Check if already submitted
 	res, err := s.resultRepo.GetStudentResult(ctx, quizID, studentID)
 	if err == nil && res != nil {
@@ -142,15 +150,8 @@ func (s *quizService) StartOrResumeQuiz(ctx context.Context, quizID, studentID p
 		}, nil
 	}
 
-	// Ensure session started
-	session, err := s.sessionRepo.StartSessionIfAbsent(ctx, quizID, studentID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialize quiz session: %w", err)
-	}
-
-	totalDuration := time.Duration(quiz.DurationMinutes) * time.Minute
-	elapsed := time.Since(session.StartedAt)
-	remaining := int((totalDuration - elapsed).Seconds())
+	// Synchronized remaining time for all students
+	remaining := int(quizEnd.Sub(now).Seconds())
 	if remaining < 0 {
 		remaining = 0
 	}
@@ -185,7 +186,7 @@ func (s *quizService) StartOrResumeQuiz(ctx context.Context, quizID, studentID p
 	return &StudentQuizView{
 		Quiz:             &sanitizedQuiz,
 		RemainingSeconds: remaining,
-		StartedAt:        session.StartedAt,
+		StartedAt:        quiz.StartTime,
 		IsCompleted:      false,
 		PreviousAnswers:  answersMap,
 	}, nil
