@@ -134,6 +134,9 @@ var translations = map[Language]map[string]string{
 		"admin_cohort_summary": "Active Cohorts",
 		"admin_view_roster_btn": "Browse All Students",
 		"admin_drop_csv_hint": "Select or drag student roster CSV (UTF-8)",
+		"admin_browse_files": "Browse File",
+		"admin_drag_hint": "or drag and drop here",
+		"admin_no_file_selected": "No file chosen",
 		"admin_quick_actions": "Quick Actions",
 	},
 	LangAR: {
@@ -251,6 +254,9 @@ var translations = map[Language]map[string]string{
 		"admin_cohort_summary": "المجموعات النشطة",
 		"admin_view_roster_btn": "استعراض سجل الطلاب الكامل",
 		"admin_drop_csv_hint": "اختر ملف CSV الخاص بقوائم الطلاب (ترميز UTF-8)",
+		"admin_browse_files": "اختيار ملف",
+		"admin_drag_hint": "أو قم بسحب الملف وإفلاته هنا",
+		"admin_no_file_selected": "لم يتم اختيار ملف بعد",
 		"admin_quick_actions": "إجراءات سريعة",
 	},
 }
