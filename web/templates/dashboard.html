@@ -91,7 +91,7 @@
       <table>
         <thead>
           <tr>
-            <th>{{ index .I18n.T "table_quiz_id" }}</th>
+            <th>{{ index .I18n.T "table_quiz_name" }}</th>
             <th>{{ index .I18n.T "table_score" }}</th>
             <th>{{ index .I18n.T "table_correct" }}</th>
             <th>{{ index .I18n.T "table_percentage" }}</th>
@@ -102,7 +102,7 @@
         <tbody>
           {{ range .History }}
           <tr>
-            <td><code>{{ .QuizID.Hex }}</code></td>
+            <td><strong>{{ if .QuizTitle }}{{ .QuizTitle }}{{ else }}Assessment{{ end }}</strong></td>
             <td><strong>{{ .Score }}</strong> / {{ .TotalPoints }}</td>
             <td>{{ .CorrectCount }} / {{ .TotalQuestions }}</td>
             <td>

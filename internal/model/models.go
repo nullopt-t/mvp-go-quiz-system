@@ -70,6 +70,7 @@ type StudentAnswer struct {
 type QuizResult struct {
 	ID             primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	QuizID         primitive.ObjectID `bson:"quiz_id" json:"quiz_id"`
+	QuizTitle      string             `bson:"quiz_title" json:"quiz_title"`
 	StudentID      primitive.ObjectID `bson:"student_id" json:"student_id"`
 	StudentCode    string             `bson:"student_code" json:"student_code"`
 	StudentName    string             `bson:"student_name" json:"student_name"`

@@ -91,6 +91,7 @@ func (s *resultService) CalculateAndSubmit(ctx context.Context, quizID, studentI
 	result := &model.QuizResult{
 		ID:             primitive.NewObjectID(),
 		QuizID:         quizID,
+		QuizTitle:      quiz.Title,
 		StudentID:      studentID,
 		StudentCode:    studentCode,
 		StudentName:    studentName,
