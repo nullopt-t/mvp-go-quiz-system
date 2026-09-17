@@ -34,14 +34,16 @@ var translations = map[Language]map[string]string{
 		"welcome_back":        "Welcome",
 		"login_subtitle":      "Enter your Student ID to view your quizzes",
 		"student_id_label":    "Student ID",
-		"student_id_hint":     "Example: L1G1-001 (Level 1, Group 1)",
 		"login_btn":           "Log In",
+		"err_student_id_req":  "Please enter your Student ID",
+		"err_student_not_found": "Student ID not found or inactive",
 
 		// Admin Login
 		"admin_login_title":   "Staff Login",
 		"admin_login_sub":     "Sign in to manage quizzes and view student results",
 		"admin_pin_label":     "Admin PIN",
 		"admin_pin_btn":       "Log In",
+		"err_admin_pin_invalid": "Invalid PIN code",
 
 		// Student Dashboard
 		"assigned_quizzes":    "Your Quizzes",
@@ -117,14 +119,16 @@ var translations = map[Language]map[string]string{
 		"welcome_back":        "مرحباً بك",
 		"login_subtitle":      "أدخل رقمك الجامعي لبدء اختباراتك",
 		"student_id_label":    "الرقم الجامعي",
-		"student_id_hint":     "مثال: L1G1-001 (المستوى 1، المجموعة 1)",
 		"login_btn":           "دخول",
+		"err_student_id_req":  "يرجى إدخال الرقم الجامعي",
+		"err_student_not_found": "الرقم الجامعي غير مسجل أو غير مفعل",
 
 		// Admin Login
 		"admin_login_title":   "دخول الأساتذة والإدارة",
 		"admin_login_sub":     "تسجيل الدخول لإدارة الاختبارات ومتابعة النتائج",
 		"admin_pin_label":     "رمز المرور",
 		"admin_pin_btn":       "دخول",
+		"err_admin_pin_invalid": "رمز المرور غير صحيح",
 
 		// Student Dashboard
 		"assigned_quizzes":    "اختباراتك",
