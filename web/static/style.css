@@ -96,7 +96,7 @@ body {
 /* Main Container */
 .container,
 .container-fluid {
-  max-width: 96%;
+  max-width: 95%;
   margin: 1.5rem auto;
   padding: 0 1rem;
   width: 100%;
