@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"quiz-system/internal/i18n"
 	"quiz-system/internal/model"
 	"quiz-system/internal/service"
 )
@@ -13,7 +14,38 @@ type contextKey string
 
 const (
 	AuthClaimsKey contextKey = "auth_claims"
+	I18nBundleKey contextKey = "i18n_bundle"
 )
+
+func I18nMiddleware() func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Check if language was explicitly requested in URL
+			if qLang := r.URL.Query().Get("lang"); qLang != "" {
+				http.SetCookie(w, &http.Cookie{
+					Name:     "lang_pref",
+					Value:    qLang,
+					Path:     "/",
+					MaxAge:   365 * 24 * 3600,
+					SameSite: http.SameSiteLaxMode,
+				})
+			}
+
+			lang := i18n.GetLanguage(r)
+			bundle := i18n.GetBundle(lang)
+
+			ctx := context.WithValue(r.Context(), I18nBundleKey, bundle)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
+}
+
+func GetI18n(r *http.Request) i18n.TranslationBundle {
+	if bundle, ok := r.Context().Value(I18nBundleKey).(i18n.TranslationBundle); ok {
+		return bundle
+	}
+	return i18n.GetBundle(i18n.LangEN)
+}
 
 func AuthMiddleware(authService service.AuthService) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
