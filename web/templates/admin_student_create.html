@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="{{ .I18n.Lang }}" dir="{{ .I18n.Dir }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ index .I18n.T "admin_add_student" }} - {{ index .I18n.T "admin_portal" }}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/admin" class="nav-brand">
+      <span>{{ index .I18n.T "admin_portal" }}</span>
+    </a>
+    <div class="nav-user">
+      <a href="/admin/students" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;">{{ index .I18n.T "admin_students_title" }}</a>
+      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 600;">
+        {{ index .I18n.T "lang_switch" }}
+      </a>
+      <form action="/admin/logout" method="POST" style="display:inline;">
+        <button type="submit" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;">{{ index .I18n.T "logout" }}</button>
+      </form>
+    </div>
+  </nav>
+
+  <div class="container" style="max-width: 550px;">
+    <div class="card">
+      <h2 style="margin-bottom: 0.5rem;">{{ index .I18n.T "admin_add_student" }}</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+        Register a new student or update an existing record by student code.
+      </p>
+
+      {{ if .Error }}
+      <div class="alert alert-danger" style="margin-bottom: 1.25rem;">
+        {{ .Error }}
+      </div>
+      {{ end }}
+
+      <form action="/admin/students/create" method="POST">
+        <div class="form-group">
+          <label for="student_code">{{ index .I18n.T "student_id_label" }}</label>
+          <input type="text" id="student_code" name="student_code" placeholder="e.g. L1A-050" required autofocus>
+        </div>
+
+        <div class="form-group">
+          <label for="name">{{ index .I18n.T "student_label" }} (Name)</label>
+          <input type="text" id="name" name="name" placeholder="Full Student Name" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label for="level_id">{{ index .I18n.T "level" }}</label>
+            <select id="level_id" name="level_id" required>
+              <option value="1">Level 1</option>
+              <option value="2">Level 2</option>
+              <option value="3">Level 3</option>
+              <option value="4">Level 4</option>
+              <option value="5">Level 5</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="group_id">{{ index .I18n.T "group" }}</label>
+            <input type="text" id="group_id" name="group_id" placeholder="e.g. A" value="A" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="padding: 0.85rem; margin-top: 1rem; font-size: 1rem;">
+          {{ index .I18n.T "admin_add_student" }}
+        </button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
