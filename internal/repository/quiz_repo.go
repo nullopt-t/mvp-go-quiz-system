@@ -18,7 +18,7 @@ type QuizRepository interface {
 	Update(ctx context.Context, quiz *model.Quiz) error
 	GetByID(ctx context.Context, id primitive.ObjectID) (*model.Quiz, error)
 	GetAll(ctx context.Context) ([]model.Quiz, error)
-	GetAvailableForStudent(ctx context.Context, levelID, groupID int) ([]model.Quiz, error)
+	GetAvailableForStudent(ctx context.Context, levelID int, groupID string) ([]model.Quiz, error)
 	Delete(ctx context.Context, id primitive.ObjectID) error
 }
 
@@ -97,7 +97,17 @@ func (r *quizRepository) GetAll(ctx context.Context) ([]model.Quiz, error) {
 	return quizzes, nil
 }
 
-func (r *quizRepository) GetAvailableForStudent(ctx context.Context, levelID, groupID int) ([]model.Quiz, error) {
+func (r *quizRepository) GetAvailableForStudent(ctx context.Context, levelID int, groupID string) ([]model.Quiz, error) {
+	groupFilter := bson.M{"$size": 0}
+	if groupID != "" {
+		groupFilter = bson.M{
+			"$or": []bson.M{
+				{"group_ids": bson.M{"$size": 0}},
+				{"group_ids": groupID},
+			},
+		}
+	}
+
 	filter := bson.M{
 		"is_active": true,
 		"$and": []bson.M{
@@ -107,12 +117,7 @@ func (r *quizRepository) GetAvailableForStudent(ctx context.Context, levelID, gr
 					{"level_id": levelID},
 				},
 			},
-			{
-				"$or": []bson.M{
-					{"group_ids": bson.M{"$size": 0}},
-					{"group_ids": groupID},
-				},
-			},
+			groupFilter,
 		},
 	}
 
