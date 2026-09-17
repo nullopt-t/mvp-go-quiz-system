@@ -2,6 +2,7 @@ package service_test
 
 import (
 	"context"
+	"strings"
 	"testing"
 	"time"
 
@@ -31,10 +32,10 @@ func (m *mockStudentRepo) FindByID(ctx context.Context, id primitive.ObjectID) (
 func (m *mockStudentRepo) Count(ctx context.Context) (int64, error) {
 	return int64(len(m.students)), nil
 }
-func (m *mockStudentRepo) CountByLevelAndGroup(ctx context.Context, levelID, groupID int) (int64, error) {
+func (m *mockStudentRepo) CountByLevelAndGroup(ctx context.Context, levelID int, groupID string) (int64, error) {
 	count := int64(0)
 	for _, s := range m.students {
-		if s.LevelID == levelID && s.GroupID == groupID {
+		if (levelID == 0 || s.LevelID == levelID) && (groupID == "" || s.GroupID == groupID) {
 			count++
 		}
 	}
@@ -46,10 +47,16 @@ func (m *mockStudentRepo) BulkInsert(ctx context.Context, students []model.Stude
 	}
 	return nil
 }
-func (m *mockStudentRepo) GetAll(ctx context.Context, levelID, groupID int, limit, offset int64) ([]model.Student, error) {
+func (m *mockStudentRepo) BulkUpsert(ctx context.Context, students []model.Student) (int, error) {
+	for i := range students {
+		m.students[students[i].StudentCode] = &students[i]
+	}
+	return len(students), nil
+}
+func (m *mockStudentRepo) GetAll(ctx context.Context, levelID int, groupID string, limit, offset int64) ([]model.Student, error) {
 	var list []model.Student
 	for _, s := range m.students {
-		if (levelID == 0 || s.LevelID == levelID) && (groupID == 0 || s.GroupID == groupID) {
+		if (levelID == 0 || s.LevelID == levelID) && (groupID == "" || s.GroupID == groupID) {
 			list = append(list, *s)
 		}
 	}
@@ -82,7 +89,7 @@ func (m *mockQuizRepo) GetAll(ctx context.Context) ([]model.Quiz, error) {
 	}
 	return list, nil
 }
-func (m *mockQuizRepo) GetAvailableForStudent(ctx context.Context, levelID, groupID int) ([]model.Quiz, error) {
+func (m *mockQuizRepo) GetAvailableForStudent(ctx context.Context, levelID int, groupID string) ([]model.Quiz, error) {
 	return m.GetAll(ctx)
 }
 func (m *mockQuizRepo) Delete(ctx context.Context, id primitive.ObjectID) error {
@@ -189,12 +196,12 @@ func TestAuthAndAppendOnlyFlow(t *testing.T) {
 	studentID := primitive.NewObjectID()
 	studentRepo := &mockStudentRepo{
 		students: map[string]*model.Student{
-			"L1G1-001": {
+			"L1A-001": {
 				ID:          studentID,
-				StudentCode: "L1G1-001",
+				StudentCode: "L1A-001",
 				Name:        "Alice Student",
 				LevelID:     1,
-				GroupID:     1,
+				GroupID:     "A",
 				IsActive:    true,
 			},
 		},
@@ -246,13 +253,13 @@ func TestAuthAndAppendOnlyFlow(t *testing.T) {
 	ctx := context.Background()
 
 	// 1. Test Auth
-	token, student, err := authSvc.LoginStudent(ctx, "L1G1-001")
+	token, student, err := authSvc.LoginStudent(ctx, "L1A-001")
 	if err != nil || student == nil || token == "" {
 		t.Fatalf("LoginStudent failed: %v", err)
 	}
 
 	claims, err := authSvc.ValidateToken(token)
-	if err != nil || claims.StudentCode != "L1G1-001" {
+	if err != nil || claims.StudentCode != "L1A-001" {
 		t.Fatalf("ValidateToken failed: %v", err)
 	}
 
@@ -272,15 +279,15 @@ func TestAuthAndAppendOnlyFlow(t *testing.T) {
 	}
 
 	// 3. Append-Only Answering (Student answers Q1, then changes answer to Q1, then answers Q2)
-	err = answerSvc.RecordAnswer(ctx, quizID, studentID, "L1G1-001", 1, 1) // First chose option 1 (incorrect)
+	err = answerSvc.RecordAnswer(ctx, quizID, studentID, "L1A-001", 1, 1) // First chose option 1 (incorrect)
 	if err != nil {
 		t.Fatalf("RecordAnswer 1 failed: %v", err)
 	}
-	err = answerSvc.RecordAnswer(ctx, quizID, studentID, "L1G1-001", 1, 2) // Changed to option 2 (correct)
+	err = answerSvc.RecordAnswer(ctx, quizID, studentID, "L1A-001", 1, 2) // Changed to option 2 (correct)
 	if err != nil {
 		t.Fatalf("RecordAnswer 2 failed: %v", err)
 	}
-	err = answerSvc.RecordAnswer(ctx, quizID, studentID, "L1G1-001", 2, 1) // Chose option 1 for Q2 (correct)
+	err = answerSvc.RecordAnswer(ctx, quizID, studentID, "L1A-001", 2, 1) // Chose option 1 for Q2 (correct)
 	if err != nil {
 		t.Fatalf("RecordAnswer 3 failed: %v", err)
 	}
@@ -291,7 +298,7 @@ func TestAuthAndAppendOnlyFlow(t *testing.T) {
 	}
 
 	// 4. Calculate Final Result
-	result, err := resultSvc.CalculateAndSubmit(ctx, quizID, studentID, "L1G1-001", "Alice Student", 1, 1)
+	result, err := resultSvc.CalculateAndSubmit(ctx, quizID, studentID, "L1A-001", "Alice Student", 1, "A")
 	if err != nil {
 		t.Fatalf("CalculateAndSubmit failed: %v", err)
 	}
@@ -299,5 +306,32 @@ func TestAuthAndAppendOnlyFlow(t *testing.T) {
 	// Alice got both Q1 (changed to 2) and Q2 (chose 1) correct = 20/20 points
 	if result.Score != 20 || result.CorrectCount != 2 {
 		t.Fatalf("Expected 20 points and 2 correct answers, got %d points, %d correct", result.Score, result.CorrectCount)
+	}
+}
+
+func TestCSVImportService(t *testing.T) {
+	studentRepo := &mockStudentRepo{
+		students: make(map[string]*model.Student),
+	}
+	importSvc := service.NewImportService(studentRepo)
+
+	ctx := context.Background()
+	sampleCSV := importSvc.GenerateSampleCSV()
+
+	count, err := importSvc.ImportStudentsFromCSV(ctx, strings.NewReader(string(sampleCSV)))
+	if err != nil {
+		t.Fatalf("ImportStudentsFromCSV failed: %v", err)
+	}
+
+	if count != 6 {
+		t.Fatalf("Expected 6 imported students, got %d", count)
+	}
+
+	stu, err := studentRepo.FindByCode(ctx, "L1A-001")
+	if err != nil || stu == nil {
+		t.Fatalf("Expected student L1A-001 to exist")
+	}
+	if stu.GroupID != "A" || stu.LevelID != 1 {
+		t.Fatalf("Expected Level 1, Group A, got Level %d, Group %s", stu.LevelID, stu.GroupID)
 	}
 }
