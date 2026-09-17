@@ -25,6 +25,7 @@ type StudentRepository interface {
 	Count(ctx context.Context) (int64, error)
 	CountByLevelAndGroup(ctx context.Context, levelID int, groupID string) (int64, error)
 	GetCohortDistribution(ctx context.Context) ([]CohortCount, error)
+	CreateOrUpdate(ctx context.Context, student *model.Student) error
 	BulkInsert(ctx context.Context, students []model.Student) error
 	BulkUpsert(ctx context.Context, students []model.Student) (int, error)
 	GetAll(ctx context.Context, levelID int, groupID string, limit, offset int64) ([]model.Student, error)
@@ -200,4 +201,36 @@ func (r *studentRepository) GetAll(ctx context.Context, levelID int, groupID str
 		return nil, fmt.Errorf("failed to decode students: %w", err)
 	}
 	return students, nil
+}
+
+func (r *studentRepository) CreateOrUpdate(ctx context.Context, student *model.Student) error {
+	now := time.Now().UTC()
+	if student.ID.IsZero() {
+		student.ID = primitive.NewObjectID()
+	}
+	if student.CreatedAt.IsZero() {
+		student.CreatedAt = now
+	}
+
+	filter := bson.M{"student_code": student.StudentCode}
+	update := bson.M{
+		"$set": bson.M{
+			"name":       student.Name,
+			"level_id":   student.LevelID,
+			"group_id":   student.GroupID,
+			"is_active":  student.IsActive,
+			"updated_at": now,
+		},
+		"$setOnInsert": bson.M{
+			"_id":        student.ID,
+			"created_at": student.CreatedAt,
+		},
+	}
+
+	opts := options.Update().SetUpsert(true)
+	_, err := r.col.UpdateOne(ctx, filter, update, opts)
+	if err != nil {
+		return fmt.Errorf("failed to save student: %w", err)
+	}
+	return nil
 }
