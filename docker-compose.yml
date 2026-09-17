@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quiz_app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - MONGO_URI=mongodb://mongo:27017
+      - DB_NAME=quiz_system
+      - JWT_SECRET=super-secret-college-quiz-jwt-key-2026
+      - JWT_EXPIRY_MINUTES=45
+      - ADMIN_PIN=admin123
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:7.0
+    container_name: quiz_mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
