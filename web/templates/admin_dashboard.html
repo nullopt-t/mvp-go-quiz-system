@@ -136,15 +136,29 @@
           </div>
         </div>
 
-        <form action="/admin/students/preview" method="POST" enctype="multipart/form-data" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 1rem; background: #f8fafc; padding: 1.25rem; border-radius: 10px; border: 1.5px dashed #cbd5e1;">
-          <div>
-            <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem;">
+        <form action="/admin/students/preview" method="POST" enctype="multipart/form-data" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 1rem;">
+          <label class="file-dropzone" id="csv-dropzone" for="csv_file_input">
+            <input type="file" id="csv_file_input" name="csv_file" accept=".csv" required onchange="handleFileSelected(this)">
+            <div class="file-dropzone-icon">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+            <div class="file-dropzone-title">
+              <span class="file-browse-badge">
+                <i class="fa-solid fa-folder-open"></i> {{ index .I18n.T "admin_browse_files" }}
+              </span>
+              <span style="color: var(--text-muted); font-weight: 500; font-size: 0.85rem;">
+                {{ index .I18n.T "admin_drag_hint" }}
+              </span>
+            </div>
+            <div id="file-name-display" class="file-selected-name" style="margin-top: 0.25rem;">
+              {{ index .I18n.T "admin_no_file_selected" }}
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem;">
               {{ index .I18n.T "admin_drop_csv_hint" }}
             </div>
-            <input type="file" name="csv_file" accept=".csv" required style="width: 100%; padding: 0.65rem; background: #ffffff; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem;">
-          </div>
+          </label>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
             <a href="/admin/students/sample-csv" style="font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 600;">
               <i class="fa-solid fa-file-arrow-down" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "admin_sample_csv" }}
             </a>
@@ -264,5 +278,37 @@
       </div>
     </div>
   </div>
+
+  <script>
+    function handleFileSelected(input) {
+      const display = document.getElementById('file-name-display');
+      if (input.files && input.files.length > 0) {
+        const file = input.files[0];
+        const sizeKb = (file.size / 1024).toFixed(1);
+        display.innerHTML = '<i class="fa-solid fa-file-csv" style="color: #16a34a; margin-inline-end: 0.35rem;"></i> ' +
+          '<strong>' + file.name + '</strong> (' + sizeKb + ' KB)';
+        display.style.color = '#15803d';
+      }
+    }
+
+    const dropzone = document.getElementById('csv-dropzone');
+    if (dropzone) {
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.add('dragover');
+        }, false);
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.remove('dragover');
+        }, false);
+      });
+    }
+  </script>
 </body>
 </html>
