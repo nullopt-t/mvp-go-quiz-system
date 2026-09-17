@@ -13,14 +13,13 @@
       <span>{{ index .I18n.T "app_title" }}</span>
     </a>
     <div class="nav-user">
-      <span class="badge badge-primary">{{ index .I18n.T "nav_stateless" }}</span>
-      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 700;">
+      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 600;">
         {{ index .I18n.T "lang_switch" }}
       </a>
     </div>
   </nav>
 
-  <div class="container" style="max-width: 480px; margin-top: 4rem;">
+  <div class="container" style="max-width: 440px; margin-top: 5rem;">
     <div class="card">
       <h2 style="margin-bottom: 0.5rem; text-align: center;">{{ index .I18n.T "welcome_back" }}</h2>
       <p style="color: var(--text-muted); text-align: center; margin-bottom: 1.5rem; font-size: 0.9rem;">
@@ -37,17 +36,13 @@
       <form action="/login" method="POST">
         <div class="form-group">
           <label for="student_code">{{ index .I18n.T "student_id_label" }}</label>
-          <input type="text" id="student_code" name="student_code" placeholder="e.g. L1G1-001 or L2G3-045" autofocus required>
+          <input type="text" id="student_code" name="student_code" placeholder="e.g. L1G1-001" autofocus required>
           <small style="color: var(--text-muted); display: block; margin-top: 0.4rem; font-size: 0.8rem;">
             {{ index .I18n.T "student_id_hint" }}
           </small>
         </div>
         <button type="submit" class="btn btn-primary btn-block" style="padding: 0.85rem; margin-top: 1.25rem;">{{ index .I18n.T "login_btn" }}</button>
       </form>
-    </div>
-
-    <div style="text-align: center; font-size: 0.85rem; color: var(--text-muted);">
-      {{ index .I18n.T "footer_info" }}
     </div>
   </div>
 </body>
