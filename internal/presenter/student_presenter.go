@@ -47,10 +47,13 @@ func (p *StudentPresenter) RenderDashboard(w http.ResponseWriter, r *http.Reques
 		history = nil
 	}
 
+	i18nBundle := GetI18n(r)
+
 	data := map[string]interface{}{
 		"Student": claims,
 		"Quizzes": quizzes,
 		"History": history,
+		"I18n":    i18nBundle,
 	}
 
 	_ = p.templates.ExecuteTemplate(w, "dashboard.html", data)
