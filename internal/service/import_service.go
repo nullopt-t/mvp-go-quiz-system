@@ -17,6 +17,8 @@ import (
 )
 
 type ImportService interface {
+	ParseStudentsFromCSV(reader io.Reader) ([]model.Student, error)
+	BulkImportStudents(ctx context.Context, students []model.Student) (int, error)
 	ImportStudentsFromCSV(ctx context.Context, reader io.Reader) (int, error)
 	GenerateSampleCSV() []byte
 }
@@ -31,17 +33,17 @@ func NewImportService(studentRepo repository.StudentRepository) ImportService {
 	}
 }
 
-func (s *importService) ImportStudentsFromCSV(ctx context.Context, reader io.Reader) (int, error) {
+func (s *importService) ParseStudentsFromCSV(reader io.Reader) ([]model.Student, error) {
 	csvReader := csv.NewReader(reader)
 	csvReader.TrimLeadingSpace = true
 
 	records, err := csvReader.ReadAll()
 	if err != nil {
-		return 0, fmt.Errorf("invalid CSV format: %w", err)
+		return nil, fmt.Errorf("invalid CSV format: %w", err)
 	}
 
 	if len(records) == 0 {
-		return 0, errors.New("CSV file is empty")
+		return nil, errors.New("CSV file is empty")
 	}
 
 	// Detect header row
@@ -71,14 +73,26 @@ func (s *importService) ImportStudentsFromCSV(ctx context.Context, reader io.Rea
 
 	for rowIdx := startIndex; rowIdx < len(records); rowIdx++ {
 		row := records[rowIdx]
-		if len(row) < 4 {
+		if len(row) < 2 {
 			continue
 		}
 
-		code := strings.ToUpper(strings.TrimSpace(row[codeCol]))
-		name := strings.TrimSpace(row[nameCol])
-		levelStr := strings.TrimSpace(row[levelCol])
-		group := strings.ToUpper(strings.TrimSpace(row[groupCol]))
+		code := ""
+		if codeCol < len(row) {
+			code = strings.ToUpper(strings.TrimSpace(row[codeCol]))
+		}
+		name := ""
+		if nameCol < len(row) {
+			name = strings.TrimSpace(row[nameCol])
+		}
+		levelStr := ""
+		if levelCol < len(row) {
+			levelStr = strings.TrimSpace(row[levelCol])
+		}
+		group := ""
+		if groupCol < len(row) {
+			group = strings.ToUpper(strings.TrimSpace(row[groupCol]))
+		}
 
 		if code == "" || name == "" {
 			continue
@@ -105,16 +119,25 @@ func (s *importService) ImportStudentsFromCSV(ctx context.Context, reader io.Rea
 	}
 
 	if len(students) == 0 {
-		return 0, errors.New("no valid student records found in CSV file")
+		return nil, errors.New("no valid student records found in CSV file")
 	}
 
-	// Bulk upsert into MongoDB
-	count, err := s.studentRepo.BulkUpsert(ctx, students)
+	return students, nil
+}
+
+func (s *importService) BulkImportStudents(ctx context.Context, students []model.Student) (int, error) {
+	if len(students) == 0 {
+		return 0, nil
+	}
+	return s.studentRepo.BulkUpsert(ctx, students)
+}
+
+func (s *importService) ImportStudentsFromCSV(ctx context.Context, reader io.Reader) (int, error) {
+	students, err := s.ParseStudentsFromCSV(reader)
 	if err != nil {
-		return 0, fmt.Errorf("failed to save students to database: %w", err)
+		return 0, err
 	}
-
-	return count, nil
+	return s.BulkImportStudents(ctx, students)
 }
 
 func isHeaderRow(row []string) bool {
