@@ -145,34 +145,45 @@ func (r *studentRepository) BulkUpsert(ctx context.Context, students []model.Stu
 		return 0, nil
 	}
 
-	models := make([]mongo.WriteModel, len(students))
+	total := 0
+	batchSize := 1000
 	now := time.Now().UTC()
 
-	for i, s := range students {
-		filter := bson.M{"student_code": s.StudentCode}
-		update := bson.M{
-			"$set": bson.M{
-				"name":       s.Name,
-				"level_id":   s.LevelID,
-				"group_id":   s.GroupID,
-				"is_active":  s.IsActive,
-				"updated_at": now,
-			},
-			"$setOnInsert": bson.M{
-				"_id":        primitive.NewObjectID(),
-				"created_at": now,
-			},
+	for i := 0; i < len(students); i += batchSize {
+		end := i + batchSize
+		if end > len(students) {
+			end = len(students)
 		}
-		models[i] = mongo.NewUpdateOneModel().SetFilter(filter).SetUpdate(update).SetUpsert(true)
+
+		batch := students[i:end]
+		models := make([]mongo.WriteModel, len(batch))
+
+		for idx, s := range batch {
+			filter := bson.M{"student_code": s.StudentCode}
+			update := bson.M{
+				"$set": bson.M{
+					"name":       s.Name,
+					"level_id":   s.LevelID,
+					"group_id":   s.GroupID,
+					"is_active":  s.IsActive,
+					"updated_at": now,
+				},
+				"$setOnInsert": bson.M{
+					"_id":        primitive.NewObjectID(),
+					"created_at": now,
+				},
+			}
+			models[idx] = mongo.NewUpdateOneModel().SetFilter(filter).SetUpdate(update).SetUpsert(true)
+		}
+
+		opts := options.BulkWrite().SetOrdered(false)
+		res, err := r.col.BulkWrite(ctx, models, opts)
+		if err != nil {
+			return total, fmt.Errorf("bulk upsert error: %w", err)
+		}
+		total += int(res.UpsertedCount + res.ModifiedCount + res.MatchedCount)
 	}
 
-	opts := options.BulkWrite().SetOrdered(false)
-	res, err := r.col.BulkWrite(ctx, models, opts)
-	if err != nil {
-		return 0, fmt.Errorf("bulk upsert error: %w", err)
-	}
-
-	total := int(res.UpsertedCount + res.ModifiedCount + res.MatchedCount)
 	return total, nil
 }
 
