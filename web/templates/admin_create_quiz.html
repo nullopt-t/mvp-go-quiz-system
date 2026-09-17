@@ -1,195 +1,214 @@
 <!DOCTYPE html>
-<html lang="{{ if .I18n }}{{ .I18n.Lang }}{{ else }}en{{ end }}" dir="{{ if .I18n }}{{ .I18n.Dir }}{{ else }}ltr{{ end }}">
+<html lang="{{ .I18n.Lang }}" dir="{{ .I18n.Dir }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Quiz - College Admin Portal</title>
+  <title>{{ index .I18n.T "admin_create_quiz_title" }} - {{ index .I18n.T "admin_portal" }}</title>
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <nav class="navbar">
-    <a href="/admin" class="nav-brand">
-      <span>College Administration Portal</span>
+  <nav class="navbar" style="padding: 0.85rem 2rem; border-bottom: 1px solid var(--border); background: var(--surface);">
+    <a href="/admin" class="nav-brand" style="display: flex; align-items: center; gap: 0.65rem; text-decoration: none;">
+      <i class="fa-solid fa-graduation-cap" style="color: var(--primary); font-size: 1.25rem;"></i>
+      <span style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">{{ index .I18n.T "admin_portal" }}</span>
     </a>
-    <div class="nav-user">
-      <a href="/admin" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">Back to Dashboard</a>
+    <div class="nav-user" style="display: flex; align-items: center; gap: 0.75rem;">
+      <a href="/admin" class="btn btn-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.85rem; font-weight: 600;">
+        <i class="fa-solid fa-arrow-left" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "back_dashboard" }}
+      </a>
+      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.85rem; font-weight: 700;">
+        <i class="fa-solid fa-globe" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "lang_switch" }}
+      </a>
+      <form action="/admin/logout" method="POST" style="display:inline; margin: 0;">
+        <button type="submit" class="btn btn-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.85rem; color: var(--danger); border-color: #fecaca; background: #fff5f5;">
+          <i class="fa-solid fa-arrow-right-from-bracket" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "logout" }}
+        </button>
+      </form>
     </div>
   </nav>
 
-  <div class="container" style="max-width: 800px;">
+  <div class="container" style="max-width: 900px;">
     <div class="card">
-      <h2 style="margin-bottom: 0.5rem;">Create New Academic Quiz</h2>
-      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
-        Configure assessment metadata, target cohorts, and question bank with correct answer keys.
-      </p>
+      <div style="margin-bottom: 1.5rem;">
+        <h2 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
+          <i class="fa-solid fa-file-circle-plus" style="color: var(--primary); margin-inline-end: 0.35rem;"></i>
+          {{ index .I18n.T "admin_create_quiz_title" }}
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
+          {{ index .I18n.T "admin_create_quiz_sub" }}
+        </p>
+      </div>
 
       <form action="/admin/quizzes/create" method="POST">
         <!-- Basic Info -->
-        <div class="form-group">
-          <label for="title">Quiz Title</label>
-          <input type="text" id="title" name="title" placeholder="e.g. Physics II - Midterm Assessment" required>
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label for="title" style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "quiz_title_label" }}</label>
+          <input type="text" id="title" name="title" placeholder="{{ index .I18n.T "quiz_title_placeholder" }}" required style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
         </div>
 
-        <div class="form-group">
-          <label for="description">Description / Instructions</label>
-          <textarea id="description" name="description" rows="2" placeholder="Brief instructions for students..."></textarea>
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label for="description" style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "quiz_desc_label" }}</label>
+          <textarea id="description" name="description" rows="2" placeholder="{{ index .I18n.T "quiz_desc_placeholder" }}" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;"></textarea>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
           <div class="form-group">
-            <label for="level_id">Target Level</label>
-            <select id="level_id" name="level_id">
-              <option value="0">All Levels (1 to 5)</option>
-              <option value="1">Level 1</option>
-              <option value="2">Level 2</option>
-              <option value="3">Level 3</option>
-              <option value="4">Level 4</option>
-              <option value="5">Level 5</option>
+            <label for="level_id" style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "quiz_target_level" }}</label>
+            <select id="level_id" name="level_id" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
+              <option value="0">{{ index .I18n.T "all_levels" }} (1 - 5)</option>
+              <option value="1">{{ index .I18n.T "level" }} 1</option>
+              <option value="2">{{ index .I18n.T "level" }} 2</option>
+              <option value="3">{{ index .I18n.T "level" }} 3</option>
+              <option value="4">{{ index .I18n.T "level" }} 4</option>
+              <option value="5">{{ index .I18n.T "level" }} 5</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label for="group_ids">Target Groups (Optional)</label>
-            <input type="text" id="group_ids" name="group_ids" placeholder="e.g. A, B (Leave blank for all)">
+            <label for="group_ids" style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "quiz_target_groups" }}</label>
+            <input type="text" id="group_ids" name="group_ids" placeholder="{{ index .I18n.T "quiz_target_groups_placeholder" }}" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
           </div>
 
           <div class="form-group">
-            <label for="duration_minutes">Time Limit (Minutes)</label>
-            <input type="number" id="duration_minutes" name="duration_minutes" value="15" min="1" max="180" required>
+            <label for="duration_minutes" style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "quiz_duration_minutes" }}</label>
+            <input type="number" id="duration_minutes" name="duration_minutes" value="15" min="1" max="180" required style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
           </div>
         </div>
 
-        <hr style="border: 0; border-top: 1px solid var(--border); margin: 2rem 0;">
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0;">
 
         <!-- Questions Section -->
-        <h3 style="margin-bottom: 1rem;">Questions Bank</h3>
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main);">
+          <i class="fa-solid fa-list-check" style="color: var(--primary); margin-inline-end: 0.35rem;"></i>
+          {{ index .I18n.T "quiz_questions_bank" }}
+        </h3>
         <input type="hidden" name="question_count" value="3">
 
         <!-- Question 1 -->
-        <div class="card" style="background: #f8fafc; margin-bottom: 1.25rem;">
+        <div class="card" style="background: var(--bg); margin-bottom: 1.25rem; border: 1px solid var(--border); padding: 1.25rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-            <strong>Question 1</strong>
+            <strong style="font-size: 0.95rem;">{{ printf (index .I18n.T "quiz_question_num") 1 }}</strong>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <span style="font-size: 0.85rem;">Points:</span>
-              <input type="number" name="q_1_points" value="10" style="width: 70px; padding: 0.35rem 0.5rem;" min="1">
+              <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">{{ index .I18n.T "quiz_points_label" }}:</span>
+              <input type="number" name="q_1_points" value="10" style="width: 70px; padding: 0.35rem 0.5rem; font-size: 0.85rem;" min="1">
             </div>
           </div>
-          <div class="form-group">
-            <input type="text" name="q_1_text" placeholder="Enter question statement..." required>
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <input type="text" name="q_1_text" placeholder="{{ index .I18n.T "quiz_statement_placeholder" }}" required style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem;">
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
             <div>
-              <label style="font-size: 0.8rem;">Option 1</label>
-              <input type="text" name="q_1_opt_1" placeholder="Option A text" required>
+              <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 1 }}</label>
+              <input type="text" name="q_1_opt_1" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "A" }}" required style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
             </div>
             <div>
-              <label style="font-size: 0.8rem;">Option 2</label>
-              <input type="text" name="q_1_opt_2" placeholder="Option B text" required>
+              <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 2 }}</label>
+              <input type="text" name="q_1_opt_2" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "B" }}" required style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
             </div>
             <div>
-              <label style="font-size: 0.8rem;">Option 3</label>
-              <input type="text" name="q_1_opt_3" placeholder="Option C text">
+              <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 3 }}</label>
+              <input type="text" name="q_1_opt_3" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "C" }}" style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
             </div>
             <div>
-              <label style="font-size: 0.8rem;">Option 4</label>
-              <input type="text" name="q_1_opt_4" placeholder="Option D text">
+              <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 4 }}</label>
+              <input type="text" name="q_1_opt_4" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "D" }}" style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
             </div>
           </div>
           <div style="margin-top: 0.75rem;">
-            <label style="font-size: 0.85rem; color: var(--primary);">Correct Option Key</label>
-            <select name="q_1_correct" style="width: auto;">
-              <option value="1">Option 1</option>
-              <option value="2">Option 2</option>
-              <option value="3">Option 3</option>
-              <option value="4">Option 4</option>
+            <label style="font-size: 0.85rem; color: var(--primary); font-weight: 600;">{{ index .I18n.T "quiz_correct_key" }}</label>
+            <select name="q_1_correct" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.85rem;">
+              <option value="1">{{ printf (index .I18n.T "quiz_option_num") 1 }}</option>
+              <option value="2">{{ printf (index .I18n.T "quiz_option_num") 2 }}</option>
+              <option value="3">{{ printf (index .I18n.T "quiz_option_num") 3 }}</option>
+              <option value="4">{{ printf (index .I18n.T "quiz_option_num") 4 }}</option>
             </select>
           </div>
         </div>
 
         <!-- Question 2 -->
-        <div class="card" style="background: #f8fafc; margin-bottom: 1.25rem;">
+        <div class="card" style="background: var(--bg); margin-bottom: 1.25rem; border: 1px solid var(--border); padding: 1.25rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-            <strong>Question 2</strong>
+            <strong style="font-size: 0.95rem;">{{ printf (index .I18n.T "quiz_question_num") 2 }}</strong>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <span style="font-size: 0.85rem;">Points:</span>
-              <input type="number" name="q_2_points" value="10" style="width: 70px; padding: 0.35rem 0.5rem;" min="1">
+              <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">{{ index .I18n.T "quiz_points_label" }}:</span>
+              <input type="number" name="q_2_points" value="10" style="width: 70px; padding: 0.35rem 0.5rem; font-size: 0.85rem;" min="1">
             </div>
           </div>
-          <div class="form-group">
-            <input type="text" name="q_2_text" placeholder="Enter question statement..." required>
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <input type="text" name="q_2_text" placeholder="{{ index .I18n.T "quiz_statement_placeholder" }}" required style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem;">
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
             <div>
-              <label style="font-size: 0.8rem;">Option 1</label>
-              <input type="text" name="q_2_opt_1" placeholder="Option A text" required>
+              <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 1 }}</label>
+              <input type="text" name="q_2_opt_1" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "A" }}" required style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
             </div>
             <div>
-              <label style="font-size: 0.8rem;">Option 2</label>
-              <input type="text" name="q_2_opt_2" placeholder="Option B text" required>
+              <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 2 }}</label>
+              <input type="text" name="q_2_opt_2" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "B" }}" required style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
             </div>
             <div>
-              <label style="font-size: 0.8rem;">Option 3</label>
-              <input type="text" name="q_2_opt_3" placeholder="Option C text">
+              <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 3 }}</label>
+              <input type="text" name="q_2_opt_3" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "C" }}" style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
             </div>
             <div>
-              <label style="font-size: 0.8rem;">Option 4</label>
-              <input type="text" name="q_2_opt_4" placeholder="Option D text">
+              <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 4 }}</label>
+              <input type="text" name="q_2_opt_4" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "D" }}" style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
             </div>
           </div>
           <div style="margin-top: 0.75rem;">
-            <label style="font-size: 0.85rem; color: var(--primary);">Correct Option Key</label>
-            <select name="q_2_correct" style="width: auto;">
-              <option value="1">Option 1</option>
-              <option value="2">Option 2</option>
-              <option value="3">Option 3</option>
-              <option value="4">Option 4</option>
+            <label style="font-size: 0.85rem; color: var(--primary); font-weight: 600;">{{ index .I18n.T "quiz_correct_key" }}</label>
+            <select name="q_2_correct" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.85rem;">
+              <option value="1">{{ printf (index .I18n.T "quiz_option_num") 1 }}</option>
+              <option value="2">{{ printf (index .I18n.T "quiz_option_num") 2 }}</option>
+              <option value="3">{{ printf (index .I18n.T "quiz_option_num") 3 }}</option>
+              <option value="4">{{ printf (index .I18n.T "quiz_option_num") 4 }}</option>
             </select>
           </div>
         </div>
 
         <!-- Question 3 -->
-        <div class="card" style="background: #f8fafc; margin-bottom: 1.5rem;">
+        <div class="card" style="background: var(--bg); margin-bottom: 1.5rem; border: 1px solid var(--border); padding: 1.25rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-            <strong>Question 3</strong>
+            <strong style="font-size: 0.95rem;">{{ printf (index .I18n.T "quiz_question_num") 3 }}</strong>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <span style="font-size: 0.85rem;">Points:</span>
-              <input type="number" name="q_3_points" value="10" style="width: 70px; padding: 0.35rem 0.5rem;" min="1">
+              <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">{{ index .I18n.T "quiz_points_label" }}:</span>
+              <input type="number" name="q_3_points" value="10" style="width: 70px; padding: 0.35rem 0.5rem; font-size: 0.85rem;" min="1">
             </div>
           </div>
-          <div class="form-group">
-            <input type="text" name="q_3_text" placeholder="Enter question statement...">
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <input type="text" name="q_3_text" placeholder="{{ index .I18n.T "quiz_statement_placeholder" }}" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem;">
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
             <div>
-              <label style="font-size: 0.8rem;">Option 1</label>
-              <input type="text" name="q_3_opt_1" placeholder="Option A text">
+              <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 1 }}</label>
+              <input type="text" name="q_3_opt_1" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "A" }}" style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
             </div>
             <div>
-              <label style="font-size: 0.8rem;">Option 2</label>
-              <input type="text" name="q_3_opt_2" placeholder="Option B text">
+              <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 2 }}</label>
+              <input type="text" name="q_3_opt_2" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "B" }}" style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
             </div>
             <div>
-              <label style="font-size: 0.8rem;">Option 3</label>
-              <input type="text" name="q_3_opt_3" placeholder="Option C text">
+              <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 3 }}</label>
+              <input type="text" name="q_3_opt_3" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "C" }}" style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
             </div>
             <div>
-              <label style="font-size: 0.8rem;">Option 4</label>
-              <input type="text" name="q_3_opt_4" placeholder="Option D text">
+              <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 4 }}</label>
+              <input type="text" name="q_3_opt_4" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "D" }}" style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
             </div>
           </div>
           <div style="margin-top: 0.75rem;">
-            <label style="font-size: 0.85rem; color: var(--primary);">Correct Option Key</label>
-            <select name="q_3_correct" style="width: auto;">
-              <option value="1">Option 1</option>
-              <option value="2">Option 2</option>
-              <option value="3">Option 3</option>
-              <option value="4">Option 4</option>
+            <label style="font-size: 0.85rem; color: var(--primary); font-weight: 600;">{{ index .I18n.T "quiz_correct_key" }}</label>
+            <select name="q_3_correct" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.85rem;">
+              <option value="1">{{ printf (index .I18n.T "quiz_option_num") 1 }}</option>
+              <option value="2">{{ printf (index .I18n.T "quiz_option_num") 2 }}</option>
+              <option value="3">{{ printf (index .I18n.T "quiz_option_num") 3 }}</option>
+              <option value="4">{{ printf (index .I18n.T "quiz_option_num") 4 }}</option>
             </select>
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block" style="padding: 0.85rem; font-size: 1rem;">
-          Save and Publish Quiz
+        <button type="submit" class="btn btn-primary btn-block" style="padding: 0.75rem; font-size: 0.95rem; font-weight: 700; width: 100%;">
+          <i class="fa-solid fa-floppy-disk" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "quiz_save_publish_btn" }}
         </button>
       </form>
     </div>
