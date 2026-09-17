@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Analytics - {{ .Quiz.Title }}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/admin" class="nav-brand">
+      🎓 <span>College Administration Portal</span>
+    </a>
+    <div class="nav-user">
+      <a href="/admin" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">← Back to Dashboard</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="card">
+      <h2>{{ .Quiz.Title }}</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem;">
+        Performance Breakdown & Leaderboard
+      </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+      <div class="card" style="margin-bottom: 0;">
+        <div style="font-size: 0.85rem; color: var(--text-muted);">Completed Submissions</div>
+        <div style="font-size: 2rem; font-weight: 800; color: var(--primary); margin-top: 0.25rem;">
+          {{ .TotalTakers }}
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom: 0;">
+        <div style="font-size: 0.85rem; color: var(--text-muted);">Average Score</div>
+        <div style="font-size: 2rem; font-weight: 800; color: var(--success); margin-top: 0.25rem;">
+          {{ .AverageScore }}
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom: 0;">
+        <div style="font-size: 0.85rem; color: var(--text-muted);">Highest Score</div>
+        <div style="font-size: 2rem; font-weight: 800; color: var(--warning); margin-top: 0.25rem;">
+          {{ .MaxScore }}
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Student Submissions Leaderboard</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>Cohort</th>
+            <th>Score</th>
+            <th>Correct / Total</th>
+            <th>Completion Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ range $index, $res := .Results }}
+          <tr>
+            <td><strong>#{{ add $index 1 }}</strong></td>
+            <td><code>{{ $res.StudentCode }}</code></td>
+            <td>{{ $res.StudentName }}</td>
+            <td>Level {{ $res.LevelID }} • Group {{ $res.GroupID }}</td>
+            <td><strong>{{ $res.Score }}</strong> / {{ $res.TotalPoints }}</td>
+            <td>{{ $res.CorrectCount }} / {{ $res.TotalQuestions }}</td>
+            <td>{{ $res.SubmittedAt.Format "2006-01-02 15:04:05" }}</td>
+          </tr>
+          {{ else }}
+          <tr>
+            <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No submissions recorded yet for this quiz.</td>
+          </tr>
+          {{ end }}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

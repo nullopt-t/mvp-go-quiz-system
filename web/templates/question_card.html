@@ -1,0 +1,56 @@
+<div id="question-container">
+  <!-- Progress Bar -->
+  <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+    <span>Question <strong>{{ .CurrentNumber }}</strong> of {{ .TotalQuestions }}</span>
+    <span>Points: <strong>{{ .CurrentQuestion.Points }}</strong></span>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-bar" style="width: {{ printf "%.1f" (divFloat .CurrentNumber .TotalQuestions) }}%;"></div>
+  </div>
+
+  <!-- Question Form -->
+  <form id="quiz-form"
+        hx-post="/quizzes/{{ .Quiz.ID.Hex }}/answers"
+        hx-target="#question-container"
+        hx-swap="outerHTML">
+    
+    <input type="hidden" name="quiz_id" value="{{ .Quiz.ID.Hex }}">
+    <input type="hidden" name="question_id" value="{{ .CurrentQuestion.ID }}">
+    <input type="hidden" name="current_index" value="{{ .CurrentIndex }}">
+    <input type="hidden" name="is_submit" id="is_submit_field" value="false">
+
+    <div class="card" style="margin-top: 1rem; border-left: 4px solid var(--primary);">
+      <h3 style="font-size: 1.2rem; line-height: 1.5; margin-bottom: 1.5rem;">
+        {{ .CurrentQuestion.Text }}
+      </h3>
+
+      <div class="options-list">
+        {{ $selectedID := .SelectedOptionID }}
+        {{ range .CurrentQuestion.Options }}
+        <label class="option-item {{ if eq .ID $selectedID }}selected{{ end }}" onclick="highlightOption(this)">
+          <input type="radio" name="answer_id" value="{{ .ID }}" {{ if eq .ID $selectedID }}checked{{ end }} required>
+          <span style="font-size: 1rem;">{{ .Text }}</span>
+        </label>
+        {{ end }}
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.25rem;">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">
+          💾 Answers are saved automatically to the append-only log on progression
+        </span>
+
+        <div>
+          {{ if .IsLastQuestion }}
+            <button type="button" class="btn btn-primary" onclick="submitFinalQuestion()" style="background-color: var(--success); font-size: 1rem; padding: 0.75rem 1.75rem;">
+              Submit Quiz & View Results ✔
+            </button>
+          {{ else }}
+            <button type="submit" class="btn btn-primary" style="font-size: 1rem; padding: 0.75rem 1.75rem;">
+              Next Question ➔
+            </button>
+          {{ end }}
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

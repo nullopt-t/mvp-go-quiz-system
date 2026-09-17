@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff / Admin Portal - College Quiz System</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/htmx.min.js"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/admin" class="nav-brand">
+      🎓 <span>College Administration Portal</span>
+    </a>
+    <div class="nav-user">
+      <span class="badge badge-warning">Admin Mode</span>
+      <form action="/logout" method="POST" style="display:inline;">
+        <button type="submit" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">Log Out</button>
+      </form>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- Quick Stats -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+      <div class="card" style="margin-bottom: 0;">
+        <div style="font-size: 0.85rem; color: var(--text-muted);">Total Enrolled Students</div>
+        <div style="font-size: 2rem; font-weight: 800; color: var(--primary); margin-top: 0.25rem;">
+          {{ .TotalStudents }}
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">5 Levels • 20 Groups</div>
+      </div>
+
+      <div class="card" style="margin-bottom: 0;">
+        <div style="font-size: 0.85rem; color: var(--text-muted);">Active Quizzes</div>
+        <div style="font-size: 2rem; font-weight: 800; color: var(--success); margin-top: 0.25rem;">
+          {{ len .Quizzes }}
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Live Assessments</div>
+      </div>
+
+      <div class="card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center;">
+        <a href="/admin/quizzes/create" class="btn btn-primary" style="padding: 0.85rem;">+ Create New Quiz</a>
+      </div>
+    </div>
+
+    <!-- College Hierarchy Grid Overview -->
+    <div class="card">
+      <h3 style="margin-bottom: 0.5rem;">College Structure (5 Levels × 4 Groups • 500 Capacity Each)</h3>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
+        Real-time cohort distribution across all 20 academic sections
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
+        {{ range .GroupSummaries }}
+        <div style="background: #f8fafc; border: 1px solid var(--border); padding: 0.75rem; border-radius: 8px; font-size: 0.85rem;">
+          <div style="font-weight: 700; color: var(--primary);">Level {{ .LevelID }} • Group {{ .GroupID }}</div>
+          <div style="color: var(--text-muted); margin-top: 0.2rem;">Enrolled: <strong>{{ .Count }}</strong> / 500</div>
+        </div>
+        {{ end }}
+      </div>
+    </div>
+
+    <!-- Quizzes Table -->
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3>Managed Quizzes</h3>
+        <a href="/admin/quizzes/create" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">+ New Quiz</a>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Target Level</th>
+            <th>Duration</th>
+            <th>Questions</th>
+            <th>Status</th>
+            <th>Analytics</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ range .Quizzes }}
+          <tr>
+            <td>
+              <strong>{{ .Title }}</strong>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">{{ .Description }}</div>
+            </td>
+            <td>
+              {{ if eq .LevelID 0 }}
+                <span class="badge badge-muted">All Levels</span>
+              {{ else }}
+                <span class="badge badge-primary">Level {{ .LevelID }}</span>
+              {{ end }}
+            </td>
+            <td>{{ .DurationMinutes }} mins</td>
+            <td>{{ len .Questions }}</td>
+            <td>
+              {{ if .IsActive }}
+                <span class="badge badge-success">Active</span>
+              {{ else }}
+                <span class="badge badge-muted">Inactive</span>
+              {{ end }}
+            </td>
+            <td>
+              <a href="/admin/quizzes/{{ .ID.Hex }}/analytics" class="btn btn-secondary" style="padding: 0.3rem 0.65rem; font-size: 0.8rem;">View Analytics 📊</a>
+            </td>
+          </tr>
+          {{ else }}
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No quizzes created yet.</td>
+          </tr>
+          {{ end }}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

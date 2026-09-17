@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Quiz - College Admin Portal</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/admin" class="nav-brand">
+      🎓 <span>College Administration Portal</span>
+    </a>
+    <div class="nav-user">
+      <a href="/admin" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">← Back to Dashboard</a>
+    </div>
+  </nav>
+
+  <div class="container" style="max-width: 800px;">
+    <div class="card">
+      <h2 style="margin-bottom: 0.5rem;">Create New Academic Quiz</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+        Configure assessment metadata, target cohorts, and question bank with correct answer keys.
+      </p>
+
+      <form action="/admin/quizzes/create" method="POST">
+        <!-- Basic Info -->
+        <div class="form-group">
+          <label for="title">Quiz Title</label>
+          <input type="text" id="title" name="title" placeholder="e.g. Physics II - Midterm Assessment" required>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description / Instructions</label>
+          <textarea id="description" name="description" rows="2" placeholder="Brief instructions for students..."></textarea>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label for="level_id">Target Level</label>
+            <select id="level_id" name="level_id">
+              <option value="0">All Levels (1 to 5)</option>
+              <option value="1">Level 1</option>
+              <option value="2">Level 2</option>
+              <option value="3">Level 3</option>
+              <option value="4">Level 4</option>
+              <option value="5">Level 5</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="group_ids">Target Groups (Optional)</label>
+            <input type="text" id="group_ids" name="group_ids" placeholder="e.g. 1, 2 (Leave blank for all)">
+          </div>
+
+          <div class="form-group">
+            <label for="duration_minutes">Time Limit (Minutes)</label>
+            <input type="number" id="duration_minutes" name="duration_minutes" value="15" min="1" max="180" required>
+          </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 2rem 0;">
+
+        <!-- Questions Section -->
+        <h3 style="margin-bottom: 1rem;">Questions Bank</h3>
+        <input type="hidden" name="question_count" value="3">
+
+        <!-- Question 1 -->
+        <div class="card" style="background: #f8fafc; margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <strong>Question 1</strong>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 0.85rem;">Points:</span>
+              <input type="number" name="q_1_points" value="10" style="width: 70px; padding: 0.35rem 0.5rem;" min="1">
+            </div>
+          </div>
+          <div class="form-group">
+            <input type="text" name="q_1_text" placeholder="Enter question statement..." required>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div>
+              <label style="font-size: 0.8rem;">Option 1</label>
+              <input type="text" name="q_1_opt_1" placeholder="Option A text" required>
+            </div>
+            <div>
+              <label style="font-size: 0.8rem;">Option 2</label>
+              <input type="text" name="q_1_opt_2" placeholder="Option B text" required>
+            </div>
+            <div>
+              <label style="font-size: 0.8rem;">Option 3</label>
+              <input type="text" name="q_1_opt_3" placeholder="Option C text">
+            </div>
+            <div>
+              <label style="font-size: 0.8rem;">Option 4</label>
+              <input type="text" name="q_1_opt_4" placeholder="Option D text">
+            </div>
+          </div>
+          <div style="margin-top: 0.75rem;">
+            <label style="font-size: 0.85rem; color: var(--primary);">Correct Option Key</label>
+            <select name="q_1_correct" style="width: auto;">
+              <option value="1">Option 1</option>
+              <option value="2">Option 2</option>
+              <option value="3">Option 3</option>
+              <option value="4">Option 4</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="card" style="background: #f8fafc; margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <strong>Question 2</strong>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 0.85rem;">Points:</span>
+              <input type="number" name="q_2_points" value="10" style="width: 70px; padding: 0.35rem 0.5rem;" min="1">
+            </div>
+          </div>
+          <div class="form-group">
+            <input type="text" name="q_2_text" placeholder="Enter question statement..." required>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div>
+              <label style="font-size: 0.8rem;">Option 1</label>
+              <input type="text" name="q_2_opt_1" placeholder="Option A text" required>
+            </div>
+            <div>
+              <label style="font-size: 0.8rem;">Option 2</label>
+              <input type="text" name="q_2_opt_2" placeholder="Option B text" required>
+            </div>
+            <div>
+              <label style="font-size: 0.8rem;">Option 3</label>
+              <input type="text" name="q_2_opt_3" placeholder="Option C text">
+            </div>
+            <div>
+              <label style="font-size: 0.8rem;">Option 4</label>
+              <input type="text" name="q_2_opt_4" placeholder="Option D text">
+            </div>
+          </div>
+          <div style="margin-top: 0.75rem;">
+            <label style="font-size: 0.85rem; color: var(--primary);">Correct Option Key</label>
+            <select name="q_2_correct" style="width: auto;">
+              <option value="1">Option 1</option>
+              <option value="2">Option 2</option>
+              <option value="3">Option 3</option>
+              <option value="4">Option 4</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="card" style="background: #f8fafc; margin-bottom: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <strong>Question 3</strong>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 0.85rem;">Points:</span>
+              <input type="number" name="q_3_points" value="10" style="width: 70px; padding: 0.35rem 0.5rem;" min="1">
+            </div>
+          </div>
+          <div class="form-group">
+            <input type="text" name="q_3_text" placeholder="Enter question statement...">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div>
+              <label style="font-size: 0.8rem;">Option 1</label>
+              <input type="text" name="q_3_opt_1" placeholder="Option A text">
+            </div>
+            <div>
+              <label style="font-size: 0.8rem;">Option 2</label>
+              <input type="text" name="q_3_opt_2" placeholder="Option B text">
+            </div>
+            <div>
+              <label style="font-size: 0.8rem;">Option 3</label>
+              <input type="text" name="q_3_opt_3" placeholder="Option C text">
+            </div>
+            <div>
+              <label style="font-size: 0.8rem;">Option 4</label>
+              <input type="text" name="q_3_opt_4" placeholder="Option D text">
+            </div>
+          </div>
+          <div style="margin-top: 0.75rem;">
+            <label style="font-size: 0.85rem; color: var(--primary);">Correct Option Key</label>
+            <select name="q_3_correct" style="width: auto;">
+              <option value="1">Option 1</option>
+              <option value="2">Option 2</option>
+              <option value="3">Option 3</option>
+              <option value="4">Option 4</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="padding: 0.85rem; font-size: 1rem;">
+          Save & Publish Quiz
+        </button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
