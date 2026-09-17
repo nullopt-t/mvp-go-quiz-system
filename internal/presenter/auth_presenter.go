@@ -20,6 +20,7 @@ func NewAuthPresenter(authService service.AuthService, tmpl *template.Template) 
 	}
 }
 
+// Student Login
 func (p *AuthPresenter) RenderLogin(w http.ResponseWriter, r *http.Request) {
 	errParam := r.URL.Query().Get("error")
 	i18nBundle := GetI18n(r)
@@ -33,26 +34,6 @@ func (p *AuthPresenter) RenderLogin(w http.ResponseWriter, r *http.Request) {
 func (p *AuthPresenter) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "Invalid form data", http.StatusBadRequest)
-		return
-	}
-
-	loginType := r.FormValue("login_type")
-	if loginType == "admin" {
-		pin := strings.TrimSpace(r.FormValue("pin"))
-		token, err := p.authService.LoginAdmin(pin)
-		if err != nil {
-			http.Redirect(w, r, "/login?error=Invalid+Admin+PIN", http.StatusSeeOther)
-			return
-		}
-
-		http.SetCookie(w, &http.Cookie{
-			Name:     "jwt_token",
-			Value:    token,
-			Path:     "/",
-			HttpOnly: true,
-			SameSite: http.SameSiteLaxMode,
-		})
-		http.Redirect(w, r, "/admin", http.StatusSeeOther)
 		return
 	}
 
@@ -78,6 +59,40 @@ func (p *AuthPresenter) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 }
 
+// Admin / Staff Login (Separate Route)
+func (p *AuthPresenter) RenderAdminLogin(w http.ResponseWriter, r *http.Request) {
+	errParam := r.URL.Query().Get("error")
+	i18nBundle := GetI18n(r)
+	data := map[string]interface{}{
+		"Error": errParam,
+		"I18n":  i18nBundle,
+	}
+	_ = p.templates.ExecuteTemplate(w, "admin_login.html", data)
+}
+
+func (p *AuthPresenter) HandleAdminLogin(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid form data", http.StatusBadRequest)
+		return
+	}
+
+	pin := strings.TrimSpace(r.FormValue("pin"))
+	token, err := p.authService.LoginAdmin(pin)
+	if err != nil {
+		http.Redirect(w, r, "/admin/login?error=Invalid+Admin+PIN", http.StatusSeeOther)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "jwt_token",
+		Value:    token,
+		Path:     "/",
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	})
+	http.Redirect(w, r, "/admin", http.StatusSeeOther)
+}
+
 func (p *AuthPresenter) HandleLogout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "jwt_token",
@@ -87,4 +102,15 @@ func (p *AuthPresenter) HandleLogout(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 	})
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
+}
+
+func (p *AuthPresenter) HandleAdminLogout(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     "jwt_token",
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+	})
+	http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
 }
