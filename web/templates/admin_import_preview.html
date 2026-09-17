@@ -39,7 +39,7 @@
         <strong>{{ index .I18n.T "admin_preview_count" }}:</strong> <span id="student-count">{{ .TotalCount }}</span>
         {{ if .IsTruncated }}
         <div style="font-size: 0.85rem; margin-top: 0.35rem; color: #b45309; font-weight: 600;">
-          ⚠️ Showing sample of {{ .DisplayedCount }} students out of {{ .TotalCount }} total in file for fast preview.
+          ⚠️ Showing sample of {{ .DisplayedCount }} students out of {{ .FilteredCount }} matching ({{ .TotalCount }} total in file).
         </div>
         {{ else }}
         <div style="font-size: 0.85rem; margin-top: 0.25rem; color: #15803d;">
@@ -47,6 +47,52 @@
         </div>
         {{ end }}
       </div>
+    </div>
+
+    <!-- Search & Filter Bar (Works for both server-side full dataset & instant client-side typing) -->
+    <div class="card" style="padding: 1.25rem; margin-bottom: 1.5rem;">
+      <form action="/admin/students/preview" method="POST" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+        <input type="hidden" name="file_token" value="{{ .FileToken }}">
+        
+        <div style="flex: 2; min-width: 220px;">
+          <label style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "student_label" }} / {{ index .I18n.T "student_id_label" }}</label>
+          <input type="text" id="preview-search-input" name="search" value="{{ .SearchQuery }}" placeholder="{{ index .I18n.T "admin_search_preview_placeholder" }}" style="padding: 0.55rem 0.75rem; font-size: 0.9rem; width: 100%;">
+        </div>
+
+        <div style="flex: 1; min-width: 130px;">
+          <label style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "level" }}</label>
+          <select name="filter_level" style="padding: 0.55rem 0.75rem; font-size: 0.9rem; width: 100%;">
+            <option value="0">{{ index .I18n.T "all_levels" }}</option>
+            <option value="1" {{ if eq .FilterLevel 1 }}selected{{ end }}>{{ index .I18n.T "level" }} 1</option>
+            <option value="2" {{ if eq .FilterLevel 2 }}selected{{ end }}>{{ index .I18n.T "level" }} 2</option>
+            <option value="3" {{ if eq .FilterLevel 3 }}selected{{ end }}>{{ index .I18n.T "level" }} 3</option>
+            <option value="4" {{ if eq .FilterLevel 4 }}selected{{ end }}>{{ index .I18n.T "level" }} 4</option>
+            <option value="5" {{ if eq .FilterLevel 5 }}selected{{ end }}>{{ index .I18n.T "level" }} 5</option>
+          </select>
+        </div>
+
+        <div style="flex: 1; min-width: 130px;">
+          <label style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "group" }}</label>
+          <select name="filter_group" style="padding: 0.55rem 0.75rem; font-size: 0.9rem; width: 100%;">
+            <option value="">{{ index .I18n.T "all_groups" }}</option>
+            <option value="A" {{ if eq .FilterGroup "A" }}selected{{ end }}>{{ index .I18n.T "group" }} A</option>
+            <option value="B" {{ if eq .FilterGroup "B" }}selected{{ end }}>{{ index .I18n.T "group" }} B</option>
+            <option value="C" {{ if eq .FilterGroup "C" }}selected{{ end }}>{{ index .I18n.T "group" }} C</option>
+            <option value="D" {{ if eq .FilterGroup "D" }}selected{{ end }}>{{ index .I18n.T "group" }} D</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="submit" class="btn btn-primary" style="padding: 0.55rem 1.25rem; font-size: 0.9rem;">
+            🔍 {{ index .I18n.T "admin_search_filter_btn" }}
+          </button>
+          {{ if or .SearchQuery (or .FilterLevel .FilterGroup) }}
+          <a href="/admin/students/preview?file_token={{ .FileToken }}" class="btn btn-secondary" style="padding: 0.55rem 1rem; font-size: 0.9rem;">
+            ✕ {{ index .I18n.T "admin_clear_filter" }}
+          </a>
+          {{ end }}
+        </div>
+      </form>
     </div>
 
     <form id="import-preview-form" action="/admin/students/import" method="POST">
@@ -131,11 +177,33 @@
     }
 
     function updateCount() {
-      const rows = document.querySelectorAll('#students-tbody tr');
+      const rows = document.querySelectorAll('#students-tbody tr:not([style*="display: none"])');
       const counter = document.getElementById('student-count');
       if (counter) {
         counter.textContent = rows.length;
       }
+    }
+
+    // Instant client-side table filter on typing
+    const searchInput = document.getElementById('preview-search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', function(e) {
+        const query = e.target.value.toLowerCase().trim();
+        const rows = document.querySelectorAll('#students-tbody tr');
+        rows.forEach(row => {
+          const codeInput = row.querySelector('input[name="student_code[]"]');
+          const nameInput = row.querySelector('input[name="name[]"]');
+          const codeVal = codeInput ? codeInput.value.toLowerCase() : '';
+          const nameVal = nameInput ? nameInput.value.toLowerCase() : '';
+
+          if (!query || codeVal.includes(query) || nameVal.includes(query)) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+        updateCount();
+      });
     }
   </script>
 </body>
