@@ -67,6 +67,7 @@ func main() {
 	quizService := service.NewQuizService(quizRepo, sessionRepo, answerRepo, resultRepo)
 	answerService := service.NewAnswerService(answerRepo, quizRepo, sessionRepo, resultRepo)
 	resultService := service.NewResultService(resultRepo, answerRepo, quizRepo, studentRepo)
+	importService := service.NewImportService(studentRepo)
 	seederService := service.NewSeederService(studentRepo, quizRepo)
 
 	// 5. Seed Hierarchy (5 Levels x 4 Groups x 500 Students = 10,000) & Quizzes
@@ -80,7 +81,7 @@ func main() {
 	authPres := presenter.NewAuthPresenter(authService, tmpl)
 	studentPres := presenter.NewStudentPresenter(quizService, resultService, tmpl)
 	quizPres := presenter.NewQuizPresenter(quizService, answerService, resultService, tmpl)
-	adminPres := presenter.NewAdminPresenter(quizService, resultService, studentRepo, tmpl)
+	adminPres := presenter.NewAdminPresenter(quizService, resultService, studentRepo, importService, tmpl)
 
 	// 7. Setup Router & Routes
 	router := presenter.NewRouter(presenter.RouterDependencies{
