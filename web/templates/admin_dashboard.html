@@ -47,6 +47,40 @@
       </div>
     </div>
 
+    {{ if .ImportSuccess }}
+    <div class="alert alert-info" style="background-color: #dcfce7; color: #15803d; border-color: #bbf7d0; margin-bottom: 1.5rem;">
+      {{ .ImportSuccess }}
+    </div>
+    {{ end }}
+
+    {{ if .ImportError }}
+    <div class="alert alert-danger" style="margin-bottom: 1.5rem;">
+      {{ .ImportError }}
+    </div>
+    {{ end }}
+
+    <!-- Student CSV Import Section -->
+    <div class="card" style="margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+        <div>
+          <h3 style="margin-bottom: 0.25rem;">{{ index .I18n.T "admin_import_title" }}</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">
+            {{ index .I18n.T "admin_import_sub" }}
+          </p>
+        </div>
+        <a href="/admin/students/sample-csv" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.45rem 0.9rem;">
+          📥 {{ index .I18n.T "admin_sample_csv" }}
+        </a>
+      </div>
+
+      <form action="/admin/students/import" method="POST" enctype="multipart/form-data" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+        <input type="file" name="csv_file" accept=".csv" required style="flex: 1; min-width: 240px; padding: 0.5rem; background: #fff;">
+        <button type="submit" class="btn btn-primary" style="padding: 0.55rem 1.25rem; font-size: 0.9rem;">
+          {{ index .I18n.T "admin_import_btn" }}
+        </button>
+      </form>
+    </div>
+
     <!-- College Hierarchy Grid Overview -->
     <div class="card">
       <h3 style="margin-bottom: 0.5rem;">{{ index .I18n.T "admin_hierarchy_title" }}</h3>
