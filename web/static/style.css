@@ -144,6 +144,33 @@ body {
   background-color: var(--danger);
   color: #fff;
 }
+.btn-danger:hover { background-color: #b91c1c; }
+
+.btn-outline-danger {
+  background-color: #fff;
+  color: var(--danger);
+  border: 1px solid #fca5a5;
+}
+.btn-outline-danger:hover {
+  background-color: #fef2f2;
+  border-color: var(--danger);
+}
+
+.btn-outline-primary {
+  background-color: #fff;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+.btn-outline-primary:hover {
+  background-color: var(--primary-light);
+}
+
+.btn-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+}
 
 .btn-block { width: 100%; }
 

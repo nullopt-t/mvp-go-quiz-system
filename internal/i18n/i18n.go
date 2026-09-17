@@ -188,6 +188,14 @@ var translations = map[Language]map[string]string{
 		"admin_no_student_submissions":   "No quiz submissions recorded for this student yet.",
 		"admin_no_students_filter":       "No students found for the selected filters.",
 
+		// Student activation
+		"btn_activate":                 "Activate",
+		"btn_deactivate":               "Deactivate",
+		"student_status_updated":       "Student status updated successfully",
+		"is_active_label":              "Account Status",
+		"active_option":                "Active (Allowed to take quizzes)",
+		"inactive_option":              "Inactive (Blocked from taking quizzes)",
+
 		// Quiz creation
 		"quiz_questions_bank_sub": "Configure multiple choice questions, individual point weights, and correct options.",
 	},
@@ -359,6 +367,14 @@ var translations = map[Language]map[string]string{
 		"admin_completed_quizzes":        "الاختبارات المكتملة",
 		"admin_no_student_submissions":   "لا توجد تسليمات مسجلة لهذا الطالب بعد.",
 		"admin_no_students_filter":       "لا يوجد طلاب مطابقون للتصفية المحددة.",
+
+		// Student activation
+		"btn_activate":                 "تفعيل الحساب",
+		"btn_deactivate":               "تعطيل الحساب",
+		"student_status_updated":       "تم تحديث حالة حساب الطالب بنجاح",
+		"is_active_label":              "حالة الحساب",
+		"active_option":                "نشط (مسموح له بأداء الاختبارات)",
+		"inactive_option":              "غير نشط (محظور من الاختبارات)",
 
 		// Quiz creation
 		"quiz_questions_bank_sub": "أضف أسئلة الاختيار من متعدد مع الدرجات ومفاتيح الإجابات الصحيحة.",

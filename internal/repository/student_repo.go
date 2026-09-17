@@ -29,6 +29,7 @@ type StudentRepository interface {
 	BulkInsert(ctx context.Context, students []model.Student) error
 	BulkUpsert(ctx context.Context, students []model.Student) (int, error)
 	GetAll(ctx context.Context, levelID int, groupID string, limit, offset int64) ([]model.Student, error)
+	SetActive(ctx context.Context, id primitive.ObjectID, isActive bool) error
 }
 
 type studentRepository struct {
@@ -245,3 +246,20 @@ func (r *studentRepository) CreateOrUpdate(ctx context.Context, student *model.S
 	}
 	return nil
 }
+
+func (r *studentRepository) SetActive(ctx context.Context, id primitive.ObjectID, isActive bool) error {
+	now := time.Now().UTC()
+	filter := bson.M{"_id": id}
+	update := bson.M{
+		"$set": bson.M{
+			"is_active":  isActive,
+			"updated_at": now,
+		},
+	}
+	_, err := r.col.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return fmt.Errorf("failed to update student activation: %w", err)
+	}
+	return nil
+}
+

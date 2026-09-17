@@ -521,12 +521,17 @@ func (p *AdminPresenter) HandleCreateStudent(w http.ResponseWriter, r *http.Requ
 		groupID = "A"
 	}
 
+	isActive := true
+	if r.FormValue("is_active") == "false" {
+		isActive = false
+	}
+
 	student := &model.Student{
 		StudentCode: code,
 		Name:        name,
 		LevelID:     levelID,
 		GroupID:     groupID,
-		IsActive:    true,
+		IsActive:    isActive,
 	}
 
 	if err := p.studentRepo.CreateOrUpdate(r.Context(), student); err != nil {
@@ -536,6 +541,33 @@ func (p *AdminPresenter) HandleCreateStudent(w http.ResponseWriter, r *http.Requ
 
 	http.Redirect(w, r, "/admin/students?success=Student+saved+successfully", http.StatusSeeOther)
 }
+
+func (p *AdminPresenter) HandleToggleStudentActivation(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid form data", http.StatusBadRequest)
+		return
+	}
+
+	studentIDHex := strings.TrimSpace(r.FormValue("student_id"))
+	objID, err := primitive.ObjectIDFromHex(studentIDHex)
+	if err != nil {
+		http.Error(w, "Invalid student ID", http.StatusBadRequest)
+		return
+	}
+
+	isActive := r.FormValue("is_active") == "true"
+	if err := p.studentRepo.SetActive(r.Context(), objID, isActive); err != nil {
+		http.Error(w, "Failed to update student activation: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	redirectURL := r.FormValue("redirect_to")
+	if redirectURL == "" {
+		redirectURL = "/admin/students/" + studentIDHex
+	}
+	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+}
+
 
 func (p *AdminPresenter) RenderStudentProfile(w http.ResponseWriter, r *http.Request) {
 	studentIDHex := strings.TrimPrefix(r.URL.Path, "/admin/students/")

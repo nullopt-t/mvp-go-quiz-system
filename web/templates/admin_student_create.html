@@ -64,8 +64,16 @@
           </div>
         </div>
 
+        <div class="form-group">
+          <label for="is_active">{{ index .I18n.T "is_active_label" }}</label>
+          <select id="is_active" name="is_active">
+            <option value="true">{{ index .I18n.T "active_option" }}</option>
+            <option value="false">{{ index .I18n.T "inactive_option" }}</option>
+          </select>
+        </div>
+
         <button type="submit" class="btn btn-primary btn-block" style="padding: 0.85rem; margin-top: 1rem; font-size: 1rem;">
-          {{ index .I18n.T "admin_add_student" }}
+          <i class="fa-solid fa-user-plus" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_add_student" }}
         </button>
       </form>
     </div>
