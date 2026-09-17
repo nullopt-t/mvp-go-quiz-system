@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="{{ .I18n.Lang }}" dir="{{ .I18n.Dir }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ index .I18n.T "admin_students_title" }} - {{ index .I18n.T "admin_portal" }}</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/htmx.min.js"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/admin" class="nav-brand">
+      <span>{{ index .I18n.T "admin_portal" }}</span>
+    </a>
+    <div class="nav-user">
+      <a href="/admin" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;">{{ index .I18n.T "dashboard" }}</a>
+      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 600;">
+        {{ index .I18n.T "lang_switch" }}
+      </a>
+      <form action="/admin/logout" method="POST" style="display:inline;">
+        <button type="submit" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;">{{ index .I18n.T "logout" }}</button>
+      </form>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+      <div>
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.25rem;">{{ index .I18n.T "admin_students_title" }}</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+          {{ index .I18n.T "admin_students_sub" }} ({{ .TotalStudents }} {{ index .I18n.T "admin_enrolled" }})
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem;">
+        <a href="/admin/students/create" class="btn btn-primary" style="padding: 0.55rem 1.15rem; font-size: 0.9rem;">
+          + {{ index .I18n.T "admin_add_student" }}
+        </a>
+      </div>
+    </div>
+
+    {{ if .Success }}
+    <div class="alert alert-info" style="background-color: #dcfce7; color: #15803d; border-color: #bbf7d0; margin-bottom: 1.5rem;">
+      {{ .Success }}
+    </div>
+    {{ end }}
+
+    <!-- Filter Bar -->
+    <div class="card" style="padding: 1.25rem; margin-bottom: 1.5rem;">
+      <form action="/admin/students" method="GET" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 140px;">
+          <label style="font-size: 0.85rem;">{{ index .I18n.T "level" }}</label>
+          <select name="level_id" style="padding: 0.55rem 0.75rem; font-size: 0.9rem;">
+            <option value="0">{{ index .I18n.T "all_levels" }}</option>
+            <option value="1" {{ if eq .SelectedLevel 1 }}selected{{ end }}>{{ index .I18n.T "level" }} 1</option>
+            <option value="2" {{ if eq .SelectedLevel 2 }}selected{{ end }}>{{ index .I18n.T "level" }} 2</option>
+            <option value="3" {{ if eq .SelectedLevel 3 }}selected{{ end }}>{{ index .I18n.T "level" }} 3</option>
+            <option value="4" {{ if eq .SelectedLevel 4 }}selected{{ end }}>{{ index .I18n.T "level" }} 4</option>
+            <option value="5" {{ if eq .SelectedLevel 5 }}selected{{ end }}>{{ index .I18n.T "level" }} 5</option>
+          </select>
+        </div>
+
+        <div style="flex: 1; min-width: 140px;">
+          <label style="font-size: 0.85rem;">{{ index .I18n.T "group" }}</label>
+          <select name="group_id" style="padding: 0.55rem 0.75rem; font-size: 0.9rem;">
+            <option value="">{{ index .I18n.T "all_groups" }}</option>
+            <option value="A" {{ if eq .SelectedGroup "A" }}selected{{ end }}>{{ index .I18n.T "group" }} A</option>
+            <option value="B" {{ if eq .SelectedGroup "B" }}selected{{ end }}>{{ index .I18n.T "group" }} B</option>
+            <option value="C" {{ if eq .SelectedGroup "C" }}selected{{ end }}>{{ index .I18n.T "group" }} C</option>
+            <option value="D" {{ if eq .SelectedGroup "D" }}selected{{ end }}>{{ index .I18n.T "group" }} D</option>
+          </select>
+        </div>
+
+        <div>
+          <button type="submit" class="btn btn-secondary" style="padding: 0.55rem 1.25rem; font-size: 0.9rem;">
+            {{ index .I18n.T "filter_btn" }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Students Table -->
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ index .I18n.T "student_id_label" }}</th>
+            <th>{{ index .I18n.T "student_label" }}</th>
+            <th>{{ index .I18n.T "level" }}</th>
+            <th>{{ index .I18n.T "group" }}</th>
+            <th>{{ index .I18n.T "table_status" }}</th>
+            <th>{{ index .I18n.T "table_action" }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ range .Students }}
+          <tr>
+            <td><code>{{ .StudentCode }}</code></td>
+            <td><strong>{{ .Name }}</strong></td>
+            <td><span class="badge badge-primary">{{ index $.I18n.T "level" }} {{ .LevelID }}</span></td>
+            <td><span class="badge badge-muted">{{ index $.I18n.T "group" }} {{ .GroupID }}</span></td>
+            <td>
+              {{ if .IsActive }}
+                <span class="badge badge-success">Active</span>
+              {{ else }}
+                <span class="badge badge-muted">Inactive</span>
+              {{ end }}
+            </td>
+            <td>
+              <a href="/admin/students/{{ .ID.Hex }}" class="btn btn-secondary" style="padding: 0.25rem 0.65rem; font-size: 0.8rem;">
+                {{ index $.I18n.T "view_btn" }}
+              </a>
+            </td>
+          </tr>
+          {{ else }}
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+              No students found for the selected filters.
+            </td>
+          </tr>
+          {{ end }}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>
