@@ -69,64 +69,101 @@ func (p *AdminPresenter) RenderDashboard(w http.ResponseWriter, r *http.Request)
 }
 
 func (p *AdminPresenter) HandlePreviewImportStudents(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseMultipartForm(50 << 20); err != nil { // 50MB max
-		http.Redirect(w, r, "/admin?import_error=Failed+to+read+upload+data", http.StatusSeeOther)
-		return
+	searchQuery := strings.ToLower(strings.TrimSpace(r.FormValue("search")))
+	filterLevel, _ := strconv.Atoi(r.FormValue("filter_level"))
+	filterGroup := strings.ToUpper(strings.TrimSpace(r.FormValue("filter_group")))
+	fileToken := strings.TrimSpace(r.FormValue("file_token"))
+
+	var tempPath string
+	var err error
+
+	if fileToken != "" {
+		// Existing file token: read cached file
+		tempPath = filepath.Join(os.TempDir(), filepath.Clean(fileToken))
+		if _, err := os.Stat(tempPath); err != nil {
+			http.Redirect(w, r, "/admin?import_error=Upload+session+expired.+Please+re-upload+the+file", http.StatusSeeOther)
+			return
+		}
+	} else {
+		if err := r.ParseMultipartForm(50 << 20); err != nil { // 50MB max
+			http.Redirect(w, r, "/admin?import_error=Failed+to+read+upload+data", http.StatusSeeOther)
+			return
+		}
+
+		file, _, err := r.FormFile("csv_file")
+		if err != nil {
+			http.Redirect(w, r, "/admin?import_error=Please+select+a+valid+CSV+file", http.StatusSeeOther)
+			return
+		}
+		defer file.Close()
+
+		tempFile, err := os.CreateTemp("", "roster-*.csv")
+		if err != nil {
+			http.Redirect(w, r, "/admin?import_error=Failed+to+process+uploaded+file", http.StatusSeeOther)
+			return
+		}
+		tempPath = tempFile.Name()
+		defer tempFile.Close()
+
+		if _, err := io.Copy(tempFile, file); err != nil {
+			_ = os.Remove(tempPath)
+			http.Redirect(w, r, "/admin?import_error=Failed+to+cache+uploaded+roster", http.StatusSeeOther)
+			return
+		}
+		fileToken = filepath.Base(tempPath)
 	}
 
-	file, _, err := r.FormFile("csv_file")
+	f, err := os.Open(tempPath)
 	if err != nil {
-		http.Redirect(w, r, "/admin?import_error=Please+select+a+valid+CSV+file", http.StatusSeeOther)
+		http.Redirect(w, r, "/admin?import_error=Failed+to+read+roster+file", http.StatusSeeOther)
 		return
 	}
-	defer file.Close()
+	defer f.Close()
 
-	// Save temporary copy for reliable large file importing
-	tempFile, err := os.CreateTemp("", "roster-*.csv")
+	students, err := p.importService.ParseStudentsFromCSV(f)
 	if err != nil {
-		http.Redirect(w, r, "/admin?import_error=Failed+to+process+uploaded+file", http.StatusSeeOther)
-		return
-	}
-	tempPath := tempFile.Name()
-	defer tempFile.Close()
-
-	if _, err := io.Copy(tempFile, file); err != nil {
-		_ = os.Remove(tempPath)
-		http.Redirect(w, r, "/admin?import_error=Failed+to+cache+uploaded+roster", http.StatusSeeOther)
-		return
-	}
-
-	// Rewind to parse
-	if _, err := tempFile.Seek(0, 0); err != nil {
-		_ = os.Remove(tempPath)
-		http.Redirect(w, r, "/admin?import_error=Failed+to+read+cached+roster", http.StatusSeeOther)
-		return
-	}
-
-	students, err := p.importService.ParseStudentsFromCSV(tempFile)
-	if err != nil {
-		_ = os.Remove(tempPath)
 		http.Redirect(w, r, fmt.Sprintf("/admin?import_error=%s", strings.ReplaceAll(err.Error(), " ", "+")), http.StatusSeeOther)
 		return
 	}
 
-	displayLimit := 250
-	displayStudents := students
-	isTruncated := false
-	if len(students) > displayLimit {
-		displayStudents = students[:displayLimit]
-		isTruncated = true
+	// Apply filter / search
+	var filtered []model.Student
+	for _, s := range students {
+		if filterLevel > 0 && s.LevelID != filterLevel {
+			continue
+		}
+		if filterGroup != "" && s.GroupID != filterGroup {
+			continue
+		}
+		if searchQuery != "" {
+			codeLower := strings.ToLower(s.StudentCode)
+			nameLower := strings.ToLower(s.Name)
+			if !strings.Contains(codeLower, searchQuery) && !strings.Contains(nameLower, searchQuery) {
+				continue
+			}
+		}
+		filtered = append(filtered, s)
 	}
 
-	fileToken := filepath.Base(tempPath)
+	displayLimit := 250
+	displayStudents := filtered
+	isTruncated := false
+	if len(filtered) > displayLimit {
+		displayStudents = filtered[:displayLimit]
+		isTruncated = true
+	}
 
 	i18nBundle := GetI18n(r)
 	data := map[string]interface{}{
 		"Students":        displayStudents,
 		"TotalCount":      len(students),
+		"FilteredCount":   len(filtered),
 		"DisplayedCount":  len(displayStudents),
 		"IsTruncated":     isTruncated,
 		"FileToken":       fileToken,
+		"SearchQuery":     searchQuery,
+		"FilterLevel":     filterLevel,
+		"FilterGroup":     filterGroup,
 		"I18n":            i18nBundle,
 	}
 
