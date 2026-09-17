@@ -12,11 +12,11 @@ import (
 )
 
 type ResultService interface {
-	CalculateAndSubmit(ctx context.Context, quizID, studentID primitive.ObjectID, studentCode, studentName string, levelID, groupID int) (*model.QuizResult, error)
+	CalculateAndSubmit(ctx context.Context, quizID, studentID primitive.ObjectID, studentCode, studentName string, levelID int, groupID string) (*model.QuizResult, error)
 	GetStudentResult(ctx context.Context, quizID, studentID primitive.ObjectID) (*model.QuizResult, error)
 	GetStudentHistory(ctx context.Context, studentID primitive.ObjectID) ([]model.QuizResult, error)
 	GetQuizLeaderboard(ctx context.Context, quizID primitive.ObjectID) ([]model.QuizResult, error)
-	GetGroupAnalytics(ctx context.Context, quizID primitive.ObjectID, levelID, groupID int) ([]model.QuizResult, error)
+	GetGroupAnalytics(ctx context.Context, quizID primitive.ObjectID, levelID int, groupID int) ([]model.QuizResult, error)
 }
 
 type resultService struct {
@@ -40,7 +40,7 @@ func NewResultService(
 	}
 }
 
-func (s *resultService) CalculateAndSubmit(ctx context.Context, quizID, studentID primitive.ObjectID, studentCode, studentName string, levelID, groupID int) (*model.QuizResult, error) {
+func (s *resultService) CalculateAndSubmit(ctx context.Context, quizID, studentID primitive.ObjectID, studentCode, studentName string, levelID int, groupID string) (*model.QuizResult, error) {
 	// Check if already calculated
 	existing, err := s.resultRepo.GetStudentResult(ctx, quizID, studentID)
 	if err == nil && existing != nil {
