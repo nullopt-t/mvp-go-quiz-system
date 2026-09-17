@@ -73,10 +73,10 @@
         </a>
       </div>
 
-      <form action="/admin/students/import" method="POST" enctype="multipart/form-data" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+      <form action="/admin/students/preview" method="POST" enctype="multipart/form-data" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
         <input type="file" name="csv_file" accept=".csv" required style="flex: 1; min-width: 240px; padding: 0.5rem; background: #fff;">
         <button type="submit" class="btn btn-primary" style="padding: 0.55rem 1.25rem; font-size: 0.9rem;">
-          {{ index .I18n.T "admin_import_btn" }}
+          {{ index .I18n.T "admin_preview_btn" }}
         </button>
       </form>
     </div>
