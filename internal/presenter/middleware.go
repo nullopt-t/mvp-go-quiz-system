@@ -66,8 +66,13 @@ func AuthMiddleware(authService service.AuthService) func(http.Handler) http.Han
 				}
 			}
 
+			loginPath := "/login"
+			if strings.HasPrefix(r.URL.Path, "/admin") {
+				loginPath = "/admin/login"
+			}
+
 			if tokenString == "" {
-				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				http.Redirect(w, r, loginPath, http.StatusSeeOther)
 				return
 			}
 
@@ -81,7 +86,7 @@ func AuthMiddleware(authService service.AuthService) func(http.Handler) http.Han
 					MaxAge:   -1,
 					HttpOnly: true,
 				})
-				http.Redirect(w, r, "/login?error=Session+expired.+Please+log+in+again.", http.StatusSeeOther)
+				http.Redirect(w, r, loginPath+"?error=Session+expired.+Please+log+in+again.", http.StatusSeeOther)
 				return
 			}
 
