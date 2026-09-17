@@ -155,6 +155,8 @@ var translations = map[Language]map[string]string{
 		"quiz_option_num": "Option %d",
 		"quiz_option_placeholder": "Option %s text",
 		"quiz_correct_key": "Correct Answer Key",
+		"quiz_add_question_btn": "Add Another Question",
+		"quiz_remove_question_btn": "Delete Question",
 		"quiz_save_publish_btn": "Save & Publish Assessment",
 	},
 	LangAR: {
@@ -293,6 +295,8 @@ var translations = map[Language]map[string]string{
 		"quiz_option_num": "الخيار %d",
 		"quiz_option_placeholder": "نص الخيار %s",
 		"quiz_correct_key": "مفتاح الإجابة الصحيحة",
+		"quiz_add_question_btn": "إضافة سؤال جديد",
+		"quiz_remove_question_btn": "حذف السؤال",
 		"quiz_save_publish_btn": "حفظ ونشر الاختبار",
 	},
 }

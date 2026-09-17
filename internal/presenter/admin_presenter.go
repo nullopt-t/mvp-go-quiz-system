@@ -324,29 +324,41 @@ func (p *AdminPresenter) HandleCreateQuiz(w http.ResponseWriter, r *http.Request
 		}
 	}
 
-	// Parse Dynamic Questions
-	questionCount, _ := strconv.Atoi(r.FormValue("question_count"))
-	if questionCount <= 0 {
-		questionCount = 3
+	// Parse Dynamic Questions (supports unlimited dynamic questions added or removed via UI)
+	var questions []model.Question
+	// Check if specific question indices were submitted
+	qIndices := r.Form["q_index[]"]
+	if len(qIndices) == 0 {
+		// Fallback: scan sequential or hidden count
+		count, _ := strconv.Atoi(r.FormValue("question_count"))
+		if count < 1 {
+			count = 50
+		}
+		for i := 1; i <= count; i++ {
+			qIndices = append(qIndices, strconv.Itoa(i))
+		}
 	}
 
-	var questions []model.Question
-	for qIdx := 1; qIdx <= questionCount; qIdx++ {
-		qText := strings.TrimSpace(r.FormValue(fmt.Sprintf("q_%d_text", qIdx)))
+	for _, idxStr := range qIndices {
+		idxStr = strings.TrimSpace(idxStr)
+		if idxStr == "" {
+			continue
+		}
+		qText := strings.TrimSpace(r.FormValue(fmt.Sprintf("q_%s_text", idxStr)))
 		if qText == "" {
 			continue
 		}
 
-		qPoints, _ := strconv.Atoi(r.FormValue(fmt.Sprintf("q_%d_points", qIdx)))
+		qPoints, _ := strconv.Atoi(r.FormValue(fmt.Sprintf("q_%s_points", idxStr)))
 		if qPoints <= 0 {
 			qPoints = 10
 		}
 
-		correctOptID, _ := strconv.Atoi(r.FormValue(fmt.Sprintf("q_%d_correct", qIdx)))
+		correctOptID, _ := strconv.Atoi(r.FormValue(fmt.Sprintf("q_%s_correct", idxStr)))
 
 		var options []model.Option
 		for oIdx := 1; oIdx <= 4; oIdx++ {
-			optText := strings.TrimSpace(r.FormValue(fmt.Sprintf("q_%d_opt_%d", qIdx, oIdx)))
+			optText := strings.TrimSpace(r.FormValue(fmt.Sprintf("q_%s_opt_%d", idxStr, oIdx)))
 			if optText != "" {
 				options = append(options, model.Option{
 					ID:        oIdx,
@@ -358,7 +370,7 @@ func (p *AdminPresenter) HandleCreateQuiz(w http.ResponseWriter, r *http.Request
 
 		if len(options) >= 2 {
 			questions = append(questions, model.Question{
-				ID:      qIdx,
+				ID:      len(questions) + 1,
 				Text:    qText,
 				Points:  qPoints,
 				Options: options,
