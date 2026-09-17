@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="{{ .I18n.Lang }}" dir="{{ .I18n.Dir }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ index .I18n.T "admin_portal" }} - {{ index .I18n.T "admin_login_title" }}</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/htmx.min.js"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/admin/login" class="nav-brand">
+      🎓 <span>{{ index .I18n.T "admin_portal" }}</span>
+    </a>
+    <div class="nav-user">
+      <span class="badge badge-warning">{{ index .I18n.T "admin_mode" }}</span>
+      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 700;">
+        🌐 {{ index .I18n.T "lang_switch" }}
+      </a>
+    </div>
+  </nav>
+
+  <div class="container" style="max-width: 460px; margin-top: 4.5rem;">
+    <div class="card" style="border-top: 4px solid var(--warning);">
+      <h2 style="margin-bottom: 0.5rem; text-align: center;">{{ index .I18n.T "admin_login_title" }}</h2>
+      <p style="color: var(--text-muted); text-align: center; margin-bottom: 1.5rem; font-size: 0.9rem;">
+        {{ index .I18n.T "admin_login_sub" }}
+      </p>
+
+      {{ if .Error }}
+      <div class="alert alert-danger">
+        ⚠️ {{ .Error }}
+      </div>
+      {{ end }}
+
+      <form action="/admin/login" method="POST">
+        <div class="form-group">
+          <label for="pin">{{ index .I18n.T "admin_pin_label" }}</label>
+          <input type="password" id="pin" name="pin" placeholder="Enter Admin PIN" autofocus required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" style="padding: 0.85rem; margin-top: 1.25rem;">
+          {{ index .I18n.T "admin_pin_btn" }}
+        </button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
