@@ -31,7 +31,7 @@
         <div style="font-size: 2rem; font-weight: 800; color: var(--primary); margin-top: 0.25rem;">
           {{ .TotalStudents }}
         </div>
-        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">5 {{ index .I18n.T "level" }} • 20 {{ index .I18n.T "group" }}</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">{{ len .GroupSummaries }} Cohorts Registered</div>
       </div>
 
       <div class="card" style="margin-bottom: 0;">
@@ -92,7 +92,11 @@
         {{ range .GroupSummaries }}
         <div style="background: #f8fafc; border: 1px solid var(--border); padding: 0.75rem; border-radius: 8px; font-size: 0.85rem;">
           <div style="font-weight: 700; color: var(--primary);">{{ index $.I18n.T "level" }} {{ .LevelID }} • {{ index $.I18n.T "group" }} {{ .GroupID }}</div>
-          <div style="color: var(--text-muted); margin-top: 0.2rem;">{{ index $.I18n.T "admin_enrolled" }}: <strong>{{ .Count }}</strong> / 500</div>
+          <div style="color: var(--text-muted); margin-top: 0.2rem;">{{ index $.I18n.T "admin_enrolled" }}: <strong>{{ .Count }}</strong></div>
+        </div>
+        {{ else }}
+        <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 1.5rem; background: #f8fafc; border-radius: 8px;">
+          No student cohorts registered yet. Upload a CSV roster above to get started.
         </div>
         {{ end }}
       </div>
