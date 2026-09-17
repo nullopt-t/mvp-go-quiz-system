@@ -1,0 +1,192 @@
+package service
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"time"
+
+	"quiz-system/internal/model"
+	"quiz-system/internal/repository"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
+var (
+	ErrQuizNotFound     = errors.New("quiz not found")
+	ErrQuizInactive     = errors.New("quiz is currently not active")
+	ErrQuizNotStarted   = errors.New("quiz has not started yet")
+	ErrQuizExpired      = errors.New("quiz session has expired")
+	ErrAlreadySubmitted = errors.New("quiz has already been completed and submitted")
+)
+
+type StudentQuizView struct {
+	Quiz             *model.Quiz
+	RemainingSeconds int
+	StartedAt        time.Time
+	IsCompleted      bool
+	PreviousAnswers  map[int]int // question_id -> answer_id
+}
+
+type QuizService interface {
+	CreateQuiz(ctx context.Context, quiz *model.Quiz) error
+	GetQuizByID(ctx context.Context, id primitive.ObjectID) (*model.Quiz, error)
+	GetAllQuizzes(ctx context.Context) ([]model.Quiz, error)
+	GetAvailableQuizzesForStudent(ctx context.Context, studentID primitive.ObjectID, levelID, groupID int) ([]StudentQuizSummary, error)
+	StartOrResumeQuiz(ctx context.Context, quizID, studentID primitive.ObjectID) (*StudentQuizView, error)
+}
+
+type StudentQuizSummary struct {
+	Quiz        model.Quiz
+	Status      string // "AVAILABLE", "IN_PROGRESS", "COMPLETED"
+	Score       int
+	TotalPoints int
+}
+
+type quizService struct {
+	quizRepo    repository.QuizRepository
+	sessionRepo repository.SessionRepository
+	answerRepo  repository.AnswerRepository
+	resultRepo  repository.ResultRepository
+}
+
+func NewQuizService(
+	quizRepo repository.QuizRepository,
+	sessionRepo repository.SessionRepository,
+	answerRepo repository.AnswerRepository,
+	resultRepo repository.ResultRepository,
+) QuizService {
+	return &quizService{
+		quizRepo:    quizRepo,
+		sessionRepo: sessionRepo,
+		answerRepo:  answerRepo,
+		resultRepo:  resultRepo,
+	}
+}
+
+func (s *quizService) CreateQuiz(ctx context.Context, quiz *model.Quiz) error {
+	if quiz.Title == "" {
+		return errors.New("quiz title is required")
+	}
+	if quiz.DurationMinutes <= 0 {
+		quiz.DurationMinutes = 30
+	}
+	return s.quizRepo.Create(ctx, quiz)
+}
+
+func (s *quizService) GetQuizByID(ctx context.Context, id primitive.ObjectID) (*model.Quiz, error) {
+	return s.quizRepo.GetByID(ctx, id)
+}
+
+func (s *quizService) GetAllQuizzes(ctx context.Context) ([]model.Quiz, error) {
+	return s.quizRepo.GetAll(ctx)
+}
+
+func (s *quizService) GetAvailableQuizzesForStudent(ctx context.Context, studentID primitive.ObjectID, levelID, groupID int) ([]StudentQuizSummary, error) {
+	quizzes, err := s.quizRepo.GetAvailableForStudent(ctx, levelID, groupID)
+	if err != nil {
+		return nil, err
+	}
+
+	summaries := make([]StudentQuizSummary, 0, len(quizzes))
+	for _, q := range quizzes {
+		summary := StudentQuizSummary{
+			Quiz:   q,
+			Status: "AVAILABLE",
+		}
+
+		// Check if already completed
+		res, err := s.resultRepo.GetStudentResult(ctx, q.ID, studentID)
+		if err == nil && res != nil {
+			summary.Status = "COMPLETED"
+			summary.Score = res.Score
+			summary.TotalPoints = res.TotalPoints
+		} else {
+			// Check if session started
+			sess, err := s.sessionRepo.GetSession(ctx, q.ID, studentID)
+			if err == nil && sess != nil {
+				elapsed := time.Since(sess.StartedAt)
+				totalAllowed := time.Duration(q.DurationMinutes) * time.Minute
+				if elapsed > totalAllowed {
+					summary.Status = "EXPIRED"
+				} else {
+					summary.Status = "IN_PROGRESS"
+				}
+			}
+		}
+
+		summaries = append(summaries, summary)
+	}
+
+	return summaries, nil
+}
+
+func (s *quizService) StartOrResumeQuiz(ctx context.Context, quizID, studentID primitive.ObjectID) (*StudentQuizView, error) {
+	quiz, err := s.quizRepo.GetByID(ctx, quizID)
+	if err != nil {
+		return nil, err
+	}
+	if quiz == nil {
+		return nil, ErrQuizNotFound
+	}
+	if !quiz.IsActive {
+		return nil, ErrQuizInactive
+	}
+
+	// Check if already submitted
+	res, err := s.resultRepo.GetStudentResult(ctx, quizID, studentID)
+	if err == nil && res != nil {
+		return &StudentQuizView{
+			Quiz:        quiz,
+			IsCompleted: true,
+		}, nil
+	}
+
+	// Ensure session started
+	session, err := s.sessionRepo.StartSessionIfAbsent(ctx, quizID, studentID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize quiz session: %w", err)
+	}
+
+	totalDuration := time.Duration(quiz.DurationMinutes) * time.Minute
+	elapsed := time.Since(session.StartedAt)
+	remaining := int((totalDuration - elapsed).Seconds())
+	if remaining < 0 {
+		remaining = 0
+	}
+
+	// Get latest answers map to restore client state
+	answersMap, err := s.answerRepo.GetLatestAnswersMap(ctx, quizID, studentID)
+	if err != nil {
+		answersMap = make(map[int]int)
+	}
+
+	// Sanitize quiz questions (strip is_correct)
+	sanitizedQuiz := *quiz
+	sanitizedQuestions := make([]model.Question, len(quiz.Questions))
+	for i, q := range quiz.Questions {
+		sanitizedOptions := make([]model.Option, len(q.Options))
+		for j, opt := range q.Options {
+			sanitizedOptions[j] = model.Option{
+				ID:        opt.ID,
+				Text:      opt.Text,
+				IsCorrect: false, // Protected against inspection
+			}
+		}
+		sanitizedQuestions[i] = model.Question{
+			ID:      q.ID,
+			Text:    q.Text,
+			Points:  q.Points,
+			Options: sanitizedOptions,
+		}
+	}
+	sanitizedQuiz.Questions = sanitizedQuestions
+
+	return &StudentQuizView{
+		Quiz:             &sanitizedQuiz,
+		RemainingSeconds: remaining,
+		StartedAt:        session.StartedAt,
+		IsCompleted:      false,
+		PreviousAnswers:  answersMap,
+	}, nil
+}
