@@ -8,152 +8,258 @@
   <script src="/static/htmx.min.js"></script>
 </head>
 <body>
-  <nav class="navbar">
-    <a href="/admin" class="nav-brand">
-      <span>{{ index .I18n.T "admin_portal" }}</span>
+  <!-- Academic Portal Header -->
+  <nav class="navbar" style="padding: 1rem 2rem; border-bottom: 1px solid var(--border); background: #ffffff;">
+    <a href="/admin" class="nav-brand" style="display: flex; align-items: center; gap: 0.75rem;">
+      <div style="background: var(--primary); color: #fff; width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; box-shadow: 0 2px 4px rgba(37,99,235,0.25);">
+        🎓
+      </div>
+      <div>
+        <div style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); line-height: 1.2;">{{ index .I18n.T "admin_portal" }}</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{{ index .I18n.T "admin_dashboard_badge" }}</div>
+      </div>
     </a>
-    <div class="nav-user">
-      <span class="badge badge-warning">{{ index .I18n.T "admin_mode" }}</span>
-      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 700;">
+    <div class="nav-user" style="display: flex; align-items: center; gap: 0.75rem;">
+      <a href="/admin/students" class="btn btn-secondary" style="padding: 0.45rem 0.95rem; font-size: 0.85rem; font-weight: 600;">
+        👥 {{ index .I18n.T "admin_students_title" }}
+      </a>
+      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.45rem 0.9rem; font-size: 0.85rem; font-weight: 700;">
         {{ index .I18n.T "lang_switch" }}
       </a>
-      <form action="/admin/logout" method="POST" style="display:inline;">
-        <button type="submit" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">{{ index .I18n.T "logout" }}</button>
+      <form action="/admin/logout" method="POST" style="display:inline; margin: 0;">
+        <button type="submit" class="btn btn-secondary" style="padding: 0.45rem 0.9rem; font-size: 0.85rem; color: var(--danger); border-color: #fecaca; background: #fff5f5;">
+          {{ index .I18n.T "logout" }}
+        </button>
       </form>
     </div>
   </nav>
 
   <div class="container">
-    <!-- Quick Stats -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-      <div class="card" style="margin-bottom: 0;">
-        <div style="font-size: 0.85rem; color: var(--text-muted);">{{ index .I18n.T "admin_total_students" }}</div>
-        <div style="font-size: 2rem; font-weight: 800; color: var(--primary); margin-top: 0.25rem;">
-          {{ .TotalStudents }}
+    <!-- Welcome Greeting Header -->
+    <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff; border-radius: 14px; padding: 2rem 2.25rem; margin-bottom: 2rem; box-shadow: 0 10px 25px -5px rgba(15,23,42,0.15); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+      <div>
+        <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; color: #93c5fd; margin-bottom: 0.75rem;">
+          🏛️ {{ index .I18n.T "admin_dashboard_badge" }}
         </div>
-        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">{{ len .GroupSummaries }} Cohorts Registered</div>
+        <h1 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 0.35rem; color: #ffffff;">
+          {{ index .I18n.T "admin_dashboard_welcome" }}
+        </h1>
+        <p style="color: #94a3b8; font-size: 0.95rem; margin: 0;">
+          {{ index .I18n.T "admin_dashboard_sub" }}
+        </p>
       </div>
 
-      <div class="card" style="margin-bottom: 0;">
-        <div style="font-size: 0.85rem; color: var(--text-muted);">{{ index .I18n.T "admin_active_quizzes" }}</div>
-        <div style="font-size: 2rem; font-weight: 800; color: var(--success); margin-top: 0.25rem;">
-          {{ len .Quizzes }}
-        </div>
-        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Live Assessments</div>
-      </div>
-
-      <div class="card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center;">
-        <a href="/admin/quizzes/create" class="btn btn-primary" style="padding: 0.85rem;">+ {{ index .I18n.T "admin_create_quiz" }}</a>
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <a href="/admin/quizzes/create" class="btn btn-primary" style="background: #2563eb; padding: 0.65rem 1.35rem; font-size: 0.95rem; font-weight: 700; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(37,99,235,0.4);">
+          + {{ index .I18n.T "admin_create_quiz" }}
+        </a>
+        <a href="/admin/students/create" class="btn btn-secondary" style="background: rgba(255,255,255,0.1); color: #ffffff; border-color: rgba(255,255,255,0.2); padding: 0.65rem 1.15rem; font-size: 0.95rem; font-weight: 600; border-radius: 8px;">
+          + {{ index .I18n.T "admin_add_student" }}
+        </a>
       </div>
     </div>
 
     {{ if .ImportSuccess }}
-    <div class="alert alert-info" style="background-color: #dcfce7; color: #15803d; border-color: #bbf7d0; margin-bottom: 1.5rem;">
-      {{ .ImportSuccess }}
+    <div class="alert alert-info" style="background-color: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; font-weight: 600;">
+      <span>✓</span> {{ .ImportSuccess }}
     </div>
     {{ end }}
 
     {{ if .ImportError }}
-    <div class="alert alert-danger" style="margin-bottom: 1.5rem;">
-      {{ .ImportError }}
+    <div class="alert alert-danger" style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; font-weight: 600;">
+      <span>⚠</span> {{ .ImportError }}
     </div>
     {{ end }}
 
-    <!-- Student CSV Import Section -->
-    <div class="card" style="margin-bottom: 2rem;">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+    <!-- Key Metrics Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+      <div class="card" style="margin-bottom: 0; display: flex; align-items: center; gap: 1.25rem; padding: 1.5rem;">
+        <div style="width: 52px; height: 52px; border-radius: 12px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0;">
+          👥
+        </div>
+        <div style="flex: 1;">
+          <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">{{ index .I18n.T "admin_total_students" }}</div>
+          <div style="font-size: 2rem; font-weight: 800; color: var(--text-main); margin-top: 0.15rem; line-height: 1.1;">
+            {{ .TotalStudents }}
+          </div>
+          <div style="font-size: 0.8rem; color: #2563eb; margin-top: 0.35rem; font-weight: 600;">
+            <a href="/admin/students" style="color: inherit; text-decoration: none;">{{ index .I18n.T "admin_view_roster_btn" }} →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom: 0; display: flex; align-items: center; gap: 1.25rem; padding: 1.5rem;">
+        <div style="width: 52px; height: 52px; border-radius: 12px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0;">
+          📝
+        </div>
+        <div style="flex: 1;">
+          <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">{{ index .I18n.T "admin_active_quizzes" }}</div>
+          <div style="font-size: 2rem; font-weight: 800; color: var(--text-main); margin-top: 0.15rem; line-height: 1.1;">
+            {{ len .Quizzes }}
+          </div>
+          <div style="font-size: 0.8rem; color: #059669; margin-top: 0.35rem; font-weight: 600;">
+            {{ len .Quizzes }} {{ index .I18n.T "admin_managed_quizzes" }}
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom: 0; display: flex; align-items: center; gap: 1.25rem; padding: 1.5rem;">
+        <div style="width: 52px; height: 52px; border-radius: 12px; background: #fef3c7; color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0;">
+          🏛️
+        </div>
+        <div style="flex: 1;">
+          <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">{{ index .I18n.T "admin_cohort_summary" }}</div>
+          <div style="font-size: 2rem; font-weight: 800; color: var(--text-main); margin-top: 0.15rem; line-height: 1.1;">
+            {{ len .GroupSummaries }}
+          </div>
+          <div style="font-size: 0.8rem; color: #d97706; margin-top: 0.35rem; font-weight: 600;">
+            5 {{ index .I18n.T "all_levels" }} • A, B, C, D
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Two-Column Workflow Section: Roster Ingestion & Cohort Breakdown -->
+    <div style="display: grid; grid-template-columns: 1fr 1.6fr; gap: 1.5rem; margin-bottom: 2rem;">
+      <!-- CSV Import Box -->
+      <div class="card" style="margin-bottom: 0; display: flex; flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--text-main);">
+              📥 {{ index .I18n.T "admin_import_title" }}
+            </h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">
+              {{ index .I18n.T "admin_import_sub" }}
+            </p>
+          </div>
+        </div>
+
+        <form action="/admin/students/preview" method="POST" enctype="multipart/form-data" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 1rem; background: #f8fafc; padding: 1.25rem; border-radius: 10px; border: 1.5px dashed #cbd5e1;">
+          <div>
+            <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem;">
+              {{ index .I18n.T "admin_drop_csv_hint" }}
+            </div>
+            <input type="file" name="csv_file" accept=".csv" required style="width: 100%; padding: 0.65rem; background: #ffffff; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem;">
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem;">
+            <a href="/admin/students/sample-csv" style="font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 600;">
+              📄 {{ index .I18n.T "admin_sample_csv" }}
+            </a>
+            <button type="submit" class="btn btn-primary" style="padding: 0.55rem 1.35rem; font-size: 0.9rem; font-weight: 700; border-radius: 6px;">
+              {{ index .I18n.T "admin_preview_btn" }} →
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Cohorts Distribution Grid -->
+      <div class="card" style="margin-bottom: 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.2rem; color: var(--text-main);">
+              🏛️ {{ index .I18n.T "admin_hierarchy_title" }}
+            </h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">
+              {{ index .I18n.T "admin_hierarchy_sub" }}
+            </p>
+          </div>
+          <a href="/admin/students" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.35rem 0.75rem;">
+            {{ index .I18n.T "admin_students_title" }}
+          </a>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 0.65rem; max-height: 240px; overflow-y: auto; padding-right: 0.25rem;">
+          {{ range .GroupSummaries }}
+          <a href="/admin/students?level_id={{ .LevelID }}&group_id={{ .GroupID }}" style="text-decoration: none; color: inherit; background: #f8fafc; border: 1px solid var(--border); padding: 0.65rem 0.8rem; border-radius: 8px; transition: all 0.15s ease; display: block;" onmouseover="this.style.borderColor='var(--primary)'; this.style.background='#eff6ff';" onmouseout="this.style.borderColor='var(--border)'; this.style.background='#f8fafc';">
+            <div style="font-weight: 700; color: var(--primary); font-size: 0.85rem;">
+              {{ index $.I18n.T "level" }} {{ .LevelID }} • {{ index $.I18n.T "group" }} {{ .GroupID }}
+            </div>
+            <div style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.25rem;">
+              <strong>{{ .Count }}</strong> {{ index $.I18n.T "admin_enrolled" }}
+            </div>
+          </a>
+          {{ else }}
+          <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 2rem; background: #f8fafc; border-radius: 8px; font-size: 0.9rem;">
+            No student cohorts registered yet. Upload a CSV roster to populate cohorts.
+          </div>
+          {{ end }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Assessments Management Table -->
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
         <div>
-          <h3 style="margin-bottom: 0.25rem;">{{ index .I18n.T "admin_import_title" }}</h3>
-          <p style="color: var(--text-muted); font-size: 0.85rem;">
-            {{ index .I18n.T "admin_import_sub" }}
+          <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.2rem;">
+            📋 {{ index .I18n.T "admin_managed_quizzes" }}
+          </h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
+            Overview of assessments, active timeframes, and results tracking
           </p>
         </div>
-        <a href="/admin/students/sample-csv" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.45rem 0.9rem;">
-          📥 {{ index .I18n.T "admin_sample_csv" }}
+        <a href="/admin/quizzes/create" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.5rem 1.15rem; font-weight: 700;">
+          + {{ index .I18n.T "admin_create_quiz" }}
         </a>
       </div>
 
-      <form action="/admin/students/preview" method="POST" enctype="multipart/form-data" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
-        <input type="file" name="csv_file" accept=".csv" required style="flex: 1; min-width: 240px; padding: 0.5rem; background: #fff;">
-        <button type="submit" class="btn btn-primary" style="padding: 0.55rem 1.25rem; font-size: 0.9rem;">
-          {{ index .I18n.T "admin_preview_btn" }}
-        </button>
-      </form>
-    </div>
-
-    <!-- College Hierarchy Grid Overview -->
-    <div class="card">
-      <h3 style="margin-bottom: 0.5rem;">{{ index .I18n.T "admin_hierarchy_title" }}</h3>
-      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
-        {{ index .I18n.T "admin_hierarchy_sub" }}
-      </p>
-
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
-        {{ range .GroupSummaries }}
-        <div style="background: #f8fafc; border: 1px solid var(--border); padding: 0.75rem; border-radius: 8px; font-size: 0.85rem;">
-          <div style="font-weight: 700; color: var(--primary);">{{ index $.I18n.T "level" }} {{ .LevelID }} • {{ index $.I18n.T "group" }} {{ .GroupID }}</div>
-          <div style="color: var(--text-muted); margin-top: 0.2rem;">{{ index $.I18n.T "admin_enrolled" }}: <strong>{{ .Count }}</strong></div>
-        </div>
-        {{ else }}
-        <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 1.5rem; background: #f8fafc; border-radius: 8px;">
-          No student cohorts registered yet. Upload a CSV roster above to get started.
-        </div>
-        {{ end }}
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; margin-top: 0;">
+          <thead>
+            <tr style="background: #f8fafc; border-bottom: 2px solid var(--border);">
+              <th style="padding: 0.85rem 1rem;">{{ index .I18n.T "assigned_quizzes" }}</th>
+              <th style="padding: 0.85rem 1rem;">{{ index .I18n.T "table_target_level" }}</th>
+              <th style="padding: 0.85rem 1rem;">{{ index .I18n.T "duration" }}</th>
+              <th style="padding: 0.85rem 1rem;">{{ index .I18n.T "questions" }}</th>
+              <th style="padding: 0.85rem 1rem;">{{ index .I18n.T "table_status" }}</th>
+              <th style="padding: 0.85rem 1rem; text-align: center;">{{ index .I18n.T "table_action" }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ range .Quizzes }}
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 0.85rem 1rem;">
+                <strong style="font-size: 0.95rem; color: var(--text-main);">{{ .Title }}</strong>
+                {{ if .Description }}
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">{{ .Description }}</div>
+                {{ end }}
+              </td>
+              <td style="padding: 0.85rem 1rem;">
+                {{ if eq .LevelID 0 }}
+                  <span class="badge badge-muted">{{ index $.I18n.T "all_levels" }}</span>
+                {{ else }}
+                  <span class="badge badge-primary">{{ index $.I18n.T "level" }} {{ .LevelID }}</span>
+                {{ end }}
+                {{ if .GroupIDs }}
+                  <span style="font-size: 0.8rem; color: var(--text-muted); margin-inline-start: 0.35rem;">({{ range $i, $g := .GroupIDs }}{{ if $i }}, {{ end }}{{ $g }}{{ end }})</span>
+                {{ end }}
+              </td>
+              <td style="padding: 0.85rem 1rem; font-weight: 500;">{{ .DurationMinutes }} {{ index $.I18n.T "minutes" }}</td>
+              <td style="padding: 0.85rem 1rem; font-weight: 600;">{{ len .Questions }}</td>
+              <td style="padding: 0.85rem 1rem;">
+                {{ if .IsActive }}
+                  <span class="badge badge-success">{{ index $.I18n.T "status_live" }}</span>
+                {{ else }}
+                  <span class="badge badge-muted">{{ index $.I18n.T "status_expired" }}</span>
+                {{ end }}
+              </td>
+              <td style="padding: 0.85rem 1rem; text-align: center;">
+                <a href="/admin/quizzes/{{ .ID.Hex }}/analytics" class="btn btn-secondary" style="padding: 0.4rem 0.85rem; font-size: 0.85rem; font-weight: 600;">
+                  📊 {{ index $.I18n.T "analytics_btn" }}
+                </a>
+              </td>
+            </tr>
+            {{ else }}
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+                No quizzes created yet. Click "+ {{ index .I18n.T "admin_create_quiz" }}" above to create your first quiz.
+              </td>
+            </tr>
+            {{ end }}
+          </tbody>
+        </table>
       </div>
-    </div>
-
-    <!-- Quizzes Table -->
-    <div class="card">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <h3>{{ index .I18n.T "admin_managed_quizzes" }}</h3>
-        <a href="/admin/quizzes/create" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">+ {{ index .I18n.T "admin_create_quiz" }}</a>
-      </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>{{ index .I18n.T "assigned_quizzes" }}</th>
-            <th>{{ index .I18n.T "table_target_level" }}</th>
-            <th>{{ index .I18n.T "duration" }}</th>
-            <th>{{ index .I18n.T "questions" }}</th>
-            <th>{{ index .I18n.T "table_status" }}</th>
-            <th>{{ index .I18n.T "table_action" }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {{ range .Quizzes }}
-          <tr>
-            <td>
-              <strong>{{ .Title }}</strong>
-              <div style="font-size: 0.8rem; color: var(--text-muted);">{{ .Description }}</div>
-            </td>
-            <td>
-              {{ if eq .LevelID 0 }}
-                <span class="badge badge-muted">{{ index $.I18n.T "all_levels" }}</span>
-              {{ else }}
-                <span class="badge badge-primary">{{ index $.I18n.T "level" }} {{ .LevelID }}</span>
-              {{ end }}
-            </td>
-            <td>{{ .DurationMinutes }} {{ index $.I18n.T "minutes" }}</td>
-            <td>{{ len .Questions }}</td>
-            <td>
-              {{ if .IsActive }}
-                <span class="badge badge-success">{{ index $.I18n.T "status_live" }}</span>
-              {{ else }}
-                <span class="badge badge-muted">{{ index $.I18n.T "status_expired" }}</span>
-              {{ end }}
-            </td>
-            <td>
-              <a href="/admin/quizzes/{{ .ID.Hex }}/analytics" class="btn btn-secondary" style="padding: 0.3rem 0.65rem; font-size: 0.8rem;">{{ index $.I18n.T "analytics_btn" }}</a>
-            </td>
-          </tr>
-          {{ else }}
-          <tr>
-            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No quizzes created yet.</td>
-          </tr>
-          {{ end }}
-        </tbody>
-      </table>
     </div>
   </div>
 </body>
