@@ -29,11 +29,12 @@ func RegisterAdminRoutes(
 	mux.Handle("GET /admin/students", adminAuth(http.HandlerFunc(adminPres.RenderStudentsList)))
 	mux.Handle("GET /admin/students/create", adminAuth(http.HandlerFunc(adminPres.RenderCreateStudent)))
 	mux.Handle("POST /admin/students/create", adminAuth(http.HandlerFunc(adminPres.HandleCreateStudent)))
-	mux.Handle("POST /admin/students/import", adminAuth(http.HandlerFunc(adminPres.HandleImportStudents)))
+	mux.Handle("POST /admin/students/preview", adminAuth(http.HandlerFunc(adminPres.HandlePreviewImportStudents)))
+	mux.Handle("POST /admin/students/import", adminAuth(http.HandlerFunc(adminPres.HandleConfirmImportStudents)))
 	mux.Handle("GET /admin/students/sample-csv", adminAuth(http.HandlerFunc(adminPres.HandleDownloadSampleCSV)))
 	mux.Handle("GET /admin/students/", adminAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		path := strings.TrimPrefix(r.URL.Path, "/admin/students/")
-		if path != "" && path != "create" && path != "sample-csv" && path != "import" {
+		if path != "" && path != "create" && path != "sample-csv" && path != "import" && path != "preview" {
 			adminPres.RenderStudentProfile(w, r)
 			return
 		}
