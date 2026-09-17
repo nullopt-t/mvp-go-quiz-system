@@ -37,8 +37,10 @@
             <h3 style="font-size: 1.15rem;">{{ .Quiz.Title }}</h3>
             {{ if eq .Status "COMPLETED" }}
               <span class="badge badge-success">Completed</span>
-            {{ else if eq .Status "IN_PROGRESS" }}
-              <span class="badge badge-warning">In Progress</span>
+            {{ else if eq .Status "LIVE" }}
+              <span class="badge badge-primary">🔴 LIVE NOW</span>
+            {{ else if eq .Status "UPCOMING" }}
+              <span class="badge badge-warning">Upcoming</span>
             {{ else if eq .Status "EXPIRED" }}
               <span class="badge badge-muted">Expired</span>
             {{ else }}
@@ -49,7 +51,8 @@
             {{ .Quiz.Description }}
           </p>
           <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.35rem;">
-            <div>⏱️ <strong>Duration:</strong> {{ .Quiz.DurationMinutes }} minutes</div>
+            <div>📅 <strong>Start Time:</strong> {{ .Quiz.StartTime.Format "15:04:05 MST" }}</div>
+            <div>⏱️ <strong>Duration:</strong> {{ .Quiz.DurationMinutes }} minutes (Synchronized)</div>
             <div>❓ <strong>Questions:</strong> {{ len .Quiz.Questions }}</div>
           </div>
         </div>
@@ -60,8 +63,12 @@
               Score: {{ .Score }} / {{ .TotalPoints }} pts
             </div>
             <a href="/quizzes/{{ .Quiz.ID.Hex }}/result" class="btn btn-secondary btn-block">View Result Report</a>
-          {{ else if eq .Status "IN_PROGRESS" }}
-            <a href="/quizzes/{{ .Quiz.ID.Hex }}/start" class="btn btn-primary btn-block">Resume Quiz ➔</a>
+          {{ else if eq .Status "LIVE" }}
+            <a href="/quizzes/{{ .Quiz.ID.Hex }}/start" class="btn btn-primary btn-block">Enter Live Quiz ➔</a>
+          {{ else if eq .Status "UPCOMING" }}
+            <button class="btn btn-secondary btn-block" disabled style="opacity: 0.6; cursor: not-allowed;">Starts at {{ .Quiz.StartTime.Format "15:04" }}</button>
+          {{ else if eq .Status "EXPIRED" }}
+            <button class="btn btn-secondary btn-block" disabled style="opacity: 0.6; cursor: not-allowed;">Quiz Ended</button>
           {{ else }}
             <a href="/quizzes/{{ .Quiz.ID.Hex }}/start" class="btn btn-primary btn-block">Start Quiz ➔</a>
           {{ end }}
