@@ -86,4 +86,4 @@ make nuke         # Reset everything completely
 
 ## 📄 License
 
-Open for academic institutions and educational departments.
+This project is licensed under the [MIT License](LICENSE).
