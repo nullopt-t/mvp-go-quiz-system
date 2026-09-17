@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="{{ .I18n.Lang }}" dir="{{ .I18n.Dir }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ .Student.Name }} - {{ index .I18n.T "admin_student_profile" }}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/admin" class="nav-brand">
+      <span>{{ index .I18n.T "admin_portal" }}</span>
+    </a>
+    <div class="nav-user">
+      <a href="/admin/students" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;">{{ index .I18n.T "admin_students_title" }}</a>
+      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 600;">
+        {{ index .I18n.T "lang_switch" }}
+      </a>
+      <form action="/admin/logout" method="POST" style="display:inline;">
+        <button type="submit" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;">{{ index .I18n.T "logout" }}</button>
+      </form>
+    </div>
+  </nav>
+
+  <div class="container" style="max-width: 800px;">
+    <!-- Student Details Card -->
+    <div class="card" style="margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2 style="font-size: 1.6rem; margin-bottom: 0.25rem;">{{ .Student.Name }}</h2>
+          <div style="color: var(--text-muted); font-size: 0.95rem;">
+            <code>{{ .Student.StudentCode }}</code>
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <span class="badge badge-primary">{{ index .I18n.T "level" }} {{ .Student.LevelID }}</span>
+          <span class="badge badge-muted">{{ index .I18n.T "group" }} {{ .Student.GroupID }}</span>
+          {{ if .Student.IsActive }}
+            <span class="badge badge-success">Active</span>
+          {{ else }}
+            <span class="badge badge-muted">Inactive</span>
+          {{ end }}
+        </div>
+      </div>
+
+      <hr style="border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0;">
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; font-size: 0.9rem; color: var(--secondary);">
+        <div><strong>{{ index .I18n.T "cohort_label" }}:</strong> {{ index .I18n.T "level" }} {{ .Student.LevelID }} • {{ index .I18n.T "group" }} {{ .Student.GroupID }}</div>
+        <div><strong>Registered At:</strong> {{ .Student.CreatedAt.Format "2006-01-02 15:04" }}</div>
+        <div><strong>Completed Quizzes:</strong> {{ len .History }}</div>
+      </div>
+    </div>
+
+    <!-- Student Assessment History -->
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">{{ index .I18n.T "past_results" }}</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>{{ index .I18n.T "table_quiz_name" }}</th>
+            <th>{{ index .I18n.T "table_score" }}</th>
+            <th>{{ index .I18n.T "table_correct" }}</th>
+            <th>{{ index .I18n.T "table_percentage" }}</th>
+            <th>{{ index .I18n.T "table_submitted_at" }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ range .History }}
+          <tr>
+            <td><strong>{{ if .QuizTitle }}{{ .QuizTitle }}{{ else }}Assessment{{ end }}</strong></td>
+            <td><strong>{{ .Score }}</strong> / {{ .TotalPoints }}</td>
+            <td>{{ .CorrectCount }} / {{ .TotalQuestions }}</td>
+            <td>
+              {{ if gt .TotalPoints 0 }}
+                <span class="badge badge-success">{{ printf "%.0f" (divFloat .Score .TotalPoints) }}%</span>
+              {{ else }}
+                0%
+              {{ end }}
+            </td>
+            <td>{{ .SubmittedAt.Format "2006-01-02 15:04" }}</td>
+          </tr>
+          {{ else }}
+          <tr>
+            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+              No quiz submissions recorded for this student yet.
+            </td>
+          </tr>
+          {{ end }}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>
