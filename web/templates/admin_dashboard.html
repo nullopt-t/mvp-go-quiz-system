@@ -35,25 +35,22 @@
   </nav>
 
   <div class="container">
-    <!-- Welcome Greeting Header -->
-    <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff; border-radius: 4px; padding: 2rem 2.25rem; margin-bottom: 2rem; box-shadow: 0 4px 6px -1px rgba(15,23,42,0.1); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+    <!-- Admin Controls Toolbar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
       <div>
-        <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); padding: 0.25rem 0.65rem; border-radius: 3px; font-size: 0.75rem; font-weight: 600; color: #93c5fd; margin-bottom: 0.75rem;">
-          <i class="fa-solid fa-building-columns"></i> {{ index .I18n.T "admin_dashboard_badge" }}
-        </div>
-        <h1 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 0.35rem; color: #ffffff;">
-          {{ index .I18n.T "admin_dashboard_welcome" }}
+        <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0 0 0.25rem 0;">
+          {{ index .I18n.T "admin_dashboard_badge" }}
         </h1>
-        <p style="color: #94a3b8; font-size: 0.95rem; margin: 0;">
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
           {{ index .I18n.T "admin_dashboard_sub" }}
         </p>
       </div>
 
       <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-        <a href="/admin/quizzes/create" class="btn btn-primary" style="background: #2563eb; padding: 0.65rem 1.35rem; font-size: 0.95rem; font-weight: 700; border-radius: 4px; box-shadow: 0 2px 4px rgba(37,99,235,0.3);">
+        <a href="/admin/quizzes/create" class="btn btn-primary" style="padding: 0.55rem 1.25rem; font-size: 0.9rem; font-weight: 600;">
           <i class="fa-solid fa-plus" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_create_quiz" }}
         </a>
-        <a href="/admin/students/create" class="btn btn-secondary" style="background: rgba(255,255,255,0.1); color: #ffffff; border-color: rgba(255,255,255,0.2); padding: 0.65rem 1.15rem; font-size: 0.95rem; font-weight: 600; border-radius: 4px;">
+        <a href="/admin/students/create" class="btn btn-secondary" style="padding: 0.55rem 1.15rem; font-size: 0.9rem; font-weight: 600;">
           <i class="fa-solid fa-user-plus" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_add_student" }}
         </a>
       </div>
@@ -162,7 +159,7 @@
             <a href="/admin/students/sample-csv" style="font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 600;">
               <i class="fa-solid fa-file-arrow-down" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "admin_sample_csv" }}
             </a>
-            <button type="submit" class="btn btn-primary" style="padding: 0.55rem 1.35rem; font-size: 0.9rem; font-weight: 700; border-radius: 6px;">
+            <button type="submit" class="btn btn-primary" style="padding: 0.55rem 1.35rem; font-size: 0.9rem; font-weight: 700;">
               {{ index .I18n.T "admin_preview_btn" }} <i class="fa-solid fa-arrow-right" style="font-size: 0.75rem; margin-inline-start: 0.25rem;"></i>
             </button>
           </div>
