@@ -128,6 +128,13 @@ var translations = map[Language]map[string]string{
 		"admin_search_preview_placeholder": "Search by ID or name...",
 		"admin_search_filter_btn": "Search & Filter",
 		"admin_clear_filter": "Reset",
+		"admin_dashboard_badge": "Faculty & Exam Control System",
+		"admin_dashboard_welcome": "Welcome, Administrator",
+		"admin_dashboard_sub": "Central management console for exams, cohorts, and academic rosters",
+		"admin_cohort_summary": "Active Cohorts",
+		"admin_view_roster_btn": "Browse All Students",
+		"admin_drop_csv_hint": "Select or drag student roster CSV (UTF-8)",
+		"admin_quick_actions": "Quick Actions",
 	},
 	LangAR: {
 		// Navbar & General
@@ -238,6 +245,13 @@ var translations = map[Language]map[string]string{
 		"admin_search_preview_placeholder": "بحث بالرقم الجامعي أو الاسم...",
 		"admin_search_filter_btn": "بحث وتصفية",
 		"admin_clear_filter": "إلغاء التصفية",
+		"admin_dashboard_badge": "نظام كنترول الاختبارات وشؤون الطلاب",
+		"admin_dashboard_welcome": "مرحباً، إدارة الكلية والكنترول",
+		"admin_dashboard_sub": "لوحة الإدارة المركزية لمتابعة الاختبارات والمجموعات وقوائم الطلاب",
+		"admin_cohort_summary": "المجموعات النشطة",
+		"admin_view_roster_btn": "استعراض سجل الطلاب الكامل",
+		"admin_drop_csv_hint": "اختر ملف CSV الخاص بقوائم الطلاب (ترميز UTF-8)",
+		"admin_quick_actions": "إجراءات سريعة",
 	},
 }
 
