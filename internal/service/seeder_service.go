@@ -40,9 +40,12 @@ func (s *seederService) SeedInitialData(ctx context.Context) error {
 	}
 
 	if count == 0 {
-		csvPath := "test_students_25k.csv"
+		csvPath := "data/test_students_25k.csv"
 		if _, err := os.Stat(csvPath); os.IsNotExist(err) {
-			csvPath = "/app/test_students_25k.csv"
+			csvPath = "/app/data/test_students_25k.csv"
+		}
+		if _, err := os.Stat(csvPath); os.IsNotExist(err) {
+			csvPath = "test_students_25k.csv"
 		}
 
 		f, err := os.Open(csvPath)
