@@ -22,8 +22,10 @@ func NewAuthPresenter(authService service.AuthService, tmpl *template.Template) 
 
 func (p *AuthPresenter) RenderLogin(w http.ResponseWriter, r *http.Request) {
 	errParam := r.URL.Query().Get("error")
+	i18nBundle := GetI18n(r)
 	data := map[string]interface{}{
 		"Error": errParam,
+		"I18n":  i18nBundle,
 	}
 	_ = p.templates.ExecuteTemplate(w, "login.html", data)
 }
