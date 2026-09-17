@@ -383,6 +383,17 @@ func (p *AdminPresenter) HandleCreateQuiz(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	// Parse Exam Official Scheduled Start Time
+	startTime := time.Now().UTC()
+	if startVal := strings.TrimSpace(r.FormValue("start_time")); startVal != "" {
+		if t, err := time.Parse("2006-01-02T15:04", startVal); err == nil {
+			startTime = t
+		}
+	}
+
+	// Exam end time is automatically computed directly from startTime + duration
+	endTime := startTime.Add(time.Duration(duration) * time.Minute)
+
 	quiz := &model.Quiz{
 		ID:              primitive.NewObjectID(),
 		Title:           title,
@@ -390,8 +401,8 @@ func (p *AdminPresenter) HandleCreateQuiz(w http.ResponseWriter, r *http.Request
 		LevelID:         levelID,
 		GroupIDs:        groupIDs,
 		DurationMinutes: duration,
-		StartTime:       time.Now().Add(-10 * time.Minute),
-		EndTime:         time.Now().Add(7 * 24 * time.Hour),
+		StartTime:       startTime,
+		EndTime:         endTime,
 		IsActive:        true,
 		Questions:       questions,
 		CreatedAt:       time.Now().UTC(),

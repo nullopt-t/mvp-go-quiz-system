@@ -70,8 +70,17 @@
           </div>
 
           <div class="form-group">
-            <label for="duration_minutes" style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "quiz_duration_minutes" }}</label>
-            <input type="number" id="duration_minutes" name="duration_minutes" value="15" min="1" max="180" required style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
+            <label for="start_time" style="font-size: 0.85rem; font-weight: 600;">
+              <i class="fa-solid fa-calendar-check" style="color: var(--primary); margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "quiz_start_time_label" }}
+            </label>
+            <input type="datetime-local" id="start_time" name="start_time" required style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
+          </div>
+
+          <div class="form-group">
+            <label for="duration_minutes" style="font-size: 0.85rem; font-weight: 600;">
+              <i class="fa-solid fa-stopwatch" style="color: var(--primary); margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "quiz_duration_minutes" }}
+            </label>
+            <input type="number" id="duration_minutes" name="duration_minutes" value="30" min="1" max="360" required style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
           </div>
         </div>
 
@@ -252,8 +261,15 @@
       });
     }
 
-    // Initialize controls on load
+    // Initialize controls and default start time on load
     updateQuestionTitlesAndControls();
+
+    const startInput = document.getElementById('start_time');
+    if (startInput && !startInput.value) {
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      startInput.value = now.toISOString().slice(0, 16);
+    }
   </script>
 </body>
 </html>
