@@ -80,18 +80,19 @@ func (s *seederService) SeedInitialData(ctx context.Context) error {
 	quizzes, err := s.quizRepo.GetAll(ctx)
 	if err == nil && len(quizzes) == 0 {
 		log.Println("Seeding sample quizzes...")
+		now := time.Now().UTC()
 		sampleQuizzes := []*model.Quiz{
 			{
 				ID:              primitive.NewObjectID(),
 				Title:           "Midterm Assessment: Computer Science Fundamentals",
-				Description:     "Comprehensive exam covering algorithms, data structures, and computer architecture for all Level 1 students.",
+				Description:     "Synchronized exam covering algorithms, data structures, and computer architecture for all Level 1 students.",
 				LevelID:         1,
 				GroupIDs:        []int{}, // All groups in Level 1
-				DurationMinutes: 15,
-				StartTime:       time.Now().Add(-1 * time.Hour),
-				EndTime:         time.Now().Add(48 * time.Hour),
+				DurationMinutes: 45,
+				StartTime:       now.Add(-5 * time.Minute), // Started 5 mins ago, live for next 40 mins
+				EndTime:         now.Add(40 * time.Minute),
 				IsActive:        true,
-				CreatedAt:       time.Now().UTC(),
+				CreatedAt:       now,
 				Questions: []model.Question{
 					{
 						ID:     1,
@@ -152,15 +153,15 @@ func (s *seederService) SeedInitialData(ctx context.Context) error {
 			},
 			{
 				ID:              primitive.NewObjectID(),
-				Title:           "General Engineering Quiz (All Levels)",
-				Description:     "General knowledge engineering & problem solving assessment.",
+				Title:           "General Engineering Assessment (All Levels)",
+				Description:     "Universal college engineering & problem solving assessment with synchronized live timer.",
 				LevelID:         0, // All levels
 				GroupIDs:        []int{},
-				DurationMinutes: 20,
-				StartTime:       time.Now().Add(-1 * time.Hour),
-				EndTime:         time.Now().Add(72 * time.Hour),
+				DurationMinutes: 60,
+				StartTime:       now.Add(-2 * time.Minute), // Started 2 mins ago
+				EndTime:         now.Add(58 * time.Minute),
 				IsActive:        true,
-				CreatedAt:       time.Now().UTC(),
+				CreatedAt:       now,
 				Questions: []model.Question{
 					{
 						ID:     1,
