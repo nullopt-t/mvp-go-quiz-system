@@ -28,134 +28,157 @@
   </nav>
 
   <div class="container">
-    <div class="card">
-      <div style="margin-bottom: 1.5rem;">
-        <h2 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
-          <i class="fa-solid fa-file-circle-plus" style="color: var(--primary); margin-inline-end: 0.35rem;"></i>
-          {{ index .I18n.T "admin_create_quiz_title" }}
-        </h2>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
-          {{ index .I18n.T "admin_create_quiz_sub" }}
-        </p>
-      </div>
-
-      <form action="/admin/quizzes/create" method="POST">
-        <!-- Basic Info -->
-        <div class="form-group" style="margin-bottom: 1.25rem;">
-          <label for="title" style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "quiz_title_label" }}</label>
-          <input type="text" id="title" name="title" placeholder="{{ index .I18n.T "quiz_title_placeholder" }}" required style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
-        </div>
-
-        <div class="form-group" style="margin-bottom: 1.25rem;">
-          <label for="description" style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "quiz_desc_label" }}</label>
-          <textarea id="description" name="description" rows="2" placeholder="{{ index .I18n.T "quiz_desc_placeholder" }}" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;"></textarea>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-          <div class="form-group">
-            <label for="level_id" style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "quiz_target_level" }}</label>
-            <select id="level_id" name="level_id" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
-              <option value="0">{{ index .I18n.T "all_levels" }} (1 - 5)</option>
-              <option value="1">{{ index .I18n.T "level" }} 1</option>
-              <option value="2">{{ index .I18n.T "level" }} 2</option>
-              <option value="3">{{ index .I18n.T "level" }} 3</option>
-              <option value="4">{{ index .I18n.T "level" }} 4</option>
-              <option value="5">{{ index .I18n.T "level" }} 5</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="group_ids" style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "quiz_target_groups" }}</label>
-            <input type="text" id="group_ids" name="group_ids" placeholder="{{ index .I18n.T "quiz_target_groups_placeholder" }}" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
-          </div>
-
-          <div class="form-group">
-            <label for="start_time" style="font-size: 0.85rem; font-weight: 600;">
-              <i class="fa-solid fa-calendar-check" style="color: var(--primary); margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "quiz_start_time_label" }}
-            </label>
-            <input type="datetime-local" id="start_time" name="start_time" required style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
-          </div>
-
-          <div class="form-group">
-            <label for="duration_minutes" style="font-size: 0.85rem; font-weight: 600;">
-              <i class="fa-solid fa-stopwatch" style="color: var(--primary); margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "quiz_duration_minutes" }}
-            </label>
-            <input type="number" id="duration_minutes" name="duration_minutes" value="30" min="1" max="360" required style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
-          </div>
-        </div>
-
-        <hr style="border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0;">
-
-        <!-- Dynamic Questions Section -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
-          <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">
-            <i class="fa-solid fa-list-check" style="color: var(--primary); margin-inline-end: 0.35rem;"></i>
-            {{ index .I18n.T "quiz_questions_bank" }}
-          </h3>
-          <button type="button" onclick="addQuestion()" class="btn btn-secondary" style="padding: 0.45rem 1rem; font-size: 0.85rem; font-weight: 600; border-color: var(--primary); color: var(--primary); background: #eff6ff;">
-            <i class="fa-solid fa-plus" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "quiz_add_question_btn" }}
-          </button>
-        </div>
-
-        <div id="questions-container">
-          <!-- Question 1 -->
-          <div class="card question-block" id="question-card-1" style="background: var(--bg); margin-bottom: 1.25rem; border: 1px solid var(--border); padding: 1.25rem;">
-            <input type="hidden" name="q_index[]" value="1">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-              <strong class="q-title" style="font-size: 0.95rem;">{{ printf (index .I18n.T "quiz_question_num") 1 }}</strong>
-              <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <div style="display: flex; align-items: center; gap: 0.4rem;">
-                  <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">{{ index .I18n.T "quiz_points_label" }}:</span>
-                  <input type="number" name="q_1_points" value="10" style="width: 70px; padding: 0.35rem 0.5rem; font-size: 0.85rem;" min="1">
-                </div>
-                <button type="button" onclick="removeQuestion(1)" class="btn btn-secondary remove-q-btn" style="display: none; padding: 0.3rem 0.6rem; font-size: 0.8rem; color: var(--danger); border-color: #fecaca; background: #fff5f5;" title="{{ index .I18n.T "quiz_remove_question_btn" }}">
-                  <i class="fa-solid fa-trash-can"></i>
-                </button>
-              </div>
-            </div>
-            <div class="form-group" style="margin-bottom: 0.75rem;">
-              <input type="text" name="q_1_text" placeholder="{{ index .I18n.T "quiz_statement_placeholder" }}" required style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem;">
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-              <div>
-                <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 1 }}</label>
-                <input type="text" name="q_1_opt_1" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "A" }}" required style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
-              </div>
-              <div>
-                <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 2 }}</label>
-                <input type="text" name="q_1_opt_2" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "B" }}" required style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
-              </div>
-              <div>
-                <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 3 }}</label>
-                <input type="text" name="q_1_opt_3" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "C" }}" style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
-              </div>
-              <div>
-                <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 4 }}</label>
-                <input type="text" name="q_1_opt_4" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "D" }}" style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
-              </div>
-            </div>
-            <div style="margin-top: 0.75rem;">
-              <label style="font-size: 0.85rem; color: var(--primary); font-weight: 600;">{{ index .I18n.T "quiz_correct_key" }}</label>
-              <select name="q_1_correct" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.85rem;">
-                <option value="1">{{ printf (index .I18n.T "quiz_option_num") 1 }}</option>
-                <option value="2">{{ printf (index .I18n.T "quiz_option_num") 2 }}</option>
-                <option value="3">{{ printf (index .I18n.T "quiz_option_num") 3 }}</option>
-                <option value="4">{{ printf (index .I18n.T "quiz_option_num") 4 }}</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div style="display: flex; gap: 1rem; align-items: center; margin-top: 1rem; flex-wrap: wrap;">
-          <button type="button" onclick="addQuestion()" class="btn btn-secondary" style="flex: 1; padding: 0.65rem 1rem; font-size: 0.9rem; font-weight: 600; border-color: var(--primary); color: var(--primary); background: #eff6ff;">
-            <i class="fa-solid fa-plus" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "quiz_add_question_btn" }}
-          </button>
-          <button type="submit" class="btn btn-primary" style="flex: 2; padding: 0.65rem 1.5rem; font-size: 0.95rem; font-weight: 700;">
-            <i class="fa-solid fa-floppy-disk" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "quiz_save_publish_btn" }}
-          </button>
-        </div>
-      </form>
+    <div style="margin-bottom: 1.25rem;">
+      <h2 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--text-main);">
+        <i class="fa-solid fa-file-circle-plus" style="color: var(--primary); margin-inline-end: 0.35rem;"></i>
+        {{ index .I18n.T "admin_create_quiz_title" }}
+      </h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
+        {{ index .I18n.T "admin_create_quiz_sub" }}
+      </p>
     </div>
+
+    <form action="/admin/quizzes/create" method="POST">
+      <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; align-items: start;" class="quiz-studio-grid">
+        <!-- Left Column: Sticky Assessment Settings & Actions -->
+        <div class="quiz-studio-sidebar" style="position: sticky; top: 1.25rem; z-index: 10;">
+          <div class="card" style="margin-bottom: 1rem;">
+            <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 1.15rem; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem;">
+              <i class="fa-solid fa-sliders" style="color: var(--primary);"></i>
+              {{ index .I18n.T "admin_create_quiz_title" }}
+            </h3>
+
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <label for="title" style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "quiz_title_label" }}</label>
+              <input type="text" id="title" name="title" placeholder="{{ index .I18n.T "quiz_title_placeholder" }}" required style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <label for="description" style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "quiz_desc_label" }}</label>
+              <textarea id="description" name="description" rows="2" placeholder="{{ index .I18n.T "quiz_desc_placeholder" }}" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;"></textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+              <div class="form-group">
+                <label for="level_id" style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "quiz_target_level" }}</label>
+                <select id="level_id" name="level_id" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.85rem;">
+                  <option value="0">{{ index .I18n.T "all_levels" }} (1 - 5)</option>
+                  <option value="1">{{ index .I18n.T "level" }} 1</option>
+                  <option value="2">{{ index .I18n.T "level" }} 2</option>
+                  <option value="3">{{ index .I18n.T "level" }} 3</option>
+                  <option value="4">{{ index .I18n.T "level" }} 4</option>
+                  <option value="5">{{ index .I18n.T "level" }} 5</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="group_ids" style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "quiz_target_groups" }}</label>
+                <input type="text" id="group_ids" name="group_ids" placeholder="{{ index .I18n.T "quiz_target_groups_placeholder" }}" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.85rem;">
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <label for="start_time" style="font-size: 0.85rem; font-weight: 600;">
+                <i class="fa-solid fa-calendar-check" style="color: var(--primary); margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "quiz_start_time_label" }}
+              </label>
+              <input type="datetime-local" id="start_time" name="start_time" required style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.85rem;">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+              <label for="duration_minutes" style="font-size: 0.85rem; font-weight: 600;">
+                <i class="fa-solid fa-stopwatch" style="color: var(--primary); margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "quiz_duration_minutes" }}
+              </label>
+              <input type="number" id="duration_minutes" name="duration_minutes" value="30" min="1" max="360" required style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.85rem;">
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+              <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem 1rem; font-size: 0.95rem; font-weight: 700;">
+                <i class="fa-solid fa-floppy-disk" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "quiz_save_publish_btn" }}
+              </button>
+              <button type="button" onclick="addQuestion()" class="btn btn-secondary" style="width: 100%; padding: 0.6rem 1rem; font-size: 0.85rem; font-weight: 600; border-color: var(--primary); color: var(--primary); background: #eff6ff;">
+                <i class="fa-solid fa-plus" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "quiz_add_question_btn" }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Dynamic Question Bank Workspace -->
+        <div class="quiz-studio-content">
+          <div class="card" style="margin-bottom: 1rem; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">
+                <i class="fa-solid fa-list-check" style="color: var(--primary); margin-inline-end: 0.35rem;"></i>
+                {{ index .I18n.T "quiz_questions_bank" }}
+              </h3>
+              <p style="color: var(--text-muted); font-size: 0.8rem; margin: 0.2rem 0 0 0;">
+                Configure multiple choice questions, individual point weights, and correct options.
+              </p>
+            </div>
+            <button type="button" onclick="addQuestion()" class="btn btn-secondary" style="padding: 0.45rem 1rem; font-size: 0.85rem; font-weight: 600; border-color: var(--primary); color: var(--primary); background: #eff6ff;">
+              <i class="fa-solid fa-plus" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "quiz_add_question_btn" }}
+            </button>
+          </div>
+
+          <div id="questions-container">
+            <!-- Question 1 -->
+            <div class="card question-block" id="question-card-1" style="background: var(--surface); margin-bottom: 1.25rem; border: 1px solid var(--border); padding: 1.25rem;">
+              <input type="hidden" name="q_index[]" value="1">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <strong class="q-title" style="font-size: 0.95rem; color: var(--primary);">{{ printf (index .I18n.T "quiz_question_num") 1 }}</strong>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="display: flex; align-items: center; gap: 0.4rem;">
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">{{ index .I18n.T "quiz_points_label" }}:</span>
+                    <input type="number" name="q_1_points" value="10" style="width: 70px; padding: 0.35rem 0.5rem; font-size: 0.85rem;" min="1">
+                  </div>
+                  <button type="button" onclick="removeQuestion(1)" class="btn btn-secondary remove-q-btn" style="display: none; padding: 0.3rem 0.6rem; font-size: 0.8rem; color: var(--danger); border-color: #fecaca; background: #fff5f5;" title="{{ index .I18n.T "quiz_remove_question_btn" }}">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom: 0.75rem;">
+                <input type="text" name="q_1_text" placeholder="{{ index .I18n.T "quiz_statement_placeholder" }}" required style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                <div>
+                  <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 1 }}</label>
+                  <input type="text" name="q_1_opt_1" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "A" }}" required style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
+                </div>
+                <div>
+                  <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 2 }}</label>
+                  <input type="text" name="q_1_opt_2" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "B" }}" required style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
+                </div>
+                <div>
+                  <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 3 }}</label>
+                  <input type="text" name="q_1_opt_3" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "C" }}" style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
+                </div>
+                <div>
+                  <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 4 }}</label>
+                  <input type="text" name="q_1_opt_4" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "D" }}" style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
+                </div>
+              </div>
+              <div style="margin-top: 0.75rem;">
+                <label style="font-size: 0.85rem; color: var(--primary); font-weight: 600;">{{ index .I18n.T "quiz_correct_key" }}</label>
+                <select name="q_1_correct" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.85rem;">
+                  <option value="1">{{ printf (index .I18n.T "quiz_option_num") 1 }}</option>
+                  <option value="2">{{ printf (index .I18n.T "quiz_option_num") 2 }}</option>
+                  <option value="3">{{ printf (index .I18n.T "quiz_option_num") 3 }}</option>
+                  <option value="4">{{ printf (index .I18n.T "quiz_option_num") 4 }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 1rem; align-items: center; margin-top: 1rem; flex-wrap: wrap;">
+            <button type="button" onclick="addQuestion()" class="btn btn-secondary" style="flex: 1; padding: 0.65rem 1rem; font-size: 0.9rem; font-weight: 600; border-color: var(--primary); color: var(--primary); background: #eff6ff;">
+              <i class="fa-solid fa-plus" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "quiz_add_question_btn" }}
+            </button>
+            <button type="submit" class="btn btn-primary" style="flex: 2; padding: 0.65rem 1.5rem; font-size: 0.95rem; font-weight: 700;">
+              <i class="fa-solid fa-floppy-disk" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "quiz_save_publish_btn" }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
   </div>
 
   <script>

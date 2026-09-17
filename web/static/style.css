@@ -439,3 +439,40 @@ th {
   text-overflow: ellipsis;
 }
 
+/* Large Display Studio & Grid Layouts */
+@media (min-width: 1024px) {
+  .quiz-studio-grid {
+    grid-template-columns: 360px 1fr !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  .quiz-studio-grid {
+    grid-template-columns: 390px 1fr !important;
+    gap: 2rem !important;
+  }
+}
+
+/* Dashboard Responsive Layouts */
+.admin-middle-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .admin-middle-grid {
+    grid-template-columns: 1.1fr 1.6fr;
+  }
+}
+
+@media (min-width: 1440px) {
+  .admin-middle-grid {
+    grid-template-columns: 420px 1fr;
+    gap: 1.75rem;
+  }
+}
+
+
+
