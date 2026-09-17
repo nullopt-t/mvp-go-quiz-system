@@ -25,6 +25,10 @@ func RegisterAdminRoutes(
 	// Admin Overview & Dashboard
 	mux.Handle("GET /admin", adminAuth(http.HandlerFunc(adminPres.RenderDashboard)))
 
+	// Student Management & CSV Import
+	mux.Handle("POST /admin/students/import", adminAuth(http.HandlerFunc(adminPres.HandleImportStudents)))
+	mux.Handle("GET /admin/students/sample-csv", adminAuth(http.HandlerFunc(adminPres.HandleDownloadSampleCSV)))
+
 	// Quiz Authoring
 	mux.Handle("GET /admin/quizzes/create", adminAuth(http.HandlerFunc(adminPres.RenderCreateQuiz)))
 	mux.Handle("POST /admin/quizzes/create", adminAuth(http.HandlerFunc(adminPres.HandleCreateQuiz)))
