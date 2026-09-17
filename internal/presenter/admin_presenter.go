@@ -65,7 +65,7 @@ func (p *AdminPresenter) RenderDashboard(w http.ResponseWriter, r *http.Request)
 	_ = p.templates.ExecuteTemplate(w, "admin_dashboard.html", data)
 }
 
-func (p *AdminPresenter) HandleImportStudents(w http.ResponseWriter, r *http.Request) {
+func (p *AdminPresenter) HandlePreviewImportStudents(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseMultipartForm(10 << 20); err != nil { // 10MB max
 		http.Redirect(w, r, "/admin?import_error=Failed+to+read+upload+data", http.StatusSeeOther)
 		return
@@ -78,13 +78,84 @@ func (p *AdminPresenter) HandleImportStudents(w http.ResponseWriter, r *http.Req
 	}
 	defer file.Close()
 
-	importedCount, err := p.importService.ImportStudentsFromCSV(r.Context(), file)
+	students, err := p.importService.ParseStudentsFromCSV(file)
 	if err != nil {
 		http.Redirect(w, r, fmt.Sprintf("/admin?import_error=%s", strings.ReplaceAll(err.Error(), " ", "+")), http.StatusSeeOther)
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/admin?import_success=Successfully+imported+%d+students", importedCount), http.StatusSeeOther)
+	i18nBundle := GetI18n(r)
+	data := map[string]interface{}{
+		"Students": students,
+		"Count":    len(students),
+		"I18n":     i18nBundle,
+	}
+
+	_ = p.templates.ExecuteTemplate(w, "admin_import_preview.html", data)
+}
+
+func (p *AdminPresenter) HandleConfirmImportStudents(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		http.Redirect(w, r, "/admin?import_error=Invalid+form+data", http.StatusSeeOther)
+		return
+	}
+
+	codes := r.Form["student_code[]"]
+	names := r.Form["name[]"]
+	levels := r.Form["level_id[]"]
+	groups := r.Form["group_id[]"]
+
+	var students []model.Student
+	now := time.Now().UTC()
+
+	for i := 0; i < len(codes); i++ {
+		c := strings.ToUpper(strings.TrimSpace(codes[i]))
+		n := ""
+		if i < len(names) {
+			n = strings.TrimSpace(names[i])
+		}
+		if c == "" || n == "" {
+			continue
+		}
+
+		lvl := 1
+		if i < len(levels) {
+			if l, err := strconv.Atoi(levels[i]); err == nil && l >= 1 && l <= 5 {
+				lvl = l
+			}
+		}
+
+		grp := "A"
+		if i < len(groups) {
+			g := strings.ToUpper(strings.TrimSpace(groups[i]))
+			if g != "" {
+				grp = g
+			}
+		}
+
+		students = append(students, model.Student{
+			ID:          primitive.NewObjectID(),
+			StudentCode: c,
+			Name:        n,
+			LevelID:     lvl,
+			GroupID:     grp,
+			IsActive:    true,
+			CreatedAt:   now,
+		})
+	}
+
+	if len(students) == 0 {
+		http.Redirect(w, r, "/admin?import_error=No+students+selected+for+import", http.StatusSeeOther)
+		return
+	}
+
+	count, err := p.importService.BulkImportStudents(r.Context(), students)
+	if err != nil {
+		http.Redirect(w, r, fmt.Sprintf("/admin?import_error=%s", strings.ReplaceAll(err.Error(), " ", "+")), http.StatusSeeOther)
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/admin/students?success=Successfully+imported+%d+students", count), http.StatusSeeOther)
 }
 
 func (p *AdminPresenter) HandleDownloadSampleCSV(w http.ResponseWriter, r *http.Request) {
