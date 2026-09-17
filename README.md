@@ -32,7 +32,7 @@ A high-concurrency, resilient, server-driven web application built for college-s
 ```bash
 docker compose up --build
 ```
-The application will start on: `http://localhost:8080`
+The application will start on: `http://localhost:8090`
 
 ### 2. Default Accounts for Testing
 
@@ -44,7 +44,7 @@ The application will start on: `http://localhost:8080`
     * Level 5, Group 4: `L5G4-001` .. `L5G4-500`
 * **Staff / Admin Portal**:
   * Admin PIN: `admin123`
-  * Portal URL: `http://localhost:8080/admin` (or choose "Staff / Admin" tab on login screen)
+  * Portal URL: `http://localhost:8090/admin` (or choose "Staff / Admin" tab on login screen)
 
 ---
 
