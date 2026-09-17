@@ -13,11 +13,18 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+type CohortCount struct {
+	LevelID int    `bson:"level_id" json:"level_id"`
+	GroupID string `bson:"group_id" json:"group_id"`
+	Count   int64  `bson:"count" json:"count"`
+}
+
 type StudentRepository interface {
 	FindByCode(ctx context.Context, code string) (*model.Student, error)
 	FindByID(ctx context.Context, id primitive.ObjectID) (*model.Student, error)
 	Count(ctx context.Context) (int64, error)
 	CountByLevelAndGroup(ctx context.Context, levelID int, groupID string) (int64, error)
+	GetCohortDistribution(ctx context.Context) ([]CohortCount, error)
 	BulkInsert(ctx context.Context, students []model.Student) error
 	BulkUpsert(ctx context.Context, students []model.Student) (int, error)
 	GetAll(ctx context.Context, levelID int, groupID string, limit, offset int64) ([]model.Student, error)
@@ -70,6 +77,41 @@ func (r *studentRepository) CountByLevelAndGroup(ctx context.Context, levelID in
 		filter["group_id"] = groupID
 	}
 	return r.col.CountDocuments(ctx, filter)
+}
+
+func (r *studentRepository) GetCohortDistribution(ctx context.Context) ([]CohortCount, error) {
+	pipeline := mongo.Pipeline{
+		{{Key: "$match", Value: bson.M{"is_active": true}}},
+		{{Key: "$group", Value: bson.M{
+			"_id": bson.M{
+				"level_id": "$level_id",
+				"group_id": "$group_id",
+			},
+			"count": bson.M{"$sum": 1},
+		}}},
+		{{Key: "$project", Value: bson.M{
+			"_id":      0,
+			"level_id": "$_id.level_id",
+			"group_id": "$_id.group_id",
+			"count":    "$count",
+		}}},
+		{{Key: "$sort", Value: bson.D{
+			{Key: "level_id", Value: 1},
+			{Key: "group_id", Value: 1},
+		}}},
+	}
+
+	cursor, err := r.col.Aggregate(ctx, pipeline)
+	if err != nil {
+		return nil, fmt.Errorf("failed to aggregate cohort distribution: %w", err)
+	}
+	defer cursor.Close(ctx)
+
+	var results []CohortCount
+	if err := cursor.All(ctx, &results); err != nil {
+		return nil, fmt.Errorf("failed to decode cohort distribution: %w", err)
+	}
+	return results, nil
 }
 
 func (r *studentRepository) BulkInsert(ctx context.Context, students []model.Student) error {
