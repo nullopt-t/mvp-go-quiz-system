@@ -27,6 +27,26 @@ func NewRouter(deps RouterDependencies) http.Handler {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	})
 
+	// Language Switcher Endpoint
+	mux.HandleFunc("GET /set-lang", func(w http.ResponseWriter, r *http.Request) {
+		lang := r.URL.Query().Get("lang")
+		if lang != "ar" && lang != "en" {
+			lang = "en"
+		}
+		http.SetCookie(w, &http.Cookie{
+			Name:     "lang_pref",
+			Value:    lang,
+			Path:     "/",
+			MaxAge:   365 * 24 * 3600,
+			SameSite: http.SameSiteLaxMode,
+		})
+		redirectURL := r.URL.Query().Get("redirect")
+		if redirectURL == "" {
+			redirectURL = "/login"
+		}
+		http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+	})
+
 	// Public Auth Endpoints
 	mux.HandleFunc("GET /login", deps.AuthPresenter.RenderLogin)
 	mux.HandleFunc("POST /login", deps.AuthPresenter.HandleLogin)
@@ -78,5 +98,6 @@ func NewRouter(deps RouterDependencies) http.Handler {
 		http.NotFound(w, r)
 	})))
 
-	return mux
+	// Apply I18n Middleware globally
+	return I18nMiddleware()(mux)
 }
