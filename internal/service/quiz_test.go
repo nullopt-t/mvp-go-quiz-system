@@ -8,6 +8,7 @@ import (
 
 	"quiz-system/internal/config"
 	"quiz-system/internal/model"
+	"quiz-system/internal/repository"
 	"quiz-system/internal/service"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -52,6 +53,13 @@ func (m *mockStudentRepo) BulkUpsert(ctx context.Context, students []model.Stude
 		m.students[students[i].StudentCode] = &students[i]
 	}
 	return len(students), nil
+}
+func (m *mockStudentRepo) CreateOrUpdate(ctx context.Context, student *model.Student) error {
+	m.students[student.StudentCode] = student
+	return nil
+}
+func (m *mockStudentRepo) GetCohortDistribution(ctx context.Context) ([]repository.CohortCount, error) {
+	return nil, nil
 }
 func (m *mockStudentRepo) GetAll(ctx context.Context, levelID int, groupID string, limit, offset int64) ([]model.Student, error) {
 	var list []model.Student
@@ -318,9 +326,19 @@ func TestCSVImportService(t *testing.T) {
 	ctx := context.Background()
 	sampleCSV := importSvc.GenerateSampleCSV()
 
-	count, err := importSvc.ImportStudentsFromCSV(ctx, strings.NewReader(string(sampleCSV)))
+	// 1. Test Parse preview
+	parsedStudents, err := importSvc.ParseStudentsFromCSV(strings.NewReader(string(sampleCSV)))
 	if err != nil {
-		t.Fatalf("ImportStudentsFromCSV failed: %v", err)
+		t.Fatalf("ParseStudentsFromCSV failed: %v", err)
+	}
+	if len(parsedStudents) != 6 {
+		t.Fatalf("Expected 6 parsed students for preview, got %d", len(parsedStudents))
+	}
+
+	// 2. Test Bulk Import from preview list
+	count, err := importSvc.BulkImportStudents(ctx, parsedStudents)
+	if err != nil {
+		t.Fatalf("BulkImportStudents failed: %v", err)
 	}
 
 	if count != 6 {
