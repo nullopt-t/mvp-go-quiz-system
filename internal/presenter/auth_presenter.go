@@ -37,15 +37,24 @@ func (p *AuthPresenter) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	i18nBundle := GetI18n(r)
 	studentCode := strings.ToUpper(strings.TrimSpace(r.FormValue("student_code")))
 	if studentCode == "" {
-		http.Redirect(w, r, "/login?error=Student+ID+is+required", http.StatusSeeOther)
+		w.WriteHeader(http.StatusBadRequest)
+		_ = p.templates.ExecuteTemplate(w, "login.html", map[string]interface{}{
+			"Error": i18nBundle.Translate("err_student_id_req"),
+			"I18n":  i18nBundle,
+		})
 		return
 	}
 
 	token, _, err := p.authService.LoginStudent(r.Context(), studentCode)
 	if err != nil {
-		http.Redirect(w, r, "/login?error=Student+ID+not+found+or+inactive", http.StatusSeeOther)
+		w.WriteHeader(http.StatusUnauthorized)
+		_ = p.templates.ExecuteTemplate(w, "login.html", map[string]interface{}{
+			"Error": i18nBundle.Translate("err_student_not_found"),
+			"I18n":  i18nBundle,
+		})
 		return
 	}
 
@@ -76,10 +85,15 @@ func (p *AuthPresenter) HandleAdminLogin(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	i18nBundle := GetI18n(r)
 	pin := strings.TrimSpace(r.FormValue("pin"))
 	token, err := p.authService.LoginAdmin(pin)
 	if err != nil {
-		http.Redirect(w, r, "/admin/login?error=Invalid+Admin+PIN", http.StatusSeeOther)
+		w.WriteHeader(http.StatusUnauthorized)
+		_ = p.templates.ExecuteTemplate(w, "admin_login.html", map[string]interface{}{
+			"Error": i18nBundle.Translate("err_admin_pin_invalid"),
+			"I18n":  i18nBundle,
+		})
 		return
 	}
 
