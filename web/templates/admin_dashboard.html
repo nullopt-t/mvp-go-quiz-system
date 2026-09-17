@@ -8,53 +8,36 @@
   <script src="/static/htmx.min.js"></script>
 </head>
 <body>
-  <!-- Academic Portal Header -->
-  <nav class="navbar" style="padding: 1rem 2rem; border-bottom: 1px solid var(--border); background: var(--surface);">
-    <a href="/admin" class="nav-brand" style="display: flex; align-items: center; gap: 0.75rem;">
-      <div style="background: var(--primary); color: #fff; width: 38px; height: 38px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; box-shadow: 0 1px 3px rgba(37,99,235,0.25);">
-        <i class="fa-solid fa-graduation-cap"></i>
-      </div>
-      <div>
-        <div style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); line-height: 1.2;">{{ index .I18n.T "admin_portal" }}</div>
-        <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{{ index .I18n.T "admin_dashboard_badge" }}</div>
-      </div>
+  <!-- Clean Minimal Navbar -->
+  <nav class="navbar" style="padding: 0.85rem 2rem; border-bottom: 1px solid var(--border); background: var(--surface);">
+    <a href="/admin" class="nav-brand" style="display: flex; align-items: center; gap: 0.65rem; text-decoration: none;">
+      <i class="fa-solid fa-graduation-cap" style="color: var(--primary); font-size: 1.25rem;"></i>
+      <span style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">{{ index .I18n.T "admin_portal" }}</span>
     </a>
+
     <div class="nav-user" style="display: flex; align-items: center; gap: 0.75rem;">
-      <a href="/admin/students" class="btn btn-secondary" style="padding: 0.45rem 0.95rem; font-size: 0.85rem; font-weight: 600;">
-        <i class="fa-solid fa-users" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_students_title" }}
+      <a href="/admin/quizzes/create" class="btn btn-primary" style="padding: 0.45rem 0.95rem; font-size: 0.85rem; font-weight: 600;">
+        <i class="fa-solid fa-plus" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "admin_create_quiz" }}
       </a>
-      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.45rem 0.9rem; font-size: 0.85rem; font-weight: 700;">
-        <i class="fa-solid fa-globe" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "lang_switch" }}
+      <a href="/admin/students/create" class="btn btn-secondary" style="padding: 0.45rem 0.95rem; font-size: 0.85rem; font-weight: 600;">
+        <i class="fa-solid fa-user-plus" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "admin_add_student" }}
+      </a>
+      <div style="width: 1px; height: 24px; background: var(--border); margin: 0 0.25rem;"></div>
+      <a href="/admin/students" class="btn btn-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.85rem; font-weight: 600;">
+        <i class="fa-solid fa-users" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "admin_students_title" }}
+      </a>
+      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.85rem; font-weight: 700;">
+        <i class="fa-solid fa-globe" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "lang_switch" }}
       </a>
       <form action="/admin/logout" method="POST" style="display:inline; margin: 0;">
-        <button type="submit" class="btn btn-secondary" style="padding: 0.45rem 0.9rem; font-size: 0.85rem; color: var(--danger); border-color: #fecaca; background: #fff5f5;">
-          <i class="fa-solid fa-arrow-right-from-bracket" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "logout" }}
+        <button type="submit" class="btn btn-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.85rem; color: var(--danger); border-color: #fecaca; background: #fff5f5;">
+          <i class="fa-solid fa-arrow-right-from-bracket" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "logout" }}
         </button>
       </form>
     </div>
   </nav>
 
   <div class="container">
-    <!-- Admin Controls Toolbar -->
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
-      <div>
-        <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0 0 0.25rem 0;">
-          {{ index .I18n.T "admin_dashboard_badge" }}
-        </h1>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
-          {{ index .I18n.T "admin_dashboard_sub" }}
-        </p>
-      </div>
-
-      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-        <a href="/admin/quizzes/create" class="btn btn-primary" style="padding: 0.55rem 1.25rem; font-size: 0.9rem; font-weight: 600;">
-          <i class="fa-solid fa-plus" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_create_quiz" }}
-        </a>
-        <a href="/admin/students/create" class="btn btn-secondary" style="padding: 0.55rem 1.15rem; font-size: 0.9rem; font-weight: 600;">
-          <i class="fa-solid fa-user-plus" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_add_student" }}
-        </a>
-      </div>
-    </div>
 
     {{ if .ImportSuccess }}
     <div class="alert alert-info" style="background-color: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; font-weight: 600;">
