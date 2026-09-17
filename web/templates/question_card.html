@@ -1,8 +1,8 @@
 <div id="question-container">
   <!-- Progress Bar -->
   <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">
-    <span>Question <strong>{{ .CurrentNumber }}</strong> of {{ .TotalQuestions }}</span>
-    <span>Points: <strong>{{ .CurrentQuestion.Points }}</strong></span>
+    <span>{{ index .I18n.T "question_of" }} <strong>{{ .CurrentNumber }}</strong> {{ index .I18n.T "of" }} {{ .TotalQuestions }}</span>
+    <span>{{ index .I18n.T "points" }}: <strong>{{ .CurrentQuestion.Points }}</strong></span>
   </div>
   <div class="progress-bar-container">
     <div class="progress-bar" style="width: {{ printf "%.1f" (divFloat .CurrentNumber .TotalQuestions) }}%;"></div>
@@ -36,17 +36,17 @@
 
       <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.25rem;">
         <span style="font-size: 0.85rem; color: var(--text-muted);">
-          💾 Answers are saved automatically to the append-only log on progression
+          {{ index .I18n.T "saved_notice" }}
         </span>
 
         <div>
           {{ if .IsLastQuestion }}
             <button type="button" class="btn btn-primary" onclick="submitFinalQuestion()" style="background-color: var(--success); font-size: 1rem; padding: 0.75rem 1.75rem;">
-              Submit Quiz & View Results ✔
+              {{ index .I18n.T "btn_submit_final" }}
             </button>
           {{ else }}
             <button type="submit" class="btn btn-primary" style="font-size: 1rem; padding: 0.75rem 1.75rem;">
-              Next Question ➔
+              {{ index .I18n.T "btn_next" }}
             </button>
           {{ end }}
         </div>

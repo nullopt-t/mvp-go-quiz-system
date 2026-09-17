@@ -1,20 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ .I18n.Lang }}" dir="{{ .I18n.Dir }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ .Quiz.Title }} - Live Quiz</title>
+  <title>{{ .Quiz.Title }} - {{ index .I18n.T "app_title" }}</title>
   <link rel="stylesheet" href="/static/style.css">
   <script src="/static/htmx.min.js"></script>
 </head>
 <body>
   <nav class="navbar">
     <a href="/dashboard" class="nav-brand">
-      🎓 <span>College Quiz System</span>
+      🎓 <span>{{ index .I18n.T "app_title" }}</span>
     </a>
     <div class="nav-user">
-      <span class="badge badge-primary">Level {{ .Student.LevelID }} • Group {{ .Student.GroupID }}</span>
+      <span class="badge badge-primary">{{ index .I18n.T "level" }} {{ .Student.LevelID }} • {{ index .I18n.T "group" }} {{ .Student.GroupID }}</span>
       <span style="font-weight: 600;">{{ .Student.Name }}</span>
+      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 700;">
+        🌐 {{ index .I18n.T "lang_switch" }}
+      </a>
     </div>
   </nav>
 
@@ -47,8 +50,8 @@
 
     function updateTimer() {
       if (remainingSeconds <= 0) {
-        countdownEl.innerText = "00:00 - Time Expired";
-        alert("Time limit reached! Submitting your quiz now...");
+        countdownEl.innerText = "00:00 - {{ index .I18n.T "status_expired" }}";
+        alert("{{ index .I18n.T "time_expired_alert" }}");
         document.getElementById('auto-submit-form').submit();
         return;
       }
@@ -71,7 +74,7 @@
       const form = document.getElementById('quiz-form');
       const radioChecked = form.querySelector('input[name="answer_id"]:checked');
       if (!radioChecked) {
-        alert("Please select an answer option before submitting.");
+        alert("Please select an option / يرجى اختيار إجابة");
         return;
       }
       document.getElementById('is_submit_field').value = "true";
