@@ -23,8 +23,8 @@
     </div>
   </nav>
 
-  <div class="container">
-    <div style="margin-bottom: 2rem;">
+  <div class="container-fluid">
+    <div style="margin-bottom: 1.75rem;">
       <a href="/admin" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--primary); font-size: 0.9rem; font-weight: 600; margin-bottom: 0.75rem;">
         ← {{ index .I18n.T "back_dashboard" }}
       </a>
@@ -36,16 +36,10 @@
 
     <div class="alert alert-info" style="background-color: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
       <div>
-        <strong>{{ index .I18n.T "admin_preview_count" }}:</strong> <span id="student-count">{{ .TotalCount }}</span>
-        {{ if .IsTruncated }}
-        <div style="font-size: 0.85rem; margin-top: 0.35rem; color: #b45309; font-weight: 600;">
-          ⚠️ Showing sample of {{ .DisplayedCount }} students out of {{ .FilteredCount }} matching ({{ .TotalCount }} total in file).
+        <strong>{{ index .I18n.T "admin_preview_count" }}:</strong> <span id="student-count" style="font-size: 1.15rem; font-weight: 800; color: #15803d; margin: 0 0.35rem;">{{ if .IsTruncated }}{{ .DisplayedCount }}{{ else }}{{ .TotalCount }}{{ end }}</span>
+        <div style="font-size: 0.85rem; margin-top: 0.35rem; color: {{ if .IsTruncated }}#b45309{{ else }}#15803d{{ end }}; font-weight: 500;">
+          {{ .PreviewNotice }}
         </div>
-        {{ else }}
-        <div style="font-size: 0.85rem; margin-top: 0.25rem; color: #15803d;">
-          {{ index .I18n.T "admin_preview_notice" }}
-        </div>
-        {{ end }}
       </div>
     </div>
 
@@ -156,7 +150,7 @@
         </a>
         {{ if .IsTruncated }}
         <button type="submit" name="import_mode" value="all_file" class="btn btn-primary" style="padding: 0.65rem 1.75rem; font-size: 1rem; font-weight: 700; background: #0284c7;">
-          ✓ Import All {{ .TotalCount }} Students from File
+          ✓ {{ .ConfirmAllBtnText }}
         </button>
         {{ else }}
         <button type="submit" name="import_mode" value="form_data" class="btn btn-primary" style="padding: 0.65rem 1.75rem; font-size: 1rem; font-weight: 700;">
