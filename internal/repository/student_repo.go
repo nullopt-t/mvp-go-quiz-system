@@ -17,9 +17,10 @@ type StudentRepository interface {
 	FindByCode(ctx context.Context, code string) (*model.Student, error)
 	FindByID(ctx context.Context, id primitive.ObjectID) (*model.Student, error)
 	Count(ctx context.Context) (int64, error)
-	CountByLevelAndGroup(ctx context.Context, levelID, groupID int) (int64, error)
+	CountByLevelAndGroup(ctx context.Context, levelID int, groupID string) (int64, error)
 	BulkInsert(ctx context.Context, students []model.Student) error
-	GetAll(ctx context.Context, levelID, groupID int, limit, offset int64) ([]model.Student, error)
+	BulkUpsert(ctx context.Context, students []model.Student) (int, error)
+	GetAll(ctx context.Context, levelID int, groupID string, limit, offset int64) ([]model.Student, error)
 }
 
 type studentRepository struct {
@@ -60,12 +61,12 @@ func (r *studentRepository) Count(ctx context.Context) (int64, error) {
 	return r.col.CountDocuments(ctx, bson.M{})
 }
 
-func (r *studentRepository) CountByLevelAndGroup(ctx context.Context, levelID, groupID int) (int64, error) {
+func (r *studentRepository) CountByLevelAndGroup(ctx context.Context, levelID int, groupID string) (int64, error) {
 	filter := bson.M{}
 	if levelID > 0 {
 		filter["level_id"] = levelID
 	}
-	if groupID > 0 {
+	if groupID != "" {
 		filter["group_id"] = groupID
 	}
 	return r.col.CountDocuments(ctx, filter)
@@ -96,12 +97,48 @@ func (r *studentRepository) BulkInsert(ctx context.Context, students []model.Stu
 	return nil
 }
 
-func (r *studentRepository) GetAll(ctx context.Context, levelID, groupID int, limit, offset int64) ([]model.Student, error) {
+func (r *studentRepository) BulkUpsert(ctx context.Context, students []model.Student) (int, error) {
+	if len(students) == 0 {
+		return 0, nil
+	}
+
+	models := make([]mongo.WriteModel, len(students))
+	now := time.Now().UTC()
+
+	for i, s := range students {
+		filter := bson.M{"student_code": s.StudentCode}
+		update := bson.M{
+			"$set": bson.M{
+				"name":       s.Name,
+				"level_id":   s.LevelID,
+				"group_id":   s.GroupID,
+				"is_active":  s.IsActive,
+				"updated_at": now,
+			},
+			"$setOnInsert": bson.M{
+				"_id":        primitive.NewObjectID(),
+				"created_at": now,
+			},
+		}
+		models[i] = mongo.NewUpdateOneModel().SetFilter(filter).SetUpdate(update).SetUpsert(true)
+	}
+
+	opts := options.BulkWrite().SetOrdered(false)
+	res, err := r.col.BulkWrite(ctx, models, opts)
+	if err != nil {
+		return 0, fmt.Errorf("bulk upsert error: %w", err)
+	}
+
+	total := int(res.UpsertedCount + res.ModifiedCount + res.MatchedCount)
+	return total, nil
+}
+
+func (r *studentRepository) GetAll(ctx context.Context, levelID int, groupID string, limit, offset int64) ([]model.Student, error) {
 	filter := bson.M{}
 	if levelID > 0 {
 		filter["level_id"] = levelID
 	}
-	if groupID > 0 {
+	if groupID != "" {
 		filter["group_id"] = groupID
 	}
 
