@@ -26,7 +26,7 @@
   <div class="container-fluid">
     <div style="margin-bottom: 1.75rem;">
       <a href="/admin" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--primary); font-size: 0.9rem; font-weight: 600; margin-bottom: 0.75rem;">
-        ← {{ index .I18n.T "back_dashboard" }}
+        <i class="fa-solid fa-arrow-left"></i> {{ index .I18n.T "back_dashboard" }}
       </a>
       <h2 style="font-size: 1.5rem; margin-bottom: 0.25rem;">{{ index .I18n.T "admin_preview_title" }}</h2>
       <p style="color: var(--text-muted); font-size: 0.9rem;">
@@ -78,11 +78,11 @@
 
         <div style="display: flex; gap: 0.5rem;">
           <button type="submit" class="btn btn-primary" style="padding: 0.55rem 1.25rem; font-size: 0.9rem;">
-            🔍 {{ index .I18n.T "admin_search_filter_btn" }}
+            <i class="fa-solid fa-magnifying-glass"></i> {{ index .I18n.T "admin_search_filter_btn" }}
           </button>
           {{ if or .SearchQuery (or .FilterLevel .FilterGroup) }}
           <a href="/admin/students/preview?file_token={{ .FileToken }}" class="btn btn-secondary" style="padding: 0.55rem 1rem; font-size: 0.9rem;">
-            ✕ {{ index .I18n.T "admin_clear_filter" }}
+            <i class="fa-solid fa-xmark"></i> {{ index .I18n.T "admin_clear_filter" }}
           </a>
           {{ end }}
         </div>
@@ -133,7 +133,7 @@
                 </td>
                 <td style="padding: 0.5rem 1rem; text-align: center;">
                   <button type="button" onclick="removeRow('row-{{ $idx }}')" style="background: none; border: 1px solid #fca5a5; color: #dc2626; border-radius: 4px; padding: 0.35rem 0.6rem; cursor: pointer; font-size: 0.85rem;" title="Delete row">
-                    ✕
+                    <i class="fa-solid fa-trash-can"></i>
                   </button>
                 </td>
               </tr>
@@ -150,11 +150,11 @@
         </a>
         {{ if .IsTruncated }}
         <button type="submit" name="import_mode" value="all_file" class="btn btn-primary" style="padding: 0.65rem 1.75rem; font-size: 1rem; font-weight: 700; background: #0284c7;">
-          ✓ {{ .ConfirmAllBtnText }}
+          <i class="fa-solid fa-check"></i> {{ .ConfirmAllBtnText }}
         </button>
         {{ else }}
         <button type="submit" name="import_mode" value="form_data" class="btn btn-primary" style="padding: 0.65rem 1.75rem; font-size: 1rem; font-weight: 700;">
-          ✓ {{ index .I18n.T "admin_confirm_import" }}
+          <i class="fa-solid fa-check"></i> {{ index .I18n.T "admin_confirm_import" }}
         </button>
         {{ end }}
       </div>
