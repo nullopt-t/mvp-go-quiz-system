@@ -35,17 +35,18 @@ func (s *seederService) SeedInitialData(ctx context.Context) error {
 	}
 
 	if count == 0 {
-		log.Println("Seeding college hierarchy: 5 Levels x 4 Groups x 500 Students (10,000 total)...")
+		log.Println("Seeding college hierarchy: 5 Levels x 4 Groups (A,B,C,D) x 500 Students (10,000 total)...")
 		now := time.Now().UTC()
 
 		batchSize := 1000
 		batch := make([]model.Student, 0, batchSize)
+		groups := []string{"A", "B", "C", "D"}
 
 		for level := 1; level <= 5; level++ {
-			for group := 1; group <= 4; group++ {
+			for _, group := range groups {
 				for stuNum := 1; stuNum <= 500; stuNum++ {
-					code := fmt.Sprintf("L%dG%d-%03d", level, group, stuNum)
-					name := fmt.Sprintf("Student L%d-G%d #%03d", level, group, stuNum)
+					code := fmt.Sprintf("L%d%s-%03d", level, group, stuNum)
+					name := fmt.Sprintf("Student L%d-%s #%03d", level, group, stuNum)
 
 					student := model.Student{
 						ID:          primitive.NewObjectID(),
@@ -73,7 +74,7 @@ func (s *seederService) SeedInitialData(ctx context.Context) error {
 				return fmt.Errorf("bulk insert failure: %w", err)
 			}
 		}
-		log.Println("Successfully seeded 10,000 students across 20 groups!")
+		log.Println("Successfully seeded 10,000 students across 20 groups (A, B, C, D)!")
 	}
 
 	// Seed sample quizzes if none exist
@@ -87,7 +88,7 @@ func (s *seederService) SeedInitialData(ctx context.Context) error {
 				Title:           "Midterm Assessment: Computer Science Fundamentals",
 				Description:     "Synchronized exam covering algorithms, data structures, and computer architecture for all Level 1 students.",
 				LevelID:         1,
-				GroupIDs:        []int{}, // All groups in Level 1
+				GroupIDs:        []string{}, // All groups in Level 1
 				DurationMinutes: 45,
 				StartTime:       now.Add(-5 * time.Minute), // Started 5 mins ago, live for next 40 mins
 				EndTime:         now.Add(40 * time.Minute),
@@ -156,7 +157,7 @@ func (s *seederService) SeedInitialData(ctx context.Context) error {
 				Title:           "General Engineering Assessment (All Levels)",
 				Description:     "Universal college engineering & problem solving assessment with synchronized live timer.",
 				LevelID:         0, // All levels
-				GroupIDs:        []int{},
+				GroupIDs:        []string{},
 				DurationMinutes: 60,
 				StartTime:       now.Add(-2 * time.Minute), // Started 2 mins ago
 				EndTime:         now.Add(58 * time.Minute),
