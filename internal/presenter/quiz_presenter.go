@@ -79,6 +79,8 @@ func (p *QuizPresenter) RenderQuizRoom(w http.ResponseWriter, r *http.Request) {
 	currentQuestion := quizView.Quiz.Questions[startIndex]
 	selectedOptionID := quizView.PreviousAnswers[currentQuestion.ID]
 
+	i18nBundle := GetI18n(r)
+
 	data := map[string]interface{}{
 		"Student":          claims,
 		"Quiz":             quizView.Quiz,
@@ -90,6 +92,7 @@ func (p *QuizPresenter) RenderQuizRoom(w http.ResponseWriter, r *http.Request) {
 		"RemainingSeconds": quizView.RemainingSeconds,
 		"IsLastQuestion":   startIndex == len(quizView.Quiz.Questions)-1,
 		"PreviousAnswers":  quizView.PreviousAnswers,
+		"I18n":             i18nBundle,
 	}
 
 	_ = p.templates.ExecuteTemplate(w, "quiz_room.html", data)
@@ -164,6 +167,8 @@ func (p *QuizPresenter) HandleNextAnswer(w http.ResponseWriter, r *http.Request)
 	nextQuestion := quiz.Questions[nextIndex]
 	selectedOptionID := latestAnswers[nextQuestion.ID]
 
+	i18nBundle := GetI18n(r)
+
 	data := map[string]interface{}{
 		"Student":          claims,
 		"Quiz":             quiz,
@@ -174,6 +179,7 @@ func (p *QuizPresenter) HandleNextAnswer(w http.ResponseWriter, r *http.Request)
 		"SelectedOptionID": selectedOptionID,
 		"IsLastQuestion":   nextIndex == len(quiz.Questions)-1,
 		"PreviousAnswers":  latestAnswers,
+		"I18n":             i18nBundle,
 	}
 
 	// Render the next question partial dynamically via HTMX
@@ -273,11 +279,14 @@ func (p *QuizPresenter) RenderQuizResult(w http.ResponseWriter, r *http.Request)
 		percentage = (result.Score * 100) / result.TotalPoints
 	}
 
+	i18nBundle := GetI18n(r)
+
 	data := map[string]interface{}{
 		"Student":    claims,
 		"Quiz":       quiz,
 		"Result":     result,
 		"Percentage": percentage,
+		"I18n":       i18nBundle,
 	}
 
 	_ = p.templates.ExecuteTemplate(w, "result.html", data)
