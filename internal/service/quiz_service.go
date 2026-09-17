@@ -32,7 +32,7 @@ type QuizService interface {
 	CreateQuiz(ctx context.Context, quiz *model.Quiz) error
 	GetQuizByID(ctx context.Context, id primitive.ObjectID) (*model.Quiz, error)
 	GetAllQuizzes(ctx context.Context) ([]model.Quiz, error)
-	GetAvailableQuizzesForStudent(ctx context.Context, studentID primitive.ObjectID, levelID, groupID int) ([]StudentQuizSummary, error)
+	GetAvailableQuizzesForStudent(ctx context.Context, studentID primitive.ObjectID, levelID int, groupID string) ([]StudentQuizSummary, error)
 	StartOrResumeQuiz(ctx context.Context, quizID, studentID primitive.ObjectID) (*StudentQuizView, error)
 }
 
@@ -82,7 +82,7 @@ func (s *quizService) GetAllQuizzes(ctx context.Context) ([]model.Quiz, error) {
 	return s.quizRepo.GetAll(ctx)
 }
 
-func (s *quizService) GetAvailableQuizzesForStudent(ctx context.Context, studentID primitive.ObjectID, levelID, groupID int) ([]StudentQuizSummary, error) {
+func (s *quizService) GetAvailableQuizzesForStudent(ctx context.Context, studentID primitive.ObjectID, levelID int, groupID string) ([]StudentQuizSummary, error) {
 	quizzes, err := s.quizRepo.GetAvailableForStudent(ctx, levelID, groupID)
 	if err != nil {
 		return nil, err
