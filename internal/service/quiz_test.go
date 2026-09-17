@@ -208,6 +208,7 @@ func TestAuthAndAppendOnlyFlow(t *testing.T) {
 				Title:           "Algorithm Midterm",
 				LevelID:         1,
 				DurationMinutes: 10,
+				StartTime:       time.Now().Add(-1 * time.Minute),
 				IsActive:        true,
 				Questions: []model.Question{
 					{
