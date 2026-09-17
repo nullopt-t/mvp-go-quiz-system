@@ -43,24 +43,10 @@ func (p *AdminPresenter) RenderDashboard(w http.ResponseWriter, r *http.Request)
 	quizzes, _ := p.quizService.GetAllQuizzes(r.Context())
 	totalStudents, _ := p.studentRepo.Count(r.Context())
 
-	// Summarize counts across 5 levels & 4 letter groups (A, B, C, D)
-	type GroupSummary struct {
-		LevelID int
-		GroupID string
-		Count   int64
-	}
-	var groupSummaries []GroupSummary
-	groups := []string{"A", "B", "C", "D"}
-
-	for l := 1; l <= 5; l++ {
-		for _, g := range groups {
-			c, _ := p.studentRepo.CountByLevelAndGroup(r.Context(), l, g)
-			groupSummaries = append(groupSummaries, GroupSummary{
-				LevelID: l,
-				GroupID: g,
-				Count:   c,
-			})
-		}
+	// Dynamically aggregate all active cohorts from MongoDB
+	groupSummaries, err := p.studentRepo.GetCohortDistribution(r.Context())
+	if err != nil {
+		groupSummaries = nil
 	}
 
 	i18nBundle := GetI18n(r)
