@@ -19,6 +19,7 @@ type AdminPresenter struct {
 	quizService   service.QuizService
 	resultService service.ResultService
 	studentRepo   repository.StudentRepository
+	importService service.ImportService
 	templates     *template.Template
 }
 
@@ -26,12 +27,14 @@ func NewAdminPresenter(
 	quizService service.QuizService,
 	resultService service.ResultService,
 	studentRepo repository.StudentRepository,
+	importService service.ImportService,
 	tmpl *template.Template,
 ) *AdminPresenter {
 	return &AdminPresenter{
 		quizService:   quizService,
 		resultService: resultService,
 		studentRepo:   studentRepo,
+		importService: importService,
 		templates:     tmpl,
 	}
 }
@@ -40,15 +43,17 @@ func (p *AdminPresenter) RenderDashboard(w http.ResponseWriter, r *http.Request)
 	quizzes, _ := p.quizService.GetAllQuizzes(r.Context())
 	totalStudents, _ := p.studentRepo.Count(r.Context())
 
-	// Summarize counts across 5 levels & 4 groups
+	// Summarize counts across 5 levels & 4 letter groups (A, B, C, D)
 	type GroupSummary struct {
 		LevelID int
-		GroupID int
+		GroupID string
 		Count   int64
 	}
 	var groupSummaries []GroupSummary
+	groups := []string{"A", "B", "C", "D"}
+
 	for l := 1; l <= 5; l++ {
-		for g := 1; g <= 4; g++ {
+		for _, g := range groups {
 			c, _ := p.studentRepo.CountByLevelAndGroup(r.Context(), l, g)
 			groupSummaries = append(groupSummaries, GroupSummary{
 				LevelID: l,
@@ -59,15 +64,49 @@ func (p *AdminPresenter) RenderDashboard(w http.ResponseWriter, r *http.Request)
 	}
 
 	i18nBundle := GetI18n(r)
+	successMsg := r.URL.Query().Get("import_success")
+	errMsg := r.URL.Query().Get("import_error")
 
 	data := map[string]interface{}{
 		"Quizzes":        quizzes,
 		"TotalStudents":  totalStudents,
 		"GroupSummaries": groupSummaries,
+		"ImportSuccess":  successMsg,
+		"ImportError":    errMsg,
 		"I18n":           i18nBundle,
 	}
 
 	_ = p.templates.ExecuteTemplate(w, "admin_dashboard.html", data)
+}
+
+func (p *AdminPresenter) HandleImportStudents(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseMultipartForm(10 << 20); err != nil { // 10MB max
+		http.Redirect(w, r, "/admin?import_error=Failed+to+read+upload+data", http.StatusSeeOther)
+		return
+	}
+
+	file, _, err := r.FormFile("csv_file")
+	if err != nil {
+		http.Redirect(w, r, "/admin?import_error=Please+select+a+valid+CSV+file", http.StatusSeeOther)
+		return
+	}
+	defer file.Close()
+
+	importedCount, err := p.importService.ImportStudentsFromCSV(r.Context(), file)
+	if err != nil {
+		http.Redirect(w, r, fmt.Sprintf("/admin?import_error=%s", strings.ReplaceAll(err.Error(), " ", "+")), http.StatusSeeOther)
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/admin?import_success=Successfully+imported+%d+students", importedCount), http.StatusSeeOther)
+}
+
+func (p *AdminPresenter) HandleDownloadSampleCSV(w http.ResponseWriter, r *http.Request) {
+	csvData := p.importService.GenerateSampleCSV()
+	w.Header().Set("Content-Type", "text/csv")
+	w.Header().Set("Content-Disposition", "attachment; filename=\"students_template.csv\"")
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write(csvData)
 }
 
 func (p *AdminPresenter) RenderCreateQuiz(w http.ResponseWriter, r *http.Request) {
@@ -90,12 +129,13 @@ func (p *AdminPresenter) HandleCreateQuiz(w http.ResponseWriter, r *http.Request
 		duration = 20
 	}
 
-	// Group IDs parsing (e.g. "1,2,3")
-	var groupIDs []int
+	// Group IDs parsing (e.g. "A, B, C")
+	var groupIDs []string
 	groupsInput := r.FormValue("group_ids")
 	if groupsInput != "" {
 		for _, part := range strings.Split(groupsInput, ",") {
-			if g, err := strconv.Atoi(strings.TrimSpace(part)); err == nil && g > 0 {
+			g := strings.ToUpper(strings.TrimSpace(part))
+			if g != "" {
 				groupIDs = append(groupIDs, g)
 			}
 		}
