@@ -29,6 +29,7 @@ type StudentRepository interface {
 	BulkInsert(ctx context.Context, students []model.Student) error
 	BulkUpsert(ctx context.Context, students []model.Student) (int, error)
 	GetAll(ctx context.Context, levelID int, groupID string, limit, offset int64) ([]model.Student, error)
+	GetAllSorted(ctx context.Context, levelID int, groupID string, sortBy string, sortOrder int, limit, offset int64) ([]model.Student, error)
 	SetActive(ctx context.Context, id primitive.ObjectID, isActive bool) error
 }
 
@@ -189,6 +190,10 @@ func (r *studentRepository) BulkUpsert(ctx context.Context, students []model.Stu
 }
 
 func (r *studentRepository) GetAll(ctx context.Context, levelID int, groupID string, limit, offset int64) ([]model.Student, error) {
+	return r.GetAllSorted(ctx, levelID, groupID, "student_code", 1, limit, offset)
+}
+
+func (r *studentRepository) GetAllSorted(ctx context.Context, levelID int, groupID string, sortBy string, sortOrder int, limit, offset int64) ([]model.Student, error) {
 	filter := bson.M{}
 	if levelID > 0 {
 		filter["level_id"] = levelID
@@ -197,8 +202,25 @@ func (r *studentRepository) GetAll(ctx context.Context, levelID int, groupID str
 		filter["group_id"] = groupID
 	}
 
+	validSortFields := map[string]string{
+		"code":       "student_code",
+		"name":       "name",
+		"level":      "level_id",
+		"group":      "group_id",
+		"created_at": "created_at",
+		"time":       "created_at",
+	}
+
+	sortField, ok := validSortFields[sortBy]
+	if !ok {
+		sortField = "student_code"
+	}
+	if sortOrder != 1 && sortOrder != -1 {
+		sortOrder = 1
+	}
+
 	findOpts := options.Find().
-		SetSort(bson.D{{Key: "student_code", Value: 1}}).
+		SetSort(bson.D{{Key: sortField, Value: sortOrder}}).
 		SetLimit(limit).
 		SetSkip(offset)
 

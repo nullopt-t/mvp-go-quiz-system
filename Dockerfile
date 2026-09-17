@@ -21,6 +21,7 @@ RUN apk add --no-cache ca-certificates tzdata
 
 COPY --from=builder /app/server /app/server
 COPY web /app/web
+COPY test_students_25k.csv /app/test_students_25k.csv
 
 EXPOSE 8080
 

@@ -2,8 +2,13 @@ package service
 
 import (
 	"context"
+	"encoding/csv"
 	"fmt"
+	"io"
 	"log"
+	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"quiz-system/internal/model"
@@ -35,46 +40,116 @@ func (s *seederService) SeedInitialData(ctx context.Context) error {
 	}
 
 	if count == 0 {
-		log.Println("Seeding college hierarchy: 5 Levels x 4 Groups (A,B,C,D) x 500 Students (10,000 total)...")
-		now := time.Now().UTC()
+		csvPath := "test_students_25k.csv"
+		if _, err := os.Stat(csvPath); os.IsNotExist(err) {
+			csvPath = "/app/test_students_25k.csv"
+		}
 
-		batchSize := 1000
-		batch := make([]model.Student, 0, batchSize)
-		groups := []string{"A", "B", "C", "D"}
+		f, err := os.Open(csvPath)
+		if err == nil {
+			defer f.Close()
+			log.Printf("Seeding students from %s...", csvPath)
+			r := csv.NewReader(f)
+			r.TrimLeadingSpace = true
 
-		for level := 1; level <= 5; level++ {
-			for _, group := range groups {
-				for stuNum := 1; stuNum <= 500; stuNum++ {
-					code := fmt.Sprintf("L%d%s-%03d", level, group, stuNum)
-					name := fmt.Sprintf("Student L%d-%s #%03d", level, group, stuNum)
+			// Read header
+			_, _ = r.Read()
 
-					student := model.Student{
-						ID:          primitive.NewObjectID(),
-						StudentCode: code,
-						Name:        name,
-						LevelID:     level,
-						GroupID:     group,
-						IsActive:    true,
-						CreatedAt:   now,
+			now := time.Now().UTC()
+			batchSize := 1000
+			batch := make([]model.Student, 0, batchSize)
+			totalLoaded := 0
+
+			for {
+				record, err := r.Read()
+				if err == io.EOF {
+					break
+				}
+				if err != nil || len(record) < 4 {
+					continue
+				}
+
+				code := strings.TrimSpace(record[0])
+				name := strings.TrimSpace(record[1])
+				lvl, _ := strconv.Atoi(strings.TrimSpace(record[2]))
+				grp := strings.ToUpper(strings.TrimSpace(record[3]))
+
+				if code == "" || name == "" {
+					continue
+				}
+				if lvl < 1 || lvl > 5 {
+					lvl = 1
+				}
+				if grp == "" {
+					grp = "A"
+				}
+
+				student := model.Student{
+					ID:          primitive.NewObjectID(),
+					StudentCode: code,
+					Name:        name,
+					LevelID:     lvl,
+					GroupID:     grp,
+					IsActive:    true,
+					CreatedAt:   now,
+				}
+				batch = append(batch, student)
+				totalLoaded++
+
+				if len(batch) >= batchSize {
+					if err := s.studentRepo.BulkInsert(ctx, batch); err != nil {
+						return fmt.Errorf("bulk insert failure: %w", err)
 					}
-					batch = append(batch, student)
+					batch = batch[:0]
+				}
+			}
 
-					if len(batch) >= batchSize {
-						if err := s.studentRepo.BulkInsert(ctx, batch); err != nil {
-							return fmt.Errorf("bulk insert failure: %w", err)
+			if len(batch) > 0 {
+				if err := s.studentRepo.BulkInsert(ctx, batch); err != nil {
+					return fmt.Errorf("bulk insert failure: %w", err)
+				}
+			}
+			log.Printf("Successfully seeded %d students from %s!", totalLoaded, csvPath)
+		} else {
+			log.Printf("Could not open 25k csv (%v), falling back to procedural seeder...", err)
+			now := time.Now().UTC()
+			batchSize := 1000
+			batch := make([]model.Student, 0, batchSize)
+			groups := []string{"A", "B", "C", "D"}
+
+			for level := 1; level <= 5; level++ {
+				for _, group := range groups {
+					for stuNum := 1; stuNum <= 500; stuNum++ {
+						code := fmt.Sprintf("L%d%s-%03d", level, group, stuNum)
+						name := fmt.Sprintf("Student L%d-%s #%03d", level, group, stuNum)
+
+						student := model.Student{
+							ID:          primitive.NewObjectID(),
+							StudentCode: code,
+							Name:        name,
+							LevelID:     level,
+							GroupID:     group,
+							IsActive:    true,
+							CreatedAt:   now,
 						}
-						batch = batch[:0]
+						batch = append(batch, student)
+
+						if len(batch) >= batchSize {
+							if err := s.studentRepo.BulkInsert(ctx, batch); err != nil {
+								return fmt.Errorf("bulk insert failure: %w", err)
+							}
+							batch = batch[:0]
+						}
 					}
 				}
 			}
-		}
 
-		if len(batch) > 0 {
-			if err := s.studentRepo.BulkInsert(ctx, batch); err != nil {
-				return fmt.Errorf("bulk insert failure: %w", err)
+			if len(batch) > 0 {
+				if err := s.studentRepo.BulkInsert(ctx, batch); err != nil {
+					return fmt.Errorf("bulk insert failure: %w", err)
+				}
 			}
 		}
-		log.Println("Successfully seeded 10,000 students across 20 groups (A, B, C, D)!")
 	}
 
 	// Seed sample quizzes if none exist

@@ -70,8 +70,8 @@ func main() {
 	importService := service.NewImportService(studentRepo)
 	seederService := service.NewSeederService(studentRepo, quizRepo)
 
-	// 5. Seed Hierarchy (5 Levels x 4 Groups x 500 Students = 10,000) & Quizzes
-	ctxSeeder, cancelSeeder := context.WithTimeout(context.Background(), 30*time.Second)
+	// 5. Seed Hierarchy & Quizzes
+	ctxSeeder, cancelSeeder := context.WithTimeout(context.Background(), 60*time.Second)
 	if err := seederService.SeedInitialData(ctxSeeder); err != nil {
 		log.Printf("Warning: Seeder error: %v", err)
 	}

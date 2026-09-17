@@ -468,8 +468,18 @@ func (p *AdminPresenter) RenderQuizAnalytics(w http.ResponseWriter, r *http.Requ
 func (p *AdminPresenter) RenderStudentsList(w http.ResponseWriter, r *http.Request) {
 	levelID, _ := strconv.Atoi(r.URL.Query().Get("level_id"))
 	groupID := strings.ToUpper(strings.TrimSpace(r.URL.Query().Get("group_id")))
+	sortBy := strings.ToLower(strings.TrimSpace(r.URL.Query().Get("sort_by")))
+	orderStr := strings.ToLower(strings.TrimSpace(r.URL.Query().Get("order")))
 
-	students, err := p.studentRepo.GetAll(r.Context(), levelID, groupID, 200, 0)
+	if sortBy == "" {
+		sortBy = "student_code"
+	}
+	sortOrder := 1
+	if orderStr == "desc" {
+		sortOrder = -1
+	}
+
+	students, err := p.studentRepo.GetAllSorted(r.Context(), levelID, groupID, sortBy, sortOrder, 200, 0)
 	if err != nil {
 		students = nil
 	}
@@ -487,6 +497,8 @@ func (p *AdminPresenter) RenderStudentsList(w http.ResponseWriter, r *http.Reque
 		"TotalStudents":  totalStudents,
 		"SelectedLevel":  levelID,
 		"SelectedGroup":  groupID,
+		"SortBy":         sortBy,
+		"SortOrder":      orderStr,
 		"Success":        successMsg,
 		"Error":          errMsg,
 		"I18n":           i18nBundle,
