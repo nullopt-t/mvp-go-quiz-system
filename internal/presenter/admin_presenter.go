@@ -3,7 +3,10 @@ package presenter
 import (
 	"fmt"
 	"html/template"
+	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -66,7 +69,7 @@ func (p *AdminPresenter) RenderDashboard(w http.ResponseWriter, r *http.Request)
 }
 
 func (p *AdminPresenter) HandlePreviewImportStudents(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseMultipartForm(10 << 20); err != nil { // 10MB max
+	if err := r.ParseMultipartForm(50 << 20); err != nil { // 50MB max
 		http.Redirect(w, r, "/admin?import_error=Failed+to+read+upload+data", http.StatusSeeOther)
 		return
 	}
@@ -78,17 +81,53 @@ func (p *AdminPresenter) HandlePreviewImportStudents(w http.ResponseWriter, r *h
 	}
 	defer file.Close()
 
-	students, err := p.importService.ParseStudentsFromCSV(file)
+	// Save temporary copy for reliable large file importing
+	tempFile, err := os.CreateTemp("", "roster-*.csv")
 	if err != nil {
+		http.Redirect(w, r, "/admin?import_error=Failed+to+process+uploaded+file", http.StatusSeeOther)
+		return
+	}
+	tempPath := tempFile.Name()
+	defer tempFile.Close()
+
+	if _, err := io.Copy(tempFile, file); err != nil {
+		_ = os.Remove(tempPath)
+		http.Redirect(w, r, "/admin?import_error=Failed+to+cache+uploaded+roster", http.StatusSeeOther)
+		return
+	}
+
+	// Rewind to parse
+	if _, err := tempFile.Seek(0, 0); err != nil {
+		_ = os.Remove(tempPath)
+		http.Redirect(w, r, "/admin?import_error=Failed+to+read+cached+roster", http.StatusSeeOther)
+		return
+	}
+
+	students, err := p.importService.ParseStudentsFromCSV(tempFile)
+	if err != nil {
+		_ = os.Remove(tempPath)
 		http.Redirect(w, r, fmt.Sprintf("/admin?import_error=%s", strings.ReplaceAll(err.Error(), " ", "+")), http.StatusSeeOther)
 		return
 	}
 
+	displayLimit := 250
+	displayStudents := students
+	isTruncated := false
+	if len(students) > displayLimit {
+		displayStudents = students[:displayLimit]
+		isTruncated = true
+	}
+
+	fileToken := filepath.Base(tempPath)
+
 	i18nBundle := GetI18n(r)
 	data := map[string]interface{}{
-		"Students": students,
-		"Count":    len(students),
-		"I18n":     i18nBundle,
+		"Students":        displayStudents,
+		"TotalCount":      len(students),
+		"DisplayedCount":  len(displayStudents),
+		"IsTruncated":     isTruncated,
+		"FileToken":       fileToken,
+		"I18n":            i18nBundle,
 	}
 
 	_ = p.templates.ExecuteTemplate(w, "admin_import_preview.html", data)
@@ -98,6 +137,37 @@ func (p *AdminPresenter) HandleConfirmImportStudents(w http.ResponseWriter, r *h
 	if err := r.ParseForm(); err != nil {
 		http.Redirect(w, r, "/admin?import_error=Invalid+form+data", http.StatusSeeOther)
 		return
+	}
+
+	fileToken := strings.TrimSpace(r.FormValue("file_token"))
+	importMode := strings.TrimSpace(r.FormValue("import_mode")) // "all_file" or "form_data"
+
+	// If large roster import requested directly from cached file
+	if fileToken != "" && (importMode == "all_file" || len(r.Form["student_code[]"]) == 0) {
+		tempPath := filepath.Join(os.TempDir(), filepath.Clean(fileToken))
+		f, err := os.Open(tempPath)
+		if err != nil {
+			http.Redirect(w, r, "/admin?import_error=Upload+session+expired.+Please+re-upload+the+file", http.StatusSeeOther)
+			return
+		}
+		defer func() {
+			_ = f.Close()
+			_ = os.Remove(tempPath)
+		}()
+
+		count, err := p.importService.ImportStudentsFromCSV(r.Context(), f)
+		if err != nil {
+			http.Redirect(w, r, fmt.Sprintf("/admin?import_error=%s", strings.ReplaceAll(err.Error(), " ", "+")), http.StatusSeeOther)
+			return
+		}
+
+		http.Redirect(w, r, fmt.Sprintf("/admin/students?success=Successfully+imported+%d+students", count), http.StatusSeeOther)
+		return
+	}
+
+	// Clean up temporary file if present
+	if fileToken != "" {
+		_ = os.Remove(filepath.Join(os.TempDir(), filepath.Clean(fileToken)))
 	}
 
 	codes := r.Form["student_code[]"]
