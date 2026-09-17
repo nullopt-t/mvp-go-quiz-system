@@ -9,9 +9,9 @@
 </head>
 <body>
   <!-- Academic Portal Header -->
-  <nav class="navbar" style="padding: 1rem 2rem; border-bottom: 1px solid var(--border); background: #ffffff;">
+  <nav class="navbar" style="padding: 1rem 2rem; border-bottom: 1px solid var(--border); background: var(--surface);">
     <a href="/admin" class="nav-brand" style="display: flex; align-items: center; gap: 0.75rem;">
-      <div style="background: var(--primary); color: #fff; width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; box-shadow: 0 2px 4px rgba(37,99,235,0.25);">
+      <div style="background: var(--primary); color: #fff; width: 38px; height: 38px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; box-shadow: 0 1px 3px rgba(37,99,235,0.25);">
         <i class="fa-solid fa-graduation-cap"></i>
       </div>
       <div>
@@ -36,9 +36,9 @@
 
   <div class="container">
     <!-- Welcome Greeting Header -->
-    <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff; border-radius: 14px; padding: 2rem 2.25rem; margin-bottom: 2rem; box-shadow: 0 10px 25px -5px rgba(15,23,42,0.15); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+    <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff; border-radius: 4px; padding: 2rem 2.25rem; margin-bottom: 2rem; box-shadow: 0 4px 6px -1px rgba(15,23,42,0.1); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
       <div>
-        <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; color: #93c5fd; margin-bottom: 0.75rem;">
+        <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); padding: 0.25rem 0.65rem; border-radius: 3px; font-size: 0.75rem; font-weight: 600; color: #93c5fd; margin-bottom: 0.75rem;">
           <i class="fa-solid fa-building-columns"></i> {{ index .I18n.T "admin_dashboard_badge" }}
         </div>
         <h1 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 0.35rem; color: #ffffff;">
@@ -50,10 +50,10 @@
       </div>
 
       <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-        <a href="/admin/quizzes/create" class="btn btn-primary" style="background: #2563eb; padding: 0.65rem 1.35rem; font-size: 0.95rem; font-weight: 700; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(37,99,235,0.4);">
+        <a href="/admin/quizzes/create" class="btn btn-primary" style="background: #2563eb; padding: 0.65rem 1.35rem; font-size: 0.95rem; font-weight: 700; border-radius: 4px; box-shadow: 0 2px 4px rgba(37,99,235,0.3);">
           <i class="fa-solid fa-plus" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_create_quiz" }}
         </a>
-        <a href="/admin/students/create" class="btn btn-secondary" style="background: rgba(255,255,255,0.1); color: #ffffff; border-color: rgba(255,255,255,0.2); padding: 0.65rem 1.15rem; font-size: 0.95rem; font-weight: 600; border-radius: 8px;">
+        <a href="/admin/students/create" class="btn btn-secondary" style="background: rgba(255,255,255,0.1); color: #ffffff; border-color: rgba(255,255,255,0.2); padding: 0.65rem 1.15rem; font-size: 0.95rem; font-weight: 600; border-radius: 4px;">
           <i class="fa-solid fa-user-plus" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_add_student" }}
         </a>
       </div>
@@ -74,7 +74,7 @@
     <!-- Key Metrics Cards -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
       <div class="card" style="margin-bottom: 0; display: flex; align-items: center; gap: 1.25rem; padding: 1.5rem;">
-        <div style="width: 52px; height: 52px; border-radius: 12px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0;">
+        <div style="width: 48px; height: 48px; border-radius: 4px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">
           <i class="fa-solid fa-users"></i>
         </div>
         <div style="flex: 1;">
@@ -91,7 +91,7 @@
       </div>
 
       <div class="card" style="margin-bottom: 0; display: flex; align-items: center; gap: 1.25rem; padding: 1.5rem;">
-        <div style="width: 52px; height: 52px; border-radius: 12px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0;">
+        <div style="width: 48px; height: 48px; border-radius: 4px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">
           <i class="fa-solid fa-file-pen"></i>
         </div>
         <div style="flex: 1;">
@@ -106,7 +106,7 @@
       </div>
 
       <div class="card" style="margin-bottom: 0; display: flex; align-items: center; gap: 1.25rem; padding: 1.5rem;">
-        <div style="width: 52px; height: 52px; border-radius: 12px; background: #fef3c7; color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0;">
+        <div style="width: 48px; height: 48px; border-radius: 4px; background: #fef3c7; color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">
           <i class="fa-solid fa-layer-group"></i>
         </div>
         <div style="flex: 1;">
@@ -187,7 +187,7 @@
 
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 0.65rem; max-height: 240px; overflow-y: auto; padding-right: 0.25rem;">
           {{ range .GroupSummaries }}
-          <a href="/admin/students?level_id={{ .LevelID }}&group_id={{ .GroupID }}" style="text-decoration: none; color: inherit; background: #f8fafc; border: 1px solid var(--border); padding: 0.65rem 0.8rem; border-radius: 8px; transition: all 0.15s ease; display: block;" onmouseover="this.style.borderColor='var(--primary)'; this.style.background='#eff6ff';" onmouseout="this.style.borderColor='var(--border)'; this.style.background='#f8fafc';">
+          <a href="/admin/students?level_id={{ .LevelID }}&group_id={{ .GroupID }}" style="text-decoration: none; color: inherit; background: var(--bg); border: 1px solid var(--border); padding: 0.65rem 0.8rem; border-radius: 4px; transition: all 0.15s ease; display: block;" onmouseover="this.style.borderColor='var(--primary)'; this.style.background='#eff6ff';" onmouseout="this.style.borderColor='var(--border)'; this.style.background='var(--bg)';">
             <div style="font-weight: 700; color: var(--primary); font-size: 0.85rem;">
               {{ index $.I18n.T "level" }} {{ .LevelID }} • {{ index $.I18n.T "group" }} {{ .GroupID }}
             </div>
@@ -196,7 +196,7 @@
             </div>
           </a>
           {{ else }}
-          <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 2rem; background: #f8fafc; border-radius: 8px; font-size: 0.9rem;">
+          <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 2rem; background: var(--bg); border-radius: 4px; font-size: 0.9rem;">
             No student cohorts registered yet. Upload a CSV roster to populate cohorts.
           </div>
           {{ end }}
