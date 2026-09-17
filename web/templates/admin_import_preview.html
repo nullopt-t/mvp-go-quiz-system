@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="{{ .I18n.Lang }}" dir="{{ .I18n.Dir }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ index .I18n.T "admin_preview_title" }} - {{ index .I18n.T "admin_portal" }}</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/htmx.min.js"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/admin" class="nav-brand">
+      <span>{{ index .I18n.T "admin_portal" }}</span>
+    </a>
+    <div class="nav-user">
+      <a href="/admin" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;">{{ index .I18n.T "dashboard" }}</a>
+      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 600;">
+        {{ index .I18n.T "lang_switch" }}
+      </a>
+      <form action="/admin/logout" method="POST" style="display:inline;">
+        <button type="submit" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;">{{ index .I18n.T "logout" }}</button>
+      </form>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div style="margin-bottom: 2rem;">
+      <a href="/admin" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--primary); font-size: 0.9rem; font-weight: 600; margin-bottom: 0.75rem;">
+        ← {{ index .I18n.T "back_dashboard" }}
+      </a>
+      <h2 style="font-size: 1.5rem; margin-bottom: 0.25rem;">{{ index .I18n.T "admin_preview_title" }}</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">
+        {{ index .I18n.T "admin_preview_sub" }}
+      </p>
+    </div>
+
+    <div class="alert alert-info" style="background-color: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <strong>{{ index .I18n.T "admin_preview_count" }}:</strong> <span id="student-count">{{ .Count }}</span>
+        <div style="font-size: 0.85rem; margin-top: 0.25rem; color: #15803d;">
+          {{ index .I18n.T "admin_preview_notice" }}
+        </div>
+      </div>
+    </div>
+
+    <form id="import-preview-form" action="/admin/students/import" method="POST">
+      <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 1.5rem;">
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; text-align: start;">
+            <thead>
+              <tr style="background: #f8fafc; border-bottom: 2px solid var(--border);">
+                <th style="padding: 0.85rem 1rem;">#</th>
+                <th style="padding: 0.85rem 1rem;">{{ index .I18n.T "student_id_label" }}</th>
+                <th style="padding: 0.85rem 1rem;">{{ index .I18n.T "student_label" }}</th>
+                <th style="padding: 0.85rem 1rem; width: 140px;">{{ index .I18n.T "level" }}</th>
+                <th style="padding: 0.85rem 1rem; width: 140px;">{{ index .I18n.T "group" }}</th>
+                <th style="padding: 0.85rem 1rem; width: 80px; text-align: center;">{{ index .I18n.T "admin_remove_row" }}</th>
+              </tr>
+            </thead>
+            <tbody id="students-tbody">
+              {{ range $idx, $s := .Students }}
+              <tr id="row-{{ $idx }}" style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 0.75rem 1rem; color: var(--text-muted); font-size: 0.85rem;">{{ add $idx 1 }}</td>
+                <td style="padding: 0.5rem 1rem;">
+                  <input type="text" name="student_code[]" value="{{ $s.StudentCode }}" required style="font-family: monospace; font-weight: 600; padding: 0.4rem 0.6rem; font-size: 0.9rem; width: 100%; border: 1px solid var(--border); border-radius: 4px;">
+                </td>
+                <td style="padding: 0.5rem 1rem;">
+                  <input type="text" name="name[]" value="{{ $s.Name }}" required style="padding: 0.4rem 0.6rem; font-size: 0.9rem; width: 100%; border: 1px solid var(--border); border-radius: 4px;">
+                </td>
+                <td style="padding: 0.5rem 1rem;">
+                  <select name="level_id[]" style="padding: 0.4rem 0.6rem; font-size: 0.9rem; width: 100%; border: 1px solid var(--border); border-radius: 4px;">
+                    <option value="1" {{ if eq $s.LevelID 1 }}selected{{ end }}>{{ index $.I18n.T "level" }} 1</option>
+                    <option value="2" {{ if eq $s.LevelID 2 }}selected{{ end }}>{{ index $.I18n.T "level" }} 2</option>
+                    <option value="3" {{ if eq $s.LevelID 3 }}selected{{ end }}>{{ index $.I18n.T "level" }} 3</option>
+                    <option value="4" {{ if eq $s.LevelID 4 }}selected{{ end }}>{{ index $.I18n.T "level" }} 4</option>
+                    <option value="5" {{ if eq $s.LevelID 5 }}selected{{ end }}>{{ index $.I18n.T "level" }} 5</option>
+                  </select>
+                </td>
+                <td style="padding: 0.5rem 1rem;">
+                  <select name="group_id[]" style="padding: 0.4rem 0.6rem; font-size: 0.9rem; width: 100%; border: 1px solid var(--border); border-radius: 4px;">
+                    <option value="A" {{ if eq $s.GroupID "A" }}selected{{ end }}>{{ index $.I18n.T "group" }} A</option>
+                    <option value="B" {{ if eq $s.GroupID "B" }}selected{{ end }}>{{ index $.I18n.T "group" }} B</option>
+                    <option value="C" {{ if eq $s.GroupID "C" }}selected{{ end }}>{{ index $.I18n.T "group" }} C</option>
+                    <option value="D" {{ if eq $s.GroupID "D" }}selected{{ end }}>{{ index $.I18n.T "group" }} D</option>
+                  </select>
+                </td>
+                <td style="padding: 0.5rem 1rem; text-align: center;">
+                  <button type="button" onclick="removeRow('row-{{ $idx }}')" style="background: none; border: 1px solid #fca5a5; color: #dc2626; border-radius: 4px; padding: 0.35rem 0.6rem; cursor: pointer; font-size: 0.85rem;" title="Delete row">
+                    ✕
+                  </button>
+                </td>
+              </tr>
+              {{ end }}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Action Toolbar -->
+      <div style="display: flex; justify-content: flex-end; align-items: center; gap: 1rem;">
+        <a href="/admin" class="btn btn-secondary" style="padding: 0.65rem 1.5rem;">
+          {{ index .I18n.T "admin_cancel_import" }}
+        </a>
+        <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.75rem; font-size: 1rem; font-weight: 700;">
+          ✓ {{ index .I18n.T "admin_confirm_import" }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    function removeRow(rowId) {
+      const row = document.getElementById(rowId);
+      if (row) {
+        row.remove();
+        updateCount();
+      }
+    }
+
+    function updateCount() {
+      const rows = document.querySelectorAll('#students-tbody tr');
+      const counter = document.getElementById('student-count');
+      if (counter) {
+        counter.textContent = rows.length;
+      }
+    }
+  </script>
+</body>
+</html>
