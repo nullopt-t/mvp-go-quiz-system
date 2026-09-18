@@ -507,27 +507,61 @@ func (p *AdminPresenter) RenderStudentsList(w http.ResponseWriter, r *http.Reque
 		sortOrder = -1
 	}
 
-	offset := int64((page - 1) * pageSize)
-	students, err := p.studentRepo.GetAllSorted(r.Context(), levelID, groupID, sortBy, sortOrder, int64(pageSize), offset)
+	cursorToken := strings.TrimSpace(r.URL.Query().Get("cursor"))
+	direction := strings.TrimSpace(r.URL.Query().Get("dir"))
+	if direction != "prev" {
+		direction = "next"
+	}
+
+	decodedCursor, _ := DecodeCursor(cursorToken)
+
+	students, hasMore, err := p.studentRepo.GetByCursor(
+		r.Context(),
+		levelID,
+		groupID,
+		sortBy,
+		sortOrder,
+		decodedCursor.Val,
+		decodedCursor.ID,
+		direction,
+		int64(pageSize),
+	)
 	if err != nil {
 		students = nil
 	}
 
-	// Filtered count for pagination
-	filteredCount, _ := p.studentRepo.CountByLevelAndGroup(r.Context(), levelID, groupID)
-	totalPages := int((filteredCount + int64(pageSize) - 1) / int64(pageSize))
-	if totalPages < 1 {
-		totalPages = 1
-	}
-	if page > totalPages {
-		page = totalPages
-	}
+	// Calculate cursor tokens for Next and Previous navigation
+	hasPrev := false
+	hasNext := false
+	prevCursorToken := ""
+	nextCursorToken := ""
 
-	fromRecord := int64(0)
-	toRecord := int64(0)
-	if filteredCount > 0 {
-		fromRecord = offset + 1
-		toRecord = offset + int64(len(students))
+	if len(students) > 0 {
+		// Helper to extract sort value as string
+		getSortVal := func(s model.Student) string {
+			switch sortBy {
+			case "name":
+				return s.Name
+			case "created_at", "time":
+				return s.CreatedAt.Format(time.RFC3339Nano)
+			default:
+				return s.StudentCode
+			}
+		}
+
+		firstStudent := students[0]
+		lastStudent := students[len(students)-1]
+
+		if direction == "next" {
+			hasPrev = cursorToken != ""
+			hasNext = hasMore
+		} else { // "prev"
+			hasPrev = hasMore
+			hasNext = true
+		}
+
+		prevCursorToken = EncodeCursor(getSortVal(firstStudent), firstStudent.ID)
+		nextCursorToken = EncodeCursor(getSortVal(lastStudent), lastStudent.ID)
 	}
 
 	cohorts, _ := p.studentRepo.GetCohortDistribution(r.Context())
@@ -537,26 +571,22 @@ func (p *AdminPresenter) RenderStudentsList(w http.ResponseWriter, r *http.Reque
 	errMsg, successMsg := GetFlashMessages(w, r)
 
 	data := map[string]interface{}{
-		"Students":       students,
-		"Cohorts":        cohorts,
-		"TotalStudents":  totalStudents,
-		"FilteredCount":  filteredCount,
-		"SelectedLevel":  levelID,
-		"SelectedGroup":  groupID,
-		"SortBy":         sortBy,
-		"SortOrder":      orderStr,
-		"CurrentPage":    page,
-		"PageSize":       pageSize,
-		"TotalPages":     totalPages,
-		"HasPrev":        page > 1,
-		"HasNext":        page < totalPages,
-		"PrevPage":       page - 1,
-		"NextPage":       page + 1,
-		"FromRecord":     fromRecord,
-		"ToRecord":       toRecord,
-		"Success":        successMsg,
-		"Error":          errMsg,
-		"I18n":           i18nBundle,
+		"Students":        students,
+		"Cohorts":         cohorts,
+		"TotalStudents":   totalStudents,
+		"SelectedLevel":   levelID,
+		"SelectedGroup":   groupID,
+		"SortBy":          sortBy,
+		"SortOrder":       orderStr,
+		"PageSize":        pageSize,
+		"HasPrev":         hasPrev,
+		"HasNext":         hasNext,
+		"PrevCursor":      prevCursorToken,
+		"NextCursor":      nextCursorToken,
+		"CurrentBatchLen": len(students),
+		"Success":         successMsg,
+		"Error":           errMsg,
+		"I18n":            i18nBundle,
 	}
 
 	_ = p.templates.ExecuteTemplate(w, "admin_students.html", data)

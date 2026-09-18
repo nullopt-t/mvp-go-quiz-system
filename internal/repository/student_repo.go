@@ -30,6 +30,7 @@ type StudentRepository interface {
 	BulkUpsert(ctx context.Context, students []model.Student) (int, error)
 	GetAll(ctx context.Context, levelID int, groupID string, limit, offset int64) ([]model.Student, error)
 	GetAllSorted(ctx context.Context, levelID int, groupID string, sortBy string, sortOrder int, limit, offset int64) ([]model.Student, error)
+	GetByCursor(ctx context.Context, levelID int, groupID string, sortBy string, sortOrder int, cursorVal string, cursorID primitive.ObjectID, direction string, limit int64) ([]model.Student, bool, error)
 	SetActive(ctx context.Context, id primitive.ObjectID, isActive bool) error
 }
 
@@ -235,6 +236,108 @@ func (r *studentRepository) GetAllSorted(ctx context.Context, levelID int, group
 		return nil, fmt.Errorf("failed to decode students: %w", err)
 	}
 	return students, nil
+}
+
+func (r *studentRepository) GetByCursor(
+	ctx context.Context,
+	levelID int,
+	groupID string,
+	sortBy string,
+	sortOrder int,
+	cursorVal string,
+	cursorID primitive.ObjectID,
+	direction string,
+	limit int64,
+) ([]model.Student, bool, error) {
+	filter := bson.M{}
+	if levelID > 0 {
+		filter["level_id"] = levelID
+	}
+	if groupID != "" {
+		filter["group_id"] = groupID
+	}
+
+	validSortFields := map[string]string{
+		"code":       "student_code",
+		"name":       "name",
+		"level":      "level_id",
+		"group":      "group_id",
+		"created_at": "created_at",
+		"time":       "created_at",
+	}
+
+	sortField, ok := validSortFields[sortBy]
+	if !ok {
+		sortField = "student_code"
+	}
+	if sortOrder != 1 && sortOrder != -1 {
+		sortOrder = 1
+	}
+
+	// Determine operator based on sort order and direction
+	// If direction == "next" and sortOrder == 1 (ASC) -> field > cursorVal OR (field == cursorVal AND _id > cursorID)
+	// If direction == "prev" and sortOrder == 1 (ASC) -> field < cursorVal OR (field == cursorVal AND _id < cursorID)
+	isForward := direction != "prev"
+	actualSortOrder := sortOrder
+	if !isForward {
+		// Reverse sort order when moving backwards to fetch closest preceding items
+		actualSortOrder = -sortOrder
+	}
+
+	if !cursorID.IsZero() {
+		gtLtOp := "$gt"
+		if (!isForward && sortOrder == 1) || (isForward && sortOrder == -1) {
+			gtLtOp = "$lt"
+		}
+
+		if sortField == "created_at" {
+			var cursorTime time.Time
+			if t, err := time.Parse(time.RFC3339Nano, cursorVal); err == nil {
+				cursorTime = t
+			} else if t, err := time.Parse(time.RFC3339, cursorVal); err == nil {
+				cursorTime = t
+			}
+			filter["$or"] = []bson.M{
+				{sortField: bson.M{gtLtOp: cursorTime}},
+				{sortField: cursorTime, "_id": bson.M{gtLtOp: cursorID}},
+			}
+		} else {
+			filter["$or"] = []bson.M{
+				{sortField: bson.M{gtLtOp: cursorVal}},
+				{sortField: cursorVal, "_id": bson.M{gtLtOp: cursorID}},
+			}
+		}
+	}
+
+	// Request limit + 1 to check whether there is a next/more page
+	findOpts := options.Find().
+		SetSort(bson.D{{Key: sortField, Value: actualSortOrder}, {Key: "_id", Value: actualSortOrder}}).
+		SetLimit(limit + 1)
+
+	cursor, err := r.col.Find(ctx, filter, findOpts)
+	if err != nil {
+		return nil, false, fmt.Errorf("failed to execute cursor query: %w", err)
+	}
+	defer cursor.Close(ctx)
+
+	var items []model.Student
+	if err := cursor.All(ctx, &items); err != nil {
+		return nil, false, fmt.Errorf("failed to decode cursor items: %w", err)
+	}
+
+	hasMore := int64(len(items)) > limit
+	if hasMore {
+		items = items[:limit]
+	}
+
+	// If navigating backwards, reverse the slice back to normal display order
+	if !isForward {
+		for i, j := 0, len(items)-1; i < j; i, j = i+1, j-1 {
+			items[i], items[j] = items[j], items[i]
+		}
+	}
+
+	return items, hasMore, nil
 }
 
 func (r *studentRepository) CreateOrUpdate(ctx context.Context, student *model.Student) error {

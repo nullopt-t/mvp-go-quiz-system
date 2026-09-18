@@ -50,11 +50,37 @@ func NewMongoDatabase(cfg *config.Config) (*MongoDatabase, error) {
 }
 
 func (db *MongoDatabase) ensureIndexes(ctx context.Context) error {
-	// Students collection: unique index on student_code
+	// Students collection: indexes for unique identity and cursor-based seeks
 	studentsCol := db.Database.Collection("students")
-	_, err := studentsCol.Indexes().CreateOne(ctx, mongo.IndexModel{
-		Keys:    bson.D{{Key: "student_code", Value: 1}},
-		Options: options.Index().SetUnique(true),
+	_, err := studentsCol.Indexes().CreateMany(ctx, []mongo.IndexModel{
+		{
+			Keys:    bson.D{{Key: "student_code", Value: 1}},
+			Options: options.Index().SetUnique(true),
+		},
+		{
+			Keys: bson.D{
+				{Key: "level_id", Value: 1},
+				{Key: "group_id", Value: 1},
+				{Key: "student_code", Value: 1},
+				{Key: "_id", Value: 1},
+			},
+		},
+		{
+			Keys: bson.D{
+				{Key: "level_id", Value: 1},
+				{Key: "group_id", Value: 1},
+				{Key: "name", Value: 1},
+				{Key: "_id", Value: 1},
+			},
+		},
+		{
+			Keys: bson.D{
+				{Key: "level_id", Value: 1},
+				{Key: "group_id", Value: 1},
+				{Key: "created_at", Value: -1},
+				{Key: "_id", Value: -1},
+			},
+		},
 	})
 	if err != nil {
 		return err
