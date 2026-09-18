@@ -22,7 +22,7 @@ func NewAuthPresenter(authService service.AuthService, tmpl *template.Template) 
 
 // Student Login
 func (p *AuthPresenter) RenderLogin(w http.ResponseWriter, r *http.Request) {
-	errParam := r.URL.Query().Get("error")
+	errParam, _ := GetFlashMessages(w, r)
 	i18nBundle := GetI18n(r)
 	data := map[string]interface{}{
 		"Error": errParam,
@@ -70,7 +70,7 @@ func (p *AuthPresenter) HandleLogin(w http.ResponseWriter, r *http.Request) {
 
 // Admin / Staff Login (Separate Route)
 func (p *AuthPresenter) RenderAdminLogin(w http.ResponseWriter, r *http.Request) {
-	errParam := r.URL.Query().Get("error")
+	errParam, _ := GetFlashMessages(w, r)
 	i18nBundle := GetI18n(r)
 	data := map[string]interface{}{
 		"Error": errParam,

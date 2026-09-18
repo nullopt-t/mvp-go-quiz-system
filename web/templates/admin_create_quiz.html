@@ -38,6 +38,12 @@
       </p>
     </div>
 
+    {{ if .Error }}
+    <div class="alert alert-danger" style="margin-bottom: 1.25rem;">
+      <i class="fa-solid fa-triangle-exclamation" style="margin-inline-end: 0.35rem;"></i> {{ .Error }}
+    </div>
+    {{ end }}
+
     <form action="/admin/quizzes/create" method="POST">
       <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; align-items: start;" class="quiz-studio-grid">
         <!-- Left Column: Sticky Assessment Settings & Actions -->

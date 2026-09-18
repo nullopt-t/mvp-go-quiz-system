@@ -86,7 +86,8 @@ func AuthMiddleware(authService service.AuthService) func(http.Handler) http.Han
 					MaxAge:   -1,
 					HttpOnly: true,
 				})
-				http.Redirect(w, r, loginPath+"?error=Session+expired.+Please+log+in+again.", http.StatusSeeOther)
+				SetFlashError(w, "Session expired. Please log in again.")
+				http.Redirect(w, r, loginPath, http.StatusSeeOther)
 				return
 			}
 

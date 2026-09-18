@@ -41,7 +41,13 @@
 
     {{ if .Success }}
     <div class="alert alert-info" style="background-color: #dcfce7; color: #15803d; border-color: #bbf7d0; margin-bottom: 1.5rem;">
-      {{ .Success }}
+      <i class="fa-solid fa-circle-check" style="margin-inline-end: 0.35rem;"></i> {{ .Success }}
+    </div>
+    {{ end }}
+
+    {{ if .Error }}
+    <div class="alert alert-danger" style="margin-bottom: 1.5rem;">
+      <i class="fa-solid fa-triangle-exclamation" style="margin-inline-end: 0.35rem;"></i> {{ .Error }}
     </div>
     {{ end }}
 
@@ -128,44 +134,7 @@
           </thead>
           <tbody>
             {{ range .Students }}
-            <tr>
-              <td><code>{{ .StudentCode }}</code></td>
-              <td><strong>{{ .Name }}</strong></td>
-              <td><span class="badge badge-primary">{{ index $.I18n.T "level" }} {{ .LevelID }}</span></td>
-              <td><span class="badge badge-muted">{{ index $.I18n.T "group" }} {{ .GroupID }}</span></td>
-              <td style="font-size: 0.85rem; color: var(--text-muted); white-space: nowrap;">
-                <i class="fa-regular fa-clock" style="margin-inline-end: 0.25rem;"></i>{{ .CreatedAt.Format "2006-01-02 15:04" }}
-              </td>
-              <td>
-                {{ if .IsActive }}
-                  <span class="badge badge-success">{{ index $.I18n.T "status_active" }}</span>
-                {{ else }}
-                  <span class="badge badge-muted">{{ index $.I18n.T "status_inactive" }}</span>
-                {{ end }}
-              </td>
-              <td style="white-space: nowrap;">
-                <div style="display: flex; gap: 0.5rem; align-items: center;">
-                  <a href="/admin/students/{{ .ID.Hex }}" class="btn btn-secondary btn-sm" title="{{ index $.I18n.T "view_btn" }}">
-                    <i class="fa-solid fa-id-card" style="margin-inline-end: 0.25rem;"></i> {{ index $.I18n.T "view_btn" }}
-                  </a>
-                  <form action="/admin/students/toggle-active" method="POST" style="display: inline; margin: 0;">
-                    <input type="hidden" name="student_id" value="{{ .ID.Hex }}">
-                    <input type="hidden" name="redirect_to" value="/admin/students?level_id={{ $.SelectedLevel }}&group_id={{ $.SelectedGroup }}&sort_by={{ $.SortBy }}&order={{ $.SortOrder }}">
-                    {{ if .IsActive }}
-                      <input type="hidden" name="is_active" value="false">
-                      <button type="submit" class="btn btn-outline-danger btn-sm" title="{{ index $.I18n.T "btn_deactivate" }}">
-                        <i class="fa-solid fa-ban" style="margin-inline-end: 0.25rem;"></i> {{ index $.I18n.T "btn_deactivate" }}
-                      </button>
-                    {{ else }}
-                      <input type="hidden" name="is_active" value="true">
-                      <button type="submit" class="btn btn-outline-primary btn-sm" title="{{ index $.I18n.T "btn_activate" }}">
-                        <i class="fa-solid fa-check" style="margin-inline-end: 0.25rem;"></i> {{ index $.I18n.T "btn_activate" }}
-                      </button>
-                    {{ end }}
-                  </form>
-                </div>
-              </td>
-            </tr>
+              {{ template "student_row" dict "Student" . "I18n" $.I18n }}
             {{ else }}
             <tr>
               <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">

@@ -1,0 +1,64 @@
+{{ define "student_row" }}
+<tr id="student-row-{{ .Student.ID.Hex }}">
+  <td><code>{{ .Student.StudentCode }}</code></td>
+  <td><strong>{{ .Student.Name }}</strong></td>
+  <td><span class="badge badge-primary">{{ index .I18n.T "level" }} {{ .Student.LevelID }}</span></td>
+  <td><span class="badge badge-muted">{{ index .I18n.T "group" }} {{ .Student.GroupID }}</span></td>
+  <td style="font-size: 0.85rem; color: var(--text-muted); white-space: nowrap;">
+    <i class="fa-regular fa-clock" style="margin-inline-end: 0.25rem;"></i>{{ .Student.CreatedAt.Format "2006-01-02 15:04" }}
+  </td>
+  <td>
+    {{ if .Student.IsActive }}
+      <span class="badge badge-success">{{ index .I18n.T "status_active" }}</span>
+    {{ else }}
+      <span class="badge badge-muted">{{ index .I18n.T "status_inactive" }}</span>
+    {{ end }}
+  </td>
+  <td style="white-space: nowrap;">
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <a href="/admin/students/{{ .Student.ID.Hex }}" class="btn btn-secondary btn-sm" title="{{ index .I18n.T "view_btn" }}">
+        <i class="fa-solid fa-id-card" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "view_btn" }}
+      </a>
+      <button type="button"
+              hx-post="/admin/students/toggle-active"
+              hx-vals='{"student_id": "{{ .Student.ID.Hex }}", "is_active": "{{ if .Student.IsActive }}false{{ else }}true{{ end }}"}'
+              hx-target="#student-row-{{ .Student.ID.Hex }}"
+              hx-swap="outerHTML"
+              class="btn {{ if .Student.IsActive }}btn-outline-danger{{ else }}btn-outline-primary{{ end }} btn-sm"
+              title="{{ if .Student.IsActive }}{{ index .I18n.T "btn_deactivate" }}{{ else }}{{ index .I18n.T "btn_activate" }}{{ end }}">
+        {{ if .Student.IsActive }}
+          <i class="fa-solid fa-ban" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "btn_deactivate" }}
+        {{ else }}
+          <i class="fa-solid fa-check" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "btn_activate" }}
+        {{ end }}
+      </button>
+    </div>
+  </td>
+</tr>
+{{ end }}
+
+{{ define "profile_status_toggle" }}
+<div id="profile-status-section" style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+  {{ if .Student.IsActive }}
+    <span class="badge badge-success">{{ index .I18n.T "status_active" }}</span>
+    <button type="button"
+            hx-post="/admin/students/toggle-active"
+            hx-vals='{"student_id": "{{ .Student.ID.Hex }}", "is_active": "false", "mode": "profile"}'
+            hx-target="#profile-status-section"
+            hx-swap="outerHTML"
+            class="btn btn-outline-danger" style="padding: 0.4rem 0.85rem; font-size: 0.85rem;">
+      <i class="fa-solid fa-ban" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "btn_deactivate" }}
+    </button>
+  {{ else }}
+    <span class="badge badge-muted">{{ index .I18n.T "status_inactive" }}</span>
+    <button type="button"
+            hx-post="/admin/students/toggle-active"
+            hx-vals='{"student_id": "{{ .Student.ID.Hex }}", "is_active": "true", "mode": "profile"}'
+            hx-target="#profile-status-section"
+            hx-swap="outerHTML"
+            class="btn btn-outline-primary" style="padding: 0.4rem 0.85rem; font-size: 0.85rem;">
+      <i class="fa-solid fa-check" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "btn_activate" }}
+    </button>
+  {{ end }}
+</div>
+{{ end }}

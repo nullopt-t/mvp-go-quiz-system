@@ -56,8 +56,7 @@ func (p *AdminPresenter) RenderDashboard(w http.ResponseWriter, r *http.Request)
 	recentStudents, _ := p.studentRepo.GetAll(r.Context(), 0, "", 10, 0)
 
 	i18nBundle := GetI18n(r)
-	successMsg := r.URL.Query().Get("import_success")
-	errMsg := r.URL.Query().Get("import_error")
+	errMsg, successMsg := GetFlashMessages(w, r)
 
 	data := map[string]interface{}{
 		"Quizzes":        quizzes,
@@ -85,25 +84,29 @@ func (p *AdminPresenter) HandlePreviewImportStudents(w http.ResponseWriter, r *h
 		// Existing file token: read cached file
 		tempPath = filepath.Join(os.TempDir(), filepath.Clean(fileToken))
 		if _, err := os.Stat(tempPath); err != nil {
-			http.Redirect(w, r, "/admin?import_error=Upload+session+expired.+Please+re-upload+the+file", http.StatusSeeOther)
+			SetFlashError(w, "Upload session expired. Please re-upload the file")
+			http.Redirect(w, r, "/admin", http.StatusSeeOther)
 			return
 		}
 	} else {
 		if err := r.ParseMultipartForm(50 << 20); err != nil { // 50MB max
-			http.Redirect(w, r, "/admin?import_error=Failed+to+read+upload+data", http.StatusSeeOther)
+			SetFlashError(w, "Failed to read upload data")
+			http.Redirect(w, r, "/admin", http.StatusSeeOther)
 			return
 		}
 
 		file, _, err := r.FormFile("csv_file")
 		if err != nil {
-			http.Redirect(w, r, "/admin?import_error=Please+select+a+valid+CSV+file", http.StatusSeeOther)
+			SetFlashError(w, "Please select a valid CSV file")
+			http.Redirect(w, r, "/admin", http.StatusSeeOther)
 			return
 		}
 		defer file.Close()
 
 		tempFile, err := os.CreateTemp("", "roster-*.csv")
 		if err != nil {
-			http.Redirect(w, r, "/admin?import_error=Failed+to+process+uploaded+file", http.StatusSeeOther)
+			SetFlashError(w, "Failed to process uploaded file")
+			http.Redirect(w, r, "/admin", http.StatusSeeOther)
 			return
 		}
 		tempPath = tempFile.Name()
@@ -111,7 +114,8 @@ func (p *AdminPresenter) HandlePreviewImportStudents(w http.ResponseWriter, r *h
 
 		if _, err := io.Copy(tempFile, file); err != nil {
 			_ = os.Remove(tempPath)
-			http.Redirect(w, r, "/admin?import_error=Failed+to+cache+uploaded+roster", http.StatusSeeOther)
+			SetFlashError(w, "Failed to cache uploaded roster")
+			http.Redirect(w, r, "/admin", http.StatusSeeOther)
 			return
 		}
 		fileToken = filepath.Base(tempPath)
@@ -119,14 +123,16 @@ func (p *AdminPresenter) HandlePreviewImportStudents(w http.ResponseWriter, r *h
 
 	f, err := os.Open(tempPath)
 	if err != nil {
-		http.Redirect(w, r, "/admin?import_error=Failed+to+read+roster+file", http.StatusSeeOther)
+		SetFlashError(w, "Failed to read roster file")
+		http.Redirect(w, r, "/admin", http.StatusSeeOther)
 		return
 	}
 	defer f.Close()
 
 	students, err := p.importService.ParseStudentsFromCSV(f)
 	if err != nil {
-		http.Redirect(w, r, fmt.Sprintf("/admin?import_error=%s", strings.ReplaceAll(err.Error(), " ", "+")), http.StatusSeeOther)
+		SetFlashError(w, err.Error())
+		http.Redirect(w, r, "/admin", http.StatusSeeOther)
 		return
 	}
 
@@ -195,7 +201,8 @@ func indexT(m map[string]string, key, fallback string) string {
 
 func (p *AdminPresenter) HandleConfirmImportStudents(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
-		http.Redirect(w, r, "/admin?import_error=Invalid+form+data", http.StatusSeeOther)
+		SetFlashError(w, "Invalid form data")
+		http.Redirect(w, r, "/admin", http.StatusSeeOther)
 		return
 	}
 
@@ -207,7 +214,8 @@ func (p *AdminPresenter) HandleConfirmImportStudents(w http.ResponseWriter, r *h
 		tempPath := filepath.Join(os.TempDir(), filepath.Clean(fileToken))
 		f, err := os.Open(tempPath)
 		if err != nil {
-			http.Redirect(w, r, "/admin?import_error=Upload+session+expired.+Please+re-upload+the+file", http.StatusSeeOther)
+			SetFlashError(w, "Upload session expired. Please re-upload the file")
+			http.Redirect(w, r, "/admin", http.StatusSeeOther)
 			return
 		}
 		defer func() {
@@ -217,11 +225,13 @@ func (p *AdminPresenter) HandleConfirmImportStudents(w http.ResponseWriter, r *h
 
 		count, err := p.importService.ImportStudentsFromCSV(r.Context(), f)
 		if err != nil {
-			http.Redirect(w, r, fmt.Sprintf("/admin?import_error=%s", strings.ReplaceAll(err.Error(), " ", "+")), http.StatusSeeOther)
+			SetFlashError(w, err.Error())
+			http.Redirect(w, r, "/admin", http.StatusSeeOther)
 			return
 		}
 
-		http.Redirect(w, r, fmt.Sprintf("/admin/students?success=Successfully+imported+%d+students", count), http.StatusSeeOther)
+		SetFlashSuccess(w, fmt.Sprintf("Successfully imported %d students", count))
+		http.Redirect(w, r, "/admin/students", http.StatusSeeOther)
 		return
 	}
 
@@ -275,17 +285,20 @@ func (p *AdminPresenter) HandleConfirmImportStudents(w http.ResponseWriter, r *h
 	}
 
 	if len(students) == 0 {
-		http.Redirect(w, r, "/admin?import_error=No+students+selected+for+import", http.StatusSeeOther)
+		SetFlashError(w, "No students selected for import")
+		http.Redirect(w, r, "/admin", http.StatusSeeOther)
 		return
 	}
 
 	count, err := p.importService.BulkImportStudents(r.Context(), students)
 	if err != nil {
-		http.Redirect(w, r, fmt.Sprintf("/admin?import_error=%s", strings.ReplaceAll(err.Error(), " ", "+")), http.StatusSeeOther)
+		SetFlashError(w, err.Error())
+		http.Redirect(w, r, "/admin", http.StatusSeeOther)
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/admin/students?success=Successfully+imported+%d+students", count), http.StatusSeeOther)
+	SetFlashSuccess(w, fmt.Sprintf("Successfully imported %d students", count))
+	http.Redirect(w, r, "/admin/students", http.StatusSeeOther)
 }
 
 func (p *AdminPresenter) HandleDownloadSampleCSV(w http.ResponseWriter, r *http.Request) {
@@ -297,8 +310,12 @@ func (p *AdminPresenter) HandleDownloadSampleCSV(w http.ResponseWriter, r *http.
 }
 
 func (p *AdminPresenter) RenderCreateQuiz(w http.ResponseWriter, r *http.Request) {
+	errMsg, _ := GetFlashMessages(w, r)
 	i18nBundle := GetI18n(r)
-	_ = p.templates.ExecuteTemplate(w, "admin_create_quiz.html", map[string]interface{}{"I18n": i18nBundle})
+	_ = p.templates.ExecuteTemplate(w, "admin_create_quiz.html", map[string]interface{}{
+		"Error": errMsg,
+		"I18n":  i18nBundle,
+	})
 }
 
 func (p *AdminPresenter) HandleCreateQuiz(w http.ResponseWriter, r *http.Request) {
@@ -383,7 +400,8 @@ func (p *AdminPresenter) HandleCreateQuiz(w http.ResponseWriter, r *http.Request
 	}
 
 	if len(questions) == 0 {
-		http.Redirect(w, r, "/admin/quizzes/create?error=Please+add+at+least+one+valid+question", http.StatusSeeOther)
+		SetFlashError(w, "Please add at least one valid question")
+		http.Redirect(w, r, "/admin/quizzes/create", http.StatusSeeOther)
 		return
 	}
 
@@ -417,6 +435,7 @@ func (p *AdminPresenter) HandleCreateQuiz(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	SetFlashSuccess(w, "Quiz created successfully")
 	http.Redirect(w, r, "/admin", http.StatusSeeOther)
 }
 
@@ -488,8 +507,7 @@ func (p *AdminPresenter) RenderStudentsList(w http.ResponseWriter, r *http.Reque
 	totalStudents, _ := p.studentRepo.Count(r.Context())
 
 	i18nBundle := GetI18n(r)
-	successMsg := r.URL.Query().Get("success")
-	errMsg := r.URL.Query().Get("error")
+	errMsg, successMsg := GetFlashMessages(w, r)
 
 	data := map[string]interface{}{
 		"Students":       students,
@@ -508,9 +526,12 @@ func (p *AdminPresenter) RenderStudentsList(w http.ResponseWriter, r *http.Reque
 }
 
 func (p *AdminPresenter) RenderCreateStudent(w http.ResponseWriter, r *http.Request) {
+	errMsg, successMsg := GetFlashMessages(w, r)
 	i18nBundle := GetI18n(r)
 	data := map[string]interface{}{
-		"I18n": i18nBundle,
+		"Error":   errMsg,
+		"Success": successMsg,
+		"I18n":    i18nBundle,
 	}
 	_ = p.templates.ExecuteTemplate(w, "admin_student_create.html", data)
 }
@@ -527,7 +548,8 @@ func (p *AdminPresenter) HandleCreateStudent(w http.ResponseWriter, r *http.Requ
 	groupID := strings.ToUpper(strings.TrimSpace(r.FormValue("group_id")))
 
 	if code == "" || name == "" {
-		http.Redirect(w, r, "/admin/students/create?error=Student+code+and+name+are+required", http.StatusSeeOther)
+		SetFlashError(w, "Student code and name are required")
+		http.Redirect(w, r, "/admin/students/create", http.StatusSeeOther)
 		return
 	}
 	if levelID < 1 || levelID > 5 {
@@ -551,11 +573,13 @@ func (p *AdminPresenter) HandleCreateStudent(w http.ResponseWriter, r *http.Requ
 	}
 
 	if err := p.studentRepo.CreateOrUpdate(r.Context(), student); err != nil {
-		http.Redirect(w, r, "/admin/students/create?error=Failed+to+save+student", http.StatusSeeOther)
+		SetFlashError(w, "Failed to save student")
+		http.Redirect(w, r, "/admin/students/create", http.StatusSeeOther)
 		return
 	}
 
-	http.Redirect(w, r, "/admin/students?success=Student+saved+successfully", http.StatusSeeOther)
+	SetFlashSuccess(w, "Student saved successfully")
+	http.Redirect(w, r, "/admin/students", http.StatusSeeOther)
 }
 
 func (p *AdminPresenter) HandleToggleStudentActivation(w http.ResponseWriter, r *http.Request) {
@@ -574,6 +598,30 @@ func (p *AdminPresenter) HandleToggleStudentActivation(w http.ResponseWriter, r 
 	isActive := r.FormValue("is_active") == "true"
 	if err := p.studentRepo.SetActive(r.Context(), objID, isActive); err != nil {
 		http.Error(w, "Failed to update student activation: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// If request came via HTMX, render in-place partial without whole-page redirect
+	if r.Header.Get("HX-Request") == "true" {
+		student, err := p.studentRepo.FindByID(r.Context(), objID)
+		if err != nil || student == nil {
+			student = &model.Student{
+				ID:       objID,
+				IsActive: isActive,
+			}
+		}
+		i18nBundle := GetI18n(r)
+		data := map[string]interface{}{
+			"Student": student,
+			"I18n":    i18nBundle,
+		}
+
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		if r.FormValue("mode") == "profile" {
+			_ = p.templates.ExecuteTemplate(w, "profile_status_toggle", data)
+		} else {
+			_ = p.templates.ExecuteTemplate(w, "student_row", data)
+		}
 		return
 	}
 
