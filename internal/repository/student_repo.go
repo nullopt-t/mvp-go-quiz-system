@@ -69,7 +69,7 @@ func (r *studentRepository) FindByID(ctx context.Context, id primitive.ObjectID)
 }
 
 func (r *studentRepository) Count(ctx context.Context) (int64, error) {
-	return r.col.CountDocuments(ctx, bson.M{})
+	return r.col.EstimatedDocumentCount(ctx)
 }
 
 func (r *studentRepository) CountByLevelAndGroup(ctx context.Context, levelID int, groupID string) (int64, error) {

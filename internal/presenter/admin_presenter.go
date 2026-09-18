@@ -564,7 +564,6 @@ func (p *AdminPresenter) RenderStudentsList(w http.ResponseWriter, r *http.Reque
 		nextCursorToken = EncodeCursor(getSortVal(lastStudent), lastStudent.ID)
 	}
 
-	cohorts, _ := p.studentRepo.GetCohortDistribution(r.Context())
 	totalStudents, _ := p.studentRepo.Count(r.Context())
 
 	i18nBundle := GetI18n(r)
@@ -572,7 +571,6 @@ func (p *AdminPresenter) RenderStudentsList(w http.ResponseWriter, r *http.Reque
 
 	data := map[string]interface{}{
 		"Students":        students,
-		"Cohorts":         cohorts,
 		"TotalStudents":   totalStudents,
 		"SelectedLevel":   levelID,
 		"SelectedGroup":   groupID,

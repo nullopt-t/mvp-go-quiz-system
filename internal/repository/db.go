@@ -57,6 +57,26 @@ func (db *MongoDatabase) ensureIndexes(ctx context.Context) error {
 			Keys:    bson.D{{Key: "student_code", Value: 1}},
 			Options: options.Index().SetUnique(true),
 		},
+		// Standalone sort & seek indexes (used when viewing all levels/groups)
+		{
+			Keys: bson.D{
+				{Key: "student_code", Value: 1},
+				{Key: "_id", Value: 1},
+			},
+		},
+		{
+			Keys: bson.D{
+				{Key: "name", Value: 1},
+				{Key: "_id", Value: 1},
+			},
+		},
+		{
+			Keys: bson.D{
+				{Key: "created_at", Value: -1},
+				{Key: "_id", Value: -1},
+			},
+		},
+		// Filtered compound indexes (used when filtering by level and/or group)
 		{
 			Keys: bson.D{
 				{Key: "level_id", Value: 1},
