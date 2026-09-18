@@ -490,6 +490,15 @@ func (p *AdminPresenter) RenderStudentsList(w http.ResponseWriter, r *http.Reque
 	sortBy := strings.ToLower(strings.TrimSpace(r.URL.Query().Get("sort_by")))
 	orderStr := strings.ToLower(strings.TrimSpace(r.URL.Query().Get("order")))
 
+	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+	if page < 1 {
+		page = 1
+	}
+	pageSize, _ := strconv.Atoi(r.URL.Query().Get("page_size"))
+	if pageSize <= 0 || pageSize > 100 {
+		pageSize = 25 // default 25 per page
+	}
+
 	if sortBy == "" {
 		sortBy = "student_code"
 	}
@@ -498,9 +507,27 @@ func (p *AdminPresenter) RenderStudentsList(w http.ResponseWriter, r *http.Reque
 		sortOrder = -1
 	}
 
-	students, err := p.studentRepo.GetAllSorted(r.Context(), levelID, groupID, sortBy, sortOrder, 200, 0)
+	offset := int64((page - 1) * pageSize)
+	students, err := p.studentRepo.GetAllSorted(r.Context(), levelID, groupID, sortBy, sortOrder, int64(pageSize), offset)
 	if err != nil {
 		students = nil
+	}
+
+	// Filtered count for pagination
+	filteredCount, _ := p.studentRepo.CountByLevelAndGroup(r.Context(), levelID, groupID)
+	totalPages := int((filteredCount + int64(pageSize) - 1) / int64(pageSize))
+	if totalPages < 1 {
+		totalPages = 1
+	}
+	if page > totalPages {
+		page = totalPages
+	}
+
+	fromRecord := int64(0)
+	toRecord := int64(0)
+	if filteredCount > 0 {
+		fromRecord = offset + 1
+		toRecord = offset + int64(len(students))
 	}
 
 	cohorts, _ := p.studentRepo.GetCohortDistribution(r.Context())
@@ -513,10 +540,20 @@ func (p *AdminPresenter) RenderStudentsList(w http.ResponseWriter, r *http.Reque
 		"Students":       students,
 		"Cohorts":        cohorts,
 		"TotalStudents":  totalStudents,
+		"FilteredCount":  filteredCount,
 		"SelectedLevel":  levelID,
 		"SelectedGroup":  groupID,
 		"SortBy":         sortBy,
 		"SortOrder":      orderStr,
+		"CurrentPage":    page,
+		"PageSize":       pageSize,
+		"TotalPages":     totalPages,
+		"HasPrev":        page > 1,
+		"HasNext":        page < totalPages,
+		"PrevPage":       page - 1,
+		"NextPage":       page + 1,
+		"FromRecord":     fromRecord,
+		"ToRecord":       toRecord,
 		"Success":        successMsg,
 		"Error":          errMsg,
 		"I18n":           i18nBundle,

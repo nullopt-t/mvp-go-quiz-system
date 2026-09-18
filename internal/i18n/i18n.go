@@ -204,6 +204,12 @@ var translations = map[Language]map[string]string{
 		"active_option":                "Active (Allowed to take quizzes)",
 		"inactive_option":              "Inactive (Blocked from taking quizzes)",
 
+		// Pagination
+		"page_prev":      "Previous",
+		"page_next":      "Next",
+		"showing_page":   "Page %d of %d",
+		"showing_records": "Showing %d to %d of %d students",
+
 		// Quiz creation
 		"quiz_questions_bank_sub": "Configure multiple choice questions, individual point weights, and correct options.",
 	},
@@ -391,6 +397,12 @@ var translations = map[Language]map[string]string{
 		"is_active_label":              "حالة الحساب",
 		"active_option":                "نشط (مسموح له بأداء الاختبارات)",
 		"inactive_option":              "غير نشط (محظور من الاختبارات)",
+
+		// Pagination
+		"page_prev":      "السابق",
+		"page_next":      "التالي",
+		"showing_page":   "صفحة %d من %d",
+		"showing_records": "عرض %d إلى %d من إجمالي %d طالب",
 
 		// Quiz creation
 		"quiz_questions_bank_sub": "أضف أسئلة الاختيار من متعدد مع الدرجات ومفاتيح الإجابات الصحيحة.",

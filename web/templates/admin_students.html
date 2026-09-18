@@ -86,11 +86,21 @@
           </select>
         </div>
 
-        <div style="flex: 1; min-width: 120px;">
+        <div style="flex: 1; min-width: 100px;">
           <label style="font-size: 0.85rem;">{{ index .I18n.T "table_status" }}</label>
           <select name="order" style="padding: 0.55rem 0.75rem; font-size: 0.9rem;">
             <option value="desc" {{ if eq .SortOrder "desc" }}selected{{ end }}>{{ index .I18n.T "sort_desc" }}</option>
             <option value="asc" {{ if eq .SortOrder "asc" }}selected{{ end }}>{{ index .I18n.T "sort_asc" }}</option>
+          </select>
+        </div>
+
+        <div style="flex: 1; min-width: 90px;">
+          <label style="font-size: 0.85rem;">Per Page</label>
+          <select name="page_size" style="padding: 0.55rem 0.75rem; font-size: 0.9rem;">
+            <option value="15" {{ if eq .PageSize 15 }}selected{{ end }}>15</option>
+            <option value="25" {{ if eq .PageSize 25 }}selected{{ end }}>25</option>
+            <option value="50" {{ if eq .PageSize 50 }}selected{{ end }}>50</option>
+            <option value="100" {{ if eq .PageSize 100 }}selected{{ end }}>100</option>
           </select>
         </div>
 
@@ -145,6 +155,57 @@
           </tbody>
         </table>
       </div>
+
+      {{ if gt .TotalPages 1 }}
+      <!-- Pagination Footer -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding: 1rem 1.5rem; border-top: 1px solid var(--border); background: #fafafa;">
+        <div style="font-size: 0.85rem; color: var(--text-muted);">
+          {{ if gt .FilteredCount 0 }}
+            {{ printf (index .I18n.T "showing_records") .FromRecord .ToRecord .FilteredCount }}
+          {{ end }}
+        </div>
+
+        <div style="display: flex; gap: 0.35rem; align-items: center;">
+          <!-- Previous Page Button -->
+          {{ if .HasPrev }}
+            <a href="/admin/students?level_id={{ .SelectedLevel }}&group_id={{ .SelectedGroup }}&sort_by={{ .SortBy }}&order={{ .SortOrder }}&page_size={{ .PageSize }}&page={{ .PrevPage }}"
+               class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.75rem; text-decoration: none;">
+              <i class="fa-solid fa-chevron-left" style="font-size: 0.75rem; margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "page_prev" }}
+            </a>
+          {{ else }}
+            <button class="btn btn-secondary btn-sm" disabled style="padding: 0.35rem 0.75rem; opacity: 0.5; cursor: not-allowed;">
+              <i class="fa-solid fa-chevron-left" style="font-size: 0.75rem; margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "page_prev" }}
+            </button>
+          {{ end }}
+
+          <!-- Page Number Links -->
+          {{ $startP := max 1 (sub .CurrentPage 2) }}
+          {{ $endP := min .TotalPages (add .CurrentPage 2) }}
+          {{ range $p := seq $startP $endP }}
+            {{ if eq $p $.CurrentPage }}
+              <span class="btn btn-primary btn-sm" style="padding: 0.35rem 0.75rem; font-weight: 700;">{{ $p }}</span>
+            {{ else }}
+              <a href="/admin/students?level_id={{ $.SelectedLevel }}&group_id={{ $.SelectedGroup }}&sort_by={{ $.SortBy }}&order={{ $.SortOrder }}&page_size={{ $.PageSize }}&page={{ $p }}"
+                 class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.75rem; text-decoration: none;">
+                {{ $p }}
+              </a>
+            {{ end }}
+          {{ end }}
+
+          <!-- Next Page Button -->
+          {{ if .HasNext }}
+            <a href="/admin/students?level_id={{ .SelectedLevel }}&group_id={{ .SelectedGroup }}&sort_by={{ .SortBy }}&order={{ .SortOrder }}&page_size={{ .PageSize }}&page={{ .NextPage }}"
+               class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.75rem; text-decoration: none;">
+              {{ index .I18n.T "page_next" }} <i class="fa-solid fa-chevron-right" style="font-size: 0.75rem; margin-inline-start: 0.25rem;"></i>
+            </a>
+          {{ else }}
+            <button class="btn btn-secondary btn-sm" disabled style="padding: 0.35rem 0.75rem; opacity: 0.5; cursor: not-allowed;">
+              {{ index .I18n.T "page_next" }} <i class="fa-solid fa-chevron-right" style="font-size: 0.75rem; margin-inline-start: 0.25rem;"></i>
+            </button>
+          {{ end }}
+        </div>
+      </div>
+      {{ end }}
     </div>
   </div>
 </body>

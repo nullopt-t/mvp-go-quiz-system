@@ -62,6 +62,25 @@ func main() {
 			}
 			return dict, nil
 		},
+		"seq": func(start, end int) []int {
+			var s []int
+			for i := start; i <= end; i++ {
+				s = append(s, i)
+			}
+			return s
+		},
+		"min": func(a, b int) int {
+			if a < b {
+				return a
+			}
+			return b
+		},
+		"max": func(a, b int) int {
+			if a > b {
+				return a
+			}
+			return b
+		},
 	}
 
 	tmpl, err := template.New("").Funcs(funcMap).ParseGlob("web/templates/*.html")
