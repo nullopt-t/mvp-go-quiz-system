@@ -71,18 +71,29 @@ func (p *AdminPresenter) RenderDashboard(w http.ResponseWriter, r *http.Request)
 	_ = p.templates.ExecuteTemplate(w, "admin_dashboard.html", data)
 }
 
+func getUploadDir() string {
+	// If running in container or shared directory exists, use it
+	uploadDir := "/app/uploads"
+	if _, err := os.Stat(uploadDir); err != nil {
+		uploadDir = filepath.Join("data", "uploads")
+		_ = os.MkdirAll(uploadDir, 0755)
+	}
+	return uploadDir
+}
+
 func (p *AdminPresenter) HandlePreviewImportStudents(w http.ResponseWriter, r *http.Request) {
 	searchQuery := strings.ToLower(strings.TrimSpace(r.FormValue("search")))
 	filterLevel, _ := strconv.Atoi(r.FormValue("filter_level"))
 	filterGroup := strings.ToUpper(strings.TrimSpace(r.FormValue("filter_group")))
 	fileToken := strings.TrimSpace(r.FormValue("file_token"))
 
+	uploadDir := getUploadDir()
 	var tempPath string
 	var err error
 
 	if fileToken != "" {
-		// Existing file token: read cached file
-		tempPath = filepath.Join(os.TempDir(), filepath.Clean(fileToken))
+		// Existing file token: read cached file from shared storage
+		tempPath = filepath.Join(uploadDir, filepath.Clean(fileToken))
 		if _, err := os.Stat(tempPath); err != nil {
 			SetFlashError(w, "Upload session expired. Please re-upload the file")
 			http.Redirect(w, r, "/admin", http.StatusSeeOther)
@@ -103,7 +114,7 @@ func (p *AdminPresenter) HandlePreviewImportStudents(w http.ResponseWriter, r *h
 		}
 		defer file.Close()
 
-		tempFile, err := os.CreateTemp("", "roster-*.csv")
+		tempFile, err := os.CreateTemp(uploadDir, "roster-*.csv")
 		if err != nil {
 			SetFlashError(w, "Failed to process uploaded file")
 			http.Redirect(w, r, "/admin", http.StatusSeeOther)
@@ -209,9 +220,11 @@ func (p *AdminPresenter) HandleConfirmImportStudents(w http.ResponseWriter, r *h
 	fileToken := strings.TrimSpace(r.FormValue("file_token"))
 	importMode := strings.TrimSpace(r.FormValue("import_mode")) // "all_file" or "form_data"
 
+	uploadDir := getUploadDir()
+
 	// If large roster import requested directly from cached file
 	if fileToken != "" && (importMode == "all_file" || len(r.Form["student_code[]"]) == 0) {
-		tempPath := filepath.Join(os.TempDir(), filepath.Clean(fileToken))
+		tempPath := filepath.Join(uploadDir, filepath.Clean(fileToken))
 		f, err := os.Open(tempPath)
 		if err != nil {
 			SetFlashError(w, "Upload session expired. Please re-upload the file")
@@ -237,7 +250,7 @@ func (p *AdminPresenter) HandleConfirmImportStudents(w http.ResponseWriter, r *h
 
 	// Clean up temporary file if present
 	if fileToken != "" {
-		_ = os.Remove(filepath.Join(os.TempDir(), filepath.Clean(fileToken)))
+		_ = os.Remove(filepath.Join(uploadDir, filepath.Clean(fileToken)))
 	}
 
 	codes := r.Form["student_code[]"]

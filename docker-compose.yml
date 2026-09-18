@@ -17,6 +17,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./web:/app/web
+      - ./data/uploads:/app/uploads
     expose:
       - "8080"
     environment:
