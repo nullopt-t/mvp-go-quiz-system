@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"quiz-system/internal/model"
@@ -14,11 +15,11 @@ import (
 )
 
 type ResultRepository interface {
-	SaveResult(ctx context.Context, result *model.QuizResult) error
+	SaveResult(ctx context.Context, result *model.QuizResult) (*model.QuizResult, error)
 	GetStudentResult(ctx context.Context, quizID, studentID primitive.ObjectID) (*model.QuizResult, error)
 	GetStudentResults(ctx context.Context, studentID primitive.ObjectID) ([]model.QuizResult, error)
 	GetQuizResults(ctx context.Context, quizID primitive.ObjectID) ([]model.QuizResult, error)
-	GetLevelResults(ctx context.Context, quizID primitive.ObjectID, levelID, groupID int) ([]model.QuizResult, error)
+	GetLevelResults(ctx context.Context, quizID primitive.ObjectID, levelID int, groupID string) ([]model.QuizResult, error)
 }
 
 type resultRepository struct {
@@ -31,7 +32,7 @@ func NewResultRepository(db *mongo.Database) ResultRepository {
 	}
 }
 
-func (r *resultRepository) SaveResult(ctx context.Context, result *model.QuizResult) error {
+func (r *resultRepository) SaveResult(ctx context.Context, result *model.QuizResult) (*model.QuizResult, error) {
 	if result.ID.IsZero() {
 		result.ID = primitive.NewObjectID()
 	}
@@ -49,11 +50,24 @@ func (r *resultRepository) SaveResult(ctx context.Context, result *model.QuizRes
 	}
 
 	opts := options.Update().SetUpsert(true)
-	_, err := r.col.UpdateOne(ctx, filter, update, opts)
+	res, err := r.col.UpdateOne(ctx, filter, update, opts)
 	if err != nil {
-		return fmt.Errorf("failed to save result: %w", err)
+		return nil, fmt.Errorf("failed to save result: %w", err)
 	}
-	return nil
+
+	// If document was already inserted concurrently, reload canonical document
+	if res.UpsertedCount == 0 {
+		canonical, err := r.GetStudentResult(ctx, result.QuizID, result.StudentID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to reload canonical result: %w", err)
+		}
+		if canonical != nil {
+			*result = *canonical
+			return canonical, nil
+		}
+	}
+
+	return result, nil
 }
 
 func (r *resultRepository) GetStudentResult(ctx context.Context, quizID, studentID primitive.ObjectID) (*model.QuizResult, error) {
@@ -98,13 +112,13 @@ func (r *resultRepository) GetQuizResults(ctx context.Context, quizID primitive.
 	return results, nil
 }
 
-func (r *resultRepository) GetLevelResults(ctx context.Context, quizID primitive.ObjectID, levelID, groupID int) ([]model.QuizResult, error) {
+func (r *resultRepository) GetLevelResults(ctx context.Context, quizID primitive.ObjectID, levelID int, groupID string) ([]model.QuizResult, error) {
 	filter := bson.M{"quiz_id": quizID}
 	if levelID > 0 {
 		filter["level_id"] = levelID
 	}
-	if groupID > 0 {
-		filter["group_id"] = groupID
+	if trimmed := strings.TrimSpace(groupID); trimmed != "" {
+		filter["group_id"] = trimmed
 	}
 
 	opts := options.Find().SetSort(bson.D{{Key: "score", Value: -1}})

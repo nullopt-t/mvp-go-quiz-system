@@ -13,11 +13,12 @@ import (
 )
 
 var (
-	ErrQuizNotFound     = errors.New("quiz not found")
-	ErrQuizInactive     = errors.New("quiz is currently not active")
-	ErrQuizNotStarted   = errors.New("quiz has not started yet")
-	ErrQuizExpired      = errors.New("quiz session has expired")
-	ErrAlreadySubmitted = errors.New("quiz has already been completed and submitted")
+	ErrQuizNotFound            = errors.New("quiz not found")
+	ErrQuizInactive            = errors.New("quiz is currently not active")
+	ErrQuizNotStarted          = errors.New("quiz has not started yet")
+	ErrQuizExpired             = errors.New("quiz session has expired")
+	ErrAlreadySubmitted        = errors.New("quiz has already been completed and submitted")
+	ErrInvalidQuestionOrAnswer = errors.New("invalid question or answer ID for this quiz")
 )
 
 type StudentQuizView struct {
@@ -107,7 +108,8 @@ func (s *quizService) GetAvailableQuizzesForStudent(ctx context.Context, student
 			if now.Before(q.StartTime) {
 				summary.Status = "UPCOMING"
 			} else if now.After(quizEnd) {
-				summary.Status = "EXPIRED"
+				// Ended/expired quiz without completion: do not display on student board
+				continue
 			} else {
 				summary.Status = "LIVE"
 			}
@@ -137,17 +139,18 @@ func (s *quizService) StartOrResumeQuiz(ctx context.Context, quizID, studentID p
 	if now.Before(quiz.StartTime) {
 		return nil, fmt.Errorf("quiz will start at %s for all students", quiz.StartTime.Format("15:04:05 MST"))
 	}
-	if now.After(quizEnd) {
-		return nil, ErrQuizExpired
-	}
 
-	// Check if already submitted
+	// F-07 FIX: Check completion BEFORE expiration so finished students can always view results
 	res, err := s.resultRepo.GetStudentResult(ctx, quizID, studentID)
 	if err == nil && res != nil {
 		return &StudentQuizView{
 			Quiz:        quiz,
 			IsCompleted: true,
 		}, nil
+	}
+
+	if now.After(quizEnd) {
+		return nil, ErrQuizExpired
 	}
 
 	// Synchronized remaining time for all students

@@ -1,6 +1,7 @@
 package presenter
 
 import (
+	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -67,17 +68,30 @@ func (p *QuizPresenter) RenderQuizRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Determine starting question index: first unanswered question
-	startIndex := 0
-	for i, q := range quizView.Quiz.Questions {
-		if _, answered := quizView.PreviousAnswers[q.ID]; !answered {
-			startIndex = i
-			break
+	// Determine starting question index:
+	// 1. Check if specific question requested via ?q= index
+	startIndex := -1
+	if qParam := r.URL.Query().Get("q"); qParam != "" {
+		if qIdx, err := strconv.Atoi(qParam); err == nil && qIdx >= 0 && qIdx < len(quizView.Quiz.Questions) {
+			startIndex = qIdx
+		}
+	}
+	// 2. Fallback to first unanswered question, or 0
+	if startIndex == -1 {
+		startIndex = 0
+		for i, q := range quizView.Quiz.Questions {
+			if _, answered := quizView.PreviousAnswers[q.ID]; !answered {
+				startIndex = i
+				break
+			}
 		}
 	}
 
 	currentQuestion := quizView.Quiz.Questions[startIndex]
-	selectedOptionID := quizView.PreviousAnswers[currentQuestion.ID]
+	var selectedOptionID int
+	if ans, ok := quizView.PreviousAnswers[currentQuestion.ID]; ok && ans > 0 {
+		selectedOptionID = ans
+	}
 
 	i18nBundle := GetI18n(r)
 
@@ -131,7 +145,17 @@ func (p *QuizPresenter) HandleNextAnswer(w http.ResponseWriter, r *http.Request)
 
 	// 1. Append Answer if selected (No SQL update, pure append-only insert)
 	if answerID > 0 && questionID > 0 {
-		_ = p.answerService.RecordAnswer(r.Context(), quizObjID, stuObjID, claims.StudentCode, questionID, answerID)
+		if recErr := p.answerService.RecordAnswer(r.Context(), quizObjID, stuObjID, claims.StudentCode, questionID, answerID); recErr != nil {
+			// F-03: propagate expiry/inactive errors – redirect to results instead of silently continuing
+			if errors.Is(recErr, service.ErrQuizExpired) || errors.Is(recErr, service.ErrAlreadySubmitted) {
+				w.Header().Set("HX-Redirect", fmt.Sprintf("/quizzes/%s/result", quizIDHex))
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+			// For other errors (inactive quiz, invalid IDs) surface a 400
+			http.Error(w, recErr.Error(), http.StatusBadRequest)
+			return
+		}
 	}
 
 	// 2. Fetch Quiz to render next question or finalize
@@ -142,6 +166,15 @@ func (p *QuizPresenter) HandleNextAnswer(w http.ResponseWriter, r *http.Request)
 	}
 
 	nextIndex := currentIndex + 1
+	if targetStr := r.FormValue("target_index"); targetStr != "" {
+		if ti, err := strconv.Atoi(targetStr); err == nil && ti >= 0 && ti < len(quiz.Questions) {
+			nextIndex = ti
+		}
+	}
+	// F-08: clamp negative index to prevent slice-out-of-bounds panic
+	if nextIndex < 0 {
+		nextIndex = 0
+	}
 
 	// If last question was submitted or finalize requested
 	if isFinalSubmit || nextIndex >= len(quiz.Questions) {
@@ -165,9 +198,15 @@ func (p *QuizPresenter) HandleNextAnswer(w http.ResponseWriter, r *http.Request)
 	// Retrieve updated answers state
 	latestAnswers, _ := p.answerService.GetStudentAnswerState(r.Context(), quizObjID, stuObjID)
 	nextQuestion := quiz.Questions[nextIndex]
-	selectedOptionID := latestAnswers[nextQuestion.ID]
+	var selectedOptionID int
+	if ans, ok := latestAnswers[nextQuestion.ID]; ok && ans > 0 {
+		selectedOptionID = ans
+	}
 
 	i18nBundle := GetI18n(r)
+
+	// Keep browser URL synchronized with current question index (?q=X)
+	w.Header().Set("HX-Replace-Url", fmt.Sprintf("/quizzes/%s/start?q=%d", quizIDHex, nextIndex))
 
 	data := map[string]interface{}{
 		"Student":          claims,

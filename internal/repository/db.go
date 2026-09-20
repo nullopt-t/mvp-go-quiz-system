@@ -114,6 +114,7 @@ func (db *MongoDatabase) ensureIndexes(ctx context.Context) error {
 				{Key: "quiz_id", Value: 1},
 				{Key: "student_id", Value: 1},
 				{Key: "submitted_at", Value: 1},
+				{Key: "_id", Value: 1},
 			},
 		},
 		{

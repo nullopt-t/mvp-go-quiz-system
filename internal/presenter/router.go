@@ -24,7 +24,7 @@ func NewRouter(deps RouterDependencies) http.Handler {
 	// Protected Auth Middleware
 	authMiddleware := AuthMiddleware(deps.AuthService)
 
-	// 2. Register Student-Specific Routes (/dashboard, /quizzes/*)
+	// 2. Register Student-Specific Routes (/quizzes, /quizzes/*)
 	RegisterStudentRoutes(mux, authMiddleware, deps.StudentPres, deps.QuizPresenter)
 
 	// 3. Register Admin / Staff-Specific Routes (/admin/login, /admin, /admin/quizzes/*)

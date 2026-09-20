@@ -65,7 +65,7 @@ func (p *AuthPresenter) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 	})
-	http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
+	http.Redirect(w, r, "/quizzes", http.StatusSeeOther)
 }
 
 // Admin / Staff Login (Separate Route)

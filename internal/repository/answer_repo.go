@@ -54,7 +54,10 @@ func (r *answerRepository) GetStudentAnswers(ctx context.Context, quizID, studen
 		"student_id": studentID,
 	}
 
-	opts := options.Find().SetSort(bson.D{{Key: "submitted_at", Value: 1}})
+	opts := options.Find().SetSort(bson.D{
+		{Key: "submitted_at", Value: 1},
+		{Key: "_id", Value: 1},
+	})
 	cursor, err := r.col.Find(ctx, filter, opts)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch student answers: %w", err)

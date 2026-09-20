@@ -8,16 +8,15 @@
 </head>
 <body>
   <nav class="navbar">
-    <a href="/dashboard" class="nav-brand">
-      <span>{{ index .I18n.T "app_title" }}</span>
-    </a>
-    <div class="nav-user">
+    <div style="display: flex; align-items: center; gap: 0.6rem;">
       <span class="badge badge-primary">{{ index .I18n.T "level" }} {{ .Student.LevelID }} • {{ index .I18n.T "group" }} {{ .Student.GroupID }}</span>
       <span style="font-weight: 600;">{{ .Student.Name }}</span>
+    </div>
+    <div class="nav-user" style="gap: 0.75rem;">
       <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 700;">
         {{ index .I18n.T "lang_switch" }}
       </a>
-      <a href="/dashboard" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">{{ index .I18n.T "dashboard" }}</a>
+      <a href="/quizzes" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">{{ index .I18n.T "dashboard" }}</a>
     </div>
   </nav>
 
@@ -58,7 +57,7 @@
       </div>
 
       <div style="display: flex; gap: 1rem; justify-content: center;">
-        <a href="/dashboard" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">{{ index .I18n.T "return_dashboard" }}</a>
+        <a href="/quizzes" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">{{ index .I18n.T "return_dashboard" }}</a>
       </div>
     </div>
   </div>

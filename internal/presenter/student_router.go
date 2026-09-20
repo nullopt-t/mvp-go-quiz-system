@@ -12,12 +12,20 @@ func RegisterStudentRoutes(
 	studentPres *StudentPresenter,
 	quizPres *QuizPresenter,
 ) {
-	// Student Dashboard
-	mux.Handle("GET /dashboard", authMiddleware(http.HandlerFunc(studentPres.RenderDashboard)))
+	// Student Main Board
+	mux.Handle("GET /dashboard", authMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/quizzes", http.StatusMovedPermanently)
+	})))
+
+	mux.Handle("GET /quizzes", authMiddleware(http.HandlerFunc(studentPres.RenderDashboard)))
 
 	// Student Quiz Routes (Start, Live Room, Results)
 	mux.Handle("GET /quizzes/", authMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		path := r.URL.Path
+		path := strings.TrimPrefix(r.URL.Path, "/quizzes/")
+		if path == "" {
+			studentPres.RenderDashboard(w, r)
+			return
+		}
 		if strings.HasSuffix(path, "/result") {
 			quizPres.RenderQuizResult(w, r)
 			return

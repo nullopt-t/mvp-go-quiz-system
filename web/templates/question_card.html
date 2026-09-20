@@ -1,13 +1,4 @@
 <div id="question-container">
-  <!-- Progress Bar -->
-  <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">
-    <span>{{ index .I18n.T "question_of" }} <strong>{{ .CurrentNumber }}</strong> {{ index .I18n.T "of" }} {{ .TotalQuestions }}</span>
-    <span>{{ index .I18n.T "points" }}: <strong>{{ .CurrentQuestion.Points }}</strong></span>
-  </div>
-  <div class="progress-bar-container">
-    <div class="progress-bar" style="width: {{ printf "%.1f" (divFloat .CurrentNumber .TotalQuestions) }}%;"></div>
-  </div>
-
   <!-- Question Form -->
   <form id="quiz-form"
         hx-post="/quizzes/{{ .Quiz.ID.Hex }}/answers"
@@ -17,40 +8,99 @@
     <input type="hidden" name="quiz_id" value="{{ .Quiz.ID.Hex }}">
     <input type="hidden" name="question_id" value="{{ .CurrentQuestion.ID }}">
     <input type="hidden" name="current_index" value="{{ .CurrentIndex }}">
+    <input type="hidden" name="target_index" id="target_index_field" value="">
     <input type="hidden" name="is_submit" id="is_submit_field" value="false">
 
-    <div class="card" style="margin-top: 1rem; border-left: 4px solid var(--primary);">
-      <h3 style="font-size: 1.2rem; line-height: 1.5; margin-bottom: 1.5rem;">
+    <div class="card" style="margin-bottom: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem;">
+        <span class="badge badge-primary">
+          {{ index .I18n.T "question_of" }} {{ .CurrentNumber }}
+        </span>
+        <span style="font-size: 0.85rem; font-weight: 600; color: var(--secondary);">
+          {{ .CurrentQuestion.Points }} {{ index .I18n.T "pts" }}
+        </span>
+      </div>
+
+      <h3 style="font-size: 1.15rem; font-weight: 600; line-height: 1.5; color: var(--text-main); margin-bottom: 1.5rem;">
         {{ .CurrentQuestion.Text }}
       </h3>
 
       <div class="options-list">
         {{ $selectedID := .SelectedOptionID }}
         {{ range .CurrentQuestion.Options }}
-        <label class="option-item {{ if eq .ID $selectedID }}selected{{ end }}" onclick="highlightOption(this)">
-          <input type="radio" name="answer_id" value="{{ .ID }}" {{ if eq .ID $selectedID }}checked{{ end }} required>
-          <span style="font-size: 1rem;">{{ .Text }}</span>
+        <label class="option-item {{ if and (gt $selectedID 0) (eq .ID $selectedID) }}selected{{ end }}" onclick="highlightOption(this)">
+          <input type="radio" name="answer_id" value="{{ .ID }}" {{ if and (gt $selectedID 0) (eq .ID $selectedID) }}checked{{ end }}>
+          <span style="font-size: 0.95rem; color: var(--text-main);">{{ .Text }}</span>
         </label>
         {{ end }}
       </div>
 
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.25rem;">
-        <span style="font-size: 0.85rem; color: var(--text-muted);">
-          {{ index .I18n.T "saved_notice" }}
-        </span>
-
-        <div>
-          {{ if .IsLastQuestion }}
-            <button type="button" class="btn btn-primary" onclick="submitFinalQuestion()" style="background-color: var(--success); font-size: 1rem; padding: 0.75rem 1.75rem;">
-              {{ index .I18n.T "btn_submit_final" }}
-            </button>
-          {{ else }}
-            <button type="submit" class="btn btn-primary" style="font-size: 1rem; padding: 0.75rem 1.75rem;">
-              {{ index .I18n.T "btn_next" }}
-            </button>
-          {{ end }}
-        </div>
+      <!-- Action Button Centered at Card Width -->
+      <div style="display: flex; justify-content: center; align-items: center; margin-top: 1.75rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+        {{ if .IsLastQuestion }}
+          <button type="button" class="btn btn-primary" onclick="submitFinalQuestion()" style="font-size: 0.95rem; padding: 0.75rem 3rem; min-width: 200px;">
+            {{ index .I18n.T "btn_submit_final" }}
+          </button>
+        {{ else }}
+          <button type="submit" class="btn btn-primary" style="font-size: 0.95rem; padding: 0.75rem 3rem; min-width: 200px;">
+            {{ index .I18n.T "btn_next" }}
+          </button>
+        {{ end }}
       </div>
     </div>
   </form>
+
+  <!-- Question Overview Matrix / Navigator (Consistent with Site Card Theme) -->
+  <div class="card" style="margin-bottom: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem;">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-solid fa-layer-group" style="color: var(--primary);"></i>
+        <strong style="color: var(--text-main); font-size: 0.95rem;">{{ index .I18n.T "question_navigator" }}</strong>
+      </div>
+      <span class="badge badge-primary">
+        {{ .CurrentNumber }} / {{ .TotalQuestions }}
+      </span>
+    </div>
+
+    <!-- Interactive Grid of Numbered Tiles -->
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+      {{ $currentIdx := .CurrentIndex }}
+      {{ $prevAnswers := .PreviousAnswers }}
+      {{ range $idx, $q := .Quiz.Questions }}
+        {{ $isCurrent := eq $idx $currentIdx }}
+        {{ $ansID := index $prevAnswers $q.ID }}
+        {{ $isAnswered := gt $ansID 0 }}
+        
+        {{ if $isCurrent }}
+          <!-- Current Active Question -->
+          <button type="button"
+                  class="btn btn-primary"
+                  onclick="navigateToQuestion({{ $idx }})"
+                  title="{{ index $.I18n.T "question_of" }} {{ add $idx 1 }}"
+                  style="min-width: 2.5rem; height: 2.5rem; padding: 0; font-size: 0.9rem; font-weight: 700;">
+            {{ add $idx 1 }}
+          </button>
+        {{ else if $isAnswered }}
+          <!-- Answered Question -->
+          <button type="button"
+                  class="btn btn-secondary"
+                  onclick="navigateToQuestion({{ $idx }})"
+                  title="{{ index $.I18n.T "question_of" }} {{ add $idx 1 }}"
+                  style="min-width: 2.5rem; height: 2.5rem; padding: 0; font-size: 0.9rem; font-weight: 600; border-color: #86efac; background: #f0fdf4; color: #166534;">
+            {{ add $idx 1 }}
+            <i class="fa-solid fa-check" style="font-size: 0.65rem; margin-inline-start: 0.15rem;"></i>
+          </button>
+        {{ else }}
+          <!-- Pending / Unanswered Question -->
+          <button type="button"
+                  class="btn btn-secondary"
+                  onclick="navigateToQuestion({{ $idx }})"
+                  title="{{ index $.I18n.T "question_of" }} {{ add $idx 1 }}"
+                  style="min-width: 2.5rem; height: 2.5rem; padding: 0; font-size: 0.9rem; font-weight: 500;">
+            {{ add $idx 1 }}
+          </button>
+        {{ end }}
+      {{ end }}
+    </div>
+  </div>
 </div>

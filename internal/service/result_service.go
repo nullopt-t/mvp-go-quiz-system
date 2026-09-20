@@ -16,7 +16,7 @@ type ResultService interface {
 	GetStudentResult(ctx context.Context, quizID, studentID primitive.ObjectID) (*model.QuizResult, error)
 	GetStudentHistory(ctx context.Context, studentID primitive.ObjectID) ([]model.QuizResult, error)
 	GetQuizLeaderboard(ctx context.Context, quizID primitive.ObjectID) ([]model.QuizResult, error)
-	GetGroupAnalytics(ctx context.Context, quizID primitive.ObjectID, levelID int, groupID int) ([]model.QuizResult, error)
+	GetGroupAnalytics(ctx context.Context, quizID primitive.ObjectID, levelID int, groupID string) ([]model.QuizResult, error)
 }
 
 type resultService struct {
@@ -104,11 +104,12 @@ func (s *resultService) CalculateAndSubmit(ctx context.Context, quizID, studentI
 		SubmittedAt:    time.Now().UTC(),
 	}
 
-	if err := s.resultRepo.SaveResult(ctx, result); err != nil {
+	savedResult, err := s.resultRepo.SaveResult(ctx, result)
+	if err != nil {
 		return nil, fmt.Errorf("failed to save result: %w", err)
 	}
 
-	return result, nil
+	return savedResult, nil
 }
 
 func (s *resultService) GetStudentResult(ctx context.Context, quizID, studentID primitive.ObjectID) (*model.QuizResult, error) {
@@ -123,6 +124,6 @@ func (s *resultService) GetQuizLeaderboard(ctx context.Context, quizID primitive
 	return s.resultRepo.GetQuizResults(ctx, quizID)
 }
 
-func (s *resultService) GetGroupAnalytics(ctx context.Context, quizID primitive.ObjectID, levelID, groupID int) ([]model.QuizResult, error) {
+func (s *resultService) GetGroupAnalytics(ctx context.Context, quizID primitive.ObjectID, levelID int, groupID string) ([]model.QuizResult, error) {
 	return s.resultRepo.GetLevelResults(ctx, quizID, levelID, groupID)
 }

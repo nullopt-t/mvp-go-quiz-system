@@ -70,6 +70,22 @@ func (m *mockStudentRepo) GetAll(ctx context.Context, levelID int, groupID strin
 	}
 	return list, nil
 }
+func (m *mockStudentRepo) GetAllSorted(ctx context.Context, levelID int, groupID string, sortBy string, sortOrder int, limit, offset int64) ([]model.Student, error) {
+	return m.GetAll(ctx, levelID, groupID, limit, offset)
+}
+func (m *mockStudentRepo) GetByCursor(ctx context.Context, levelID int, groupID string, sortBy string, sortOrder int, cursorVal string, cursorID primitive.ObjectID, direction string, limit int64) ([]model.Student, bool, error) {
+	list, err := m.GetAll(ctx, levelID, groupID, limit, 0)
+	return list, false, err
+}
+func (m *mockStudentRepo) SetActive(ctx context.Context, id primitive.ObjectID, isActive bool) error {
+	for _, s := range m.students {
+		if s.ID == id {
+			s.IsActive = isActive
+			return nil
+		}
+	}
+	return nil
+}
 
 // MockQuizRepo
 type mockQuizRepo struct {
@@ -164,10 +180,14 @@ type mockResultRepo struct {
 	results map[string]*model.QuizResult
 }
 
-func (m *mockResultRepo) SaveResult(ctx context.Context, result *model.QuizResult) error {
+func (m *mockResultRepo) SaveResult(ctx context.Context, result *model.QuizResult) (*model.QuizResult, error) {
 	key := result.QuizID.Hex() + ":" + result.StudentID.Hex()
+	if existing, ok := m.results[key]; ok {
+		*result = *existing
+		return existing, nil
+	}
 	m.results[key] = result
-	return nil
+	return result, nil
 }
 func (m *mockResultRepo) GetStudentResult(ctx context.Context, quizID, studentID primitive.ObjectID) (*model.QuizResult, error) {
 	return m.results[quizID.Hex()+":"+studentID.Hex()], nil
@@ -190,8 +210,17 @@ func (m *mockResultRepo) GetQuizResults(ctx context.Context, quizID primitive.Ob
 	}
 	return list, nil
 }
-func (m *mockResultRepo) GetLevelResults(ctx context.Context, quizID primitive.ObjectID, levelID, groupID int) ([]model.QuizResult, error) {
-	return m.GetQuizResults(ctx, quizID)
+func (m *mockResultRepo) GetLevelResults(ctx context.Context, quizID primitive.ObjectID, levelID int, groupID string) ([]model.QuizResult, error) {
+	var list []model.QuizResult
+	trimmedGroup := strings.TrimSpace(groupID)
+	for _, r := range m.results {
+		if r.QuizID == quizID &&
+			(levelID <= 0 || r.LevelID == levelID) &&
+			(trimmedGroup == "" || r.GroupID == trimmedGroup) {
+			list = append(list, *r)
+		}
+	}
+	return list, nil
 }
 
 func TestAuthAndAppendOnlyFlow(t *testing.T) {
@@ -353,3 +382,172 @@ func TestCSVImportService(t *testing.T) {
 		t.Fatalf("Expected Level 1, Group A, got Level %d, Group %s", stu.LevelID, stu.GroupID)
 	}
 }
+
+func TestCalculateAndSubmit_ConcurrentFinalizationPhantomPrevention(t *testing.T) {
+	quizID := primitive.NewObjectID()
+	studentID := primitive.NewObjectID()
+
+	quizRepo := &mockQuizRepo{
+		quizzes: map[primitive.ObjectID]*model.Quiz{
+			quizID: {
+				ID:        quizID,
+				Title:     "Test Quiz",
+				LevelID:   1,
+				StartTime: time.Now().Add(-5 * time.Minute),
+				IsActive:  true,
+				Questions: []model.Question{
+					{
+						ID:     1,
+						Points: 10,
+						Options: []model.Option{
+							{ID: 1, IsCorrect: true},
+						},
+					},
+				},
+			},
+		},
+	}
+	studentRepo := &mockStudentRepo{students: make(map[string]*model.Student)}
+	answerRepo := &mockAnswerRepo{}
+	resultRepo := &mockResultRepo{results: make(map[string]*model.QuizResult)}
+
+	resultSvc := service.NewResultService(resultRepo, answerRepo, quizRepo, studentRepo)
+	ctx := context.Background()
+
+	// Pre-seed an existing canonical result in the repo (simulating a concurrent submission that won the race)
+	canonicalID := primitive.NewObjectID()
+	canonicalResult := &model.QuizResult{
+		ID:           canonicalID,
+		QuizID:       quizID,
+		StudentID:    studentID,
+		StudentCode:  "L1A-001",
+		StudentName:  "Alice",
+		LevelID:      1,
+		GroupID:      "A",
+		Score:        100,
+		TotalPoints:  100,
+		CorrectCount: 1,
+		SubmittedAt:  time.Now().UTC().Add(-10 * time.Second),
+	}
+	key := quizID.Hex() + ":" + studentID.Hex()
+	resultRepo.results[key] = canonicalResult
+
+	// Now call SaveResult with a candidate result (different in-memory ID and score)
+	candidateID := primitive.NewObjectID()
+	candidateResult := &model.QuizResult{
+		ID:           candidateID,
+		QuizID:       quizID,
+		StudentID:    studentID,
+		StudentCode:  "L1A-001",
+		StudentName:  "Alice",
+		LevelID:      1,
+		GroupID:      "A",
+		Score:        50,
+		TotalPoints:  100,
+		CorrectCount: 0,
+		SubmittedAt:  time.Now().UTC(),
+	}
+
+	saved, err := resultRepo.SaveResult(ctx, candidateResult)
+	if err != nil {
+		t.Fatalf("SaveResult failed: %v", err)
+	}
+
+	// Must return the canonical persisted result, NOT the candidate phantom pointer
+	if saved.ID != canonicalID {
+		t.Errorf("Expected saved result to have canonical ID %s, got phantom ID %s", canonicalID.Hex(), saved.ID.Hex())
+	}
+	if saved.Score != 100 {
+		t.Errorf("Expected canonical score 100, got %d", saved.Score)
+	}
+	// candidateResult itself should have been updated in-place to canonical state
+	if candidateResult.ID != canonicalID {
+		t.Errorf("Expected candidateResult pointer to be updated to canonical ID %s, got %s", canonicalID.Hex(), candidateResult.ID.Hex())
+	}
+
+	// Also verify CalculateAndSubmit returns the canonical result
+	calcResult, err := resultSvc.CalculateAndSubmit(ctx, quizID, studentID, "L1A-001", "Alice", 1, "A")
+	if err != nil {
+		t.Fatalf("CalculateAndSubmit failed: %v", err)
+	}
+	if calcResult.ID != canonicalID {
+		t.Errorf("Expected CalculateAndSubmit to return canonical ID %s, got %s", canonicalID.Hex(), calcResult.ID.Hex())
+	}
+}
+
+func TestResultService_GetGroupAnalytics_StringGroupID(t *testing.T) {
+	quizID := primitive.NewObjectID()
+	otherQuizID := primitive.NewObjectID()
+
+	resultRepo := &mockResultRepo{
+		results: map[string]*model.QuizResult{
+			"1": {
+				ID:      primitive.NewObjectID(),
+				QuizID:  quizID,
+				LevelID: 1,
+				GroupID: "A",
+				Score:   70,
+			},
+			"2": {
+				ID:      primitive.NewObjectID(),
+				QuizID:  quizID,
+				LevelID: 1,
+				GroupID: "B",
+				Score:   85,
+			},
+			"3": {
+				ID:      primitive.NewObjectID(),
+				QuizID:  quizID,
+				LevelID: 2,
+				GroupID: "A",
+				Score:   90,
+			},
+			"4": {
+				ID:      primitive.NewObjectID(),
+				QuizID:  otherQuizID,
+				LevelID: 1,
+				GroupID: "A",
+				Score:   100,
+			},
+		},
+	}
+	resultSvc := service.NewResultService(resultRepo, nil, nil, nil)
+	ctx := context.Background()
+
+	// Query Level 1, Group "A"
+	res1A, err := resultSvc.GetGroupAnalytics(ctx, quizID, 1, "A")
+	if err != nil {
+		t.Fatalf("GetGroupAnalytics failed: %v", err)
+	}
+	if len(res1A) != 1 || res1A[0].GroupID != "A" || res1A[0].LevelID != 1 {
+		t.Fatalf("Expected 1 result for Level 1 Group A, got %+v", res1A)
+	}
+
+	// Query Level 1, Group "B"
+	res1B, err := resultSvc.GetGroupAnalytics(ctx, quizID, 1, "B")
+	if err != nil {
+		t.Fatalf("GetGroupAnalytics failed: %v", err)
+	}
+	if len(res1B) != 1 || res1B[0].GroupID != "B" {
+		t.Fatalf("Expected 1 result for Level 1 Group B, got %+v", res1B)
+	}
+
+	// Query with whitespace " A "
+	resTrimmed, err := resultSvc.GetGroupAnalytics(ctx, quizID, 1, " A ")
+	if err != nil {
+		t.Fatalf("GetGroupAnalytics with trimmed group failed: %v", err)
+	}
+	if len(resTrimmed) != 1 || resTrimmed[0].GroupID != "A" {
+		t.Fatalf("Expected 1 result for trimmed Group ' A ', got %+v", resTrimmed)
+	}
+
+	// Query Level 1, empty group (all groups in Level 1)
+	resAllLevel1, err := resultSvc.GetGroupAnalytics(ctx, quizID, 1, "")
+	if err != nil {
+		t.Fatalf("GetGroupAnalytics all groups failed: %v", err)
+	}
+	if len(resAllLevel1) != 2 {
+		t.Fatalf("Expected 2 results for Level 1 all groups, got %d", len(resAllLevel1))
+	}
+}
+

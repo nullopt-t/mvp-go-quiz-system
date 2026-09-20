@@ -49,11 +49,40 @@ func (s *answerService) RecordAnswer(ctx context.Context, quizID, studentID prim
 		return ErrQuizNotFound
 	}
 
+	// F-05: Reject if quiz is not active (admin may have deactivated it)
+	if !quiz.IsActive {
+		return ErrQuizInactive
+	}
+
 	now := time.Now().UTC()
 	quizEnd := quiz.StartTime.Add(time.Duration(quiz.DurationMinutes) * time.Minute)
+
+	// F-02: Reject answers submitted before the quiz has started
+	if now.Before(quiz.StartTime) {
+		return ErrQuizNotStarted
+	}
 	// Add 30 seconds grace period for network latency
 	if now.After(quizEnd.Add(30 * time.Second)) {
 		return ErrQuizExpired
+	}
+
+	// F-09: Validate that questionID and answerID belong to this quiz
+	validQuestion := false
+	validAnswer := false
+	for _, q := range quiz.Questions {
+		if q.ID == questionID {
+			validQuestion = true
+			for _, opt := range q.Options {
+				if opt.ID == answerID {
+					validAnswer = true
+					break
+				}
+			}
+			break
+		}
+	}
+	if !validQuestion || !validAnswer {
+		return ErrInvalidQuestionOrAnswer
 	}
 
 	// Append record (No SQL UPDATE, pure INSERT)

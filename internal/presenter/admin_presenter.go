@@ -224,7 +224,13 @@ func (p *AdminPresenter) HandleConfirmImportStudents(w http.ResponseWriter, r *h
 
 	// If large roster import requested directly from cached file
 	if fileToken != "" && (importMode == "all_file" || len(r.Form["student_code[]"]) == 0) {
-		tempPath := filepath.Join(uploadDir, filepath.Clean(fileToken))
+		// F-16: Prevent path traversal – fileToken must be a bare filename (no slashes)
+		if filepath.Base(fileToken) != fileToken || strings.ContainsAny(fileToken, "/\\") {
+			SetFlashError(w, "Invalid file token")
+			http.Redirect(w, r, "/admin", http.StatusSeeOther)
+			return
+		}
+		tempPath := filepath.Join(uploadDir, fileToken)
 		f, err := os.Open(tempPath)
 		if err != nil {
 			SetFlashError(w, "Upload session expired. Please re-upload the file")
@@ -704,7 +710,8 @@ func (p *AdminPresenter) HandleToggleStudentActivation(w http.ResponseWriter, r 
 	}
 
 	redirectURL := r.FormValue("redirect_to")
-	if redirectURL == "" {
+	// F-17: Only allow relative paths to prevent open redirect
+	if redirectURL == "" || !strings.HasPrefix(redirectURL, "/") || strings.HasPrefix(redirectURL, "//") {
 		redirectURL = "/admin/students/" + studentIDHex
 	}
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)

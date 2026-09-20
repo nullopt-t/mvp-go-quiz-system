@@ -230,18 +230,96 @@ input:focus, select:focus, textarea:focus {
   border: 1px solid var(--border);
 }
 
-.progress-bar-container {
-  height: 8px;
-  background-color: #e2e8f0;
-  border-radius: 4px;
-  overflow: hidden;
+/* Question Overview Matrix / Palette */
+.question-matrix-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
   margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
 }
 
-.progress-bar {
-  height: 100%;
-  background-color: var(--primary);
-  transition: width 0.3s ease;
+.question-matrix-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.85rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.question-matrix-legend {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.8rem;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-inline-end: 0.35rem;
+}
+
+.legend-current { background: var(--primary); }
+.legend-answered { background: #10b981; }
+.legend-unanswered { background: #cbd5e1; }
+
+.question-matrix-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.matrix-btn {
+  min-width: 2.5rem;
+  height: 2.5rem;
+  padding: 0 0.5rem;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: all 0.15s ease;
+  background: #f8fafc;
+  color: var(--secondary);
+  border-color: var(--border);
+}
+
+.matrix-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.matrix-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+}
+
+.matrix-btn.answered {
+  background: #ecfdf5;
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+
+.matrix-btn.answered.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.matrix-btn.answered i {
+  font-size: 0.7rem;
 }
 
 /* Options */

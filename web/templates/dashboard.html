@@ -9,29 +9,21 @@
 </head>
 <body>
   <nav class="navbar">
-    <a href="/dashboard" class="nav-brand">
-      <span>{{ index .I18n.T "app_title" }}</span>
-    </a>
-    <div class="nav-user">
+    <div style="display: flex; align-items: center; gap: 0.6rem;">
       <span class="badge badge-primary">{{ index .I18n.T "level" }} {{ .Student.LevelID }} • {{ index .I18n.T "group" }} {{ .Student.GroupID }}</span>
       <span style="font-weight: 600;">{{ .Student.Name }} ({{ .Student.StudentCode }})</span>
+    </div>
+    <div class="nav-user" style="gap: 0.75rem;">
       <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 700;">
         {{ index .I18n.T "lang_switch" }}
       </a>
-      <form action="/logout" method="POST" style="display:inline;">
+      <form action="/logout" method="POST" style="display:inline; margin: 0;">
         <button type="submit" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">{{ index .I18n.T "logout" }}</button>
       </form>
     </div>
   </nav>
 
-  <div class="container">
-    <div class="card" style="margin-bottom: 2rem;">
-      <h2 style="margin-bottom: 0.25rem;">{{ index .I18n.T "assigned_quizzes" }}</h2>
-      <p style="color: var(--text-muted); font-size: 0.95rem;">
-        {{ index .I18n.T "dashboard_subtitle" }} ({{ index .I18n.T "level" }} {{ .Student.LevelID }} • {{ index .I18n.T "group" }} {{ .Student.GroupID }})
-      </p>
-    </div>
-
+  <div class="container" style="margin-top: 2rem;">
     <div class="grid">
       {{ range .Quizzes }}
       <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">

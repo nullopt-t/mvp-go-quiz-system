@@ -2,6 +2,7 @@ package presenter
 
 import (
 	"net/http"
+	"strings"
 )
 
 // RegisterAuthRoutes configures public authentication, language switcher, and static asset routes
@@ -29,7 +30,8 @@ func RegisterAuthRoutes(mux *http.ServeMux, authPres *AuthPresenter) {
 			SameSite: http.SameSiteLaxMode,
 		})
 		redirectURL := r.URL.Query().Get("redirect")
-		if redirectURL == "" {
+		// F-17: Prevent open redirect – only allow relative paths starting with /
+		if redirectURL == "" || !strings.HasPrefix(redirectURL, "/") || strings.HasPrefix(redirectURL, "//") {
 			redirectURL = "/login"
 		}
 		http.Redirect(w, r, redirectURL, http.StatusSeeOther)

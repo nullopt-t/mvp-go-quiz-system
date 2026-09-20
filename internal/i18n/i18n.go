@@ -82,6 +82,10 @@ var translations = map[Language]map[string]string{
 		"btn_next":            "Next Question",
 		"btn_submit_final":    "Finish & Submit",
 		"time_expired_alert":  "Time is up! Submitting your answers now.",
+		"question_navigator":  "Question Navigator",
+		"legend_answered":     "Answered",
+		"legend_current":      "Current",
+		"legend_unanswered":   "Pending",
 
 		// Quiz Result
 		"result_title":        "Quiz Submitted!",
@@ -276,6 +280,10 @@ var translations = map[Language]map[string]string{
 		"btn_next":            "السؤال التالي",
 		"btn_submit_final":    "تسليم الاختبار",
 		"time_expired_alert":  "انتهى الوقت المحدد! جاري تسليم إجاباتك الآن.",
+		"question_navigator":  "مخطط الأسئلة",
+		"legend_answered":     "تمت الإجابة",
+		"legend_current":      "الحالي",
+		"legend_unanswered":   "متبقي",
 
 		// Quiz Result
 		"result_title":        "تم تسليم الاختبار بنجاح!",
