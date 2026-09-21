@@ -95,119 +95,116 @@
       </div>
     </div>
 
-    <!-- Main Two-Column Workflow Section: Roster Ingestion & Cohort Breakdown -->
-    <div class="admin-middle-grid">
-      <!-- CSV Import Box -->
-      <div class="card" style="margin-bottom: 0; display: flex; flex-direction: column;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-          <div>
-            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--text-main);">
-              <i class="fa-solid fa-file-import" style="color: var(--primary); margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_import_title" }}
-            </h3>
-            <p style="color: var(--text-muted); font-size: 0.85rem;">
-              {{ index .I18n.T "admin_import_sub" }}
-            </p>
-          </div>
+    <!-- CSV Import Box -->
+    <div class="card" style="margin-bottom: 2rem; display: flex; flex-direction: column;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--text-main);">
+            <i class="fa-solid fa-file-import" style="color: var(--primary); margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_import_title" }}
+          </h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">
+            {{ index .I18n.T "admin_import_sub" }}
+          </p>
         </div>
-
-        <form action="/admin/students/preview" method="POST" enctype="multipart/form-data" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 1rem;">
-          <label class="file-dropzone" id="csv-dropzone" for="csv_file_input">
-            <input type="file" id="csv_file_input" name="csv_file" accept=".csv" required onchange="handleFileSelected(this)">
-            <div class="file-dropzone-icon">
-              <i class="fa-solid fa-cloud-arrow-up"></i>
-            </div>
-            <div class="file-dropzone-title">
-              <span class="file-browse-badge">
-                <i class="fa-solid fa-folder-open"></i> {{ index .I18n.T "admin_browse_files" }}
-              </span>
-              <span style="color: var(--text-muted); font-weight: 500; font-size: 0.85rem;">
-                {{ index .I18n.T "admin_drag_hint" }}
-              </span>
-            </div>
-            <div id="file-name-display" class="file-selected-name" style="margin-top: 0.25rem;">
-              {{ index .I18n.T "admin_no_file_selected" }}
-            </div>
-            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem;">
-              {{ index .I18n.T "admin_drop_csv_hint" }}
-            </div>
-          </label>
-
-          <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-            <a href="/admin/students/sample-csv" style="font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 600;">
-              <i class="fa-solid fa-file-arrow-down" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "admin_sample_csv" }}
-            </a>
-            <button type="submit" class="btn btn-primary" style="padding: 0.55rem 1.35rem; font-size: 0.9rem; font-weight: 700;">
-              {{ index .I18n.T "admin_preview_btn" }} <i class="fa-solid fa-arrow-right" style="font-size: 0.75rem; margin-inline-start: 0.25rem;"></i>
-            </button>
-          </div>
-        </form>
       </div>
 
-      <!-- Cohorts Distribution Grid -->
-      <div class="card" style="margin-bottom: 0;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
-          <div>
-            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.2rem; color: var(--text-main);">
-              <i class="fa-solid fa-sitemap" style="color: var(--primary); margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_hierarchy_title" }}
-            </h3>
-            <p style="color: var(--text-muted); font-size: 0.85rem;">
-              {{ index .I18n.T "admin_hierarchy_sub" }}
-            </p>
+      <form action="/admin/students/preview" method="POST" enctype="multipart/form-data" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 1rem;">
+        <label class="file-dropzone" id="csv-dropzone" for="csv_file_input">
+          <input type="file" id="csv_file_input" name="csv_file" accept=".csv" required onchange="handleFileSelected(this)">
+          <div class="file-dropzone-icon">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
           </div>
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <a href="/admin/students/create" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.4rem 0.85rem; font-weight: 600;">
-              <i class="fa-solid fa-user-plus" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "admin_add_student" }}
-            </a>
-            <a href="/admin/students" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.4rem 0.85rem;">
-              <i class="fa-solid fa-list" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "admin_students_title" }}
-            </a>
+          <div class="file-dropzone-title">
+            <span class="file-browse-badge">
+              <i class="fa-solid fa-folder-open"></i> {{ index .I18n.T "admin_browse_files" }}
+            </span>
+            <span style="color: var(--text-muted); font-weight: 500; font-size: 0.85rem;">
+              {{ index .I18n.T "admin_drag_hint" }}
+            </span>
           </div>
-        </div>
+          <div id="file-name-display" class="file-selected-name" style="margin-top: 0.25rem;">
+            {{ index .I18n.T "admin_no_file_selected" }}
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem;">
+            {{ index .I18n.T "admin_drop_csv_hint" }}
+          </div>
+        </label>
 
-        <div style="overflow-x: auto; border: 1px solid var(--border); border-radius: 4px;">
-          <table class="cohort-matrix-table">
-            <thead>
-              <tr>
-                <th style="padding-inline-start: 0.85rem;">{{ index .I18n.T "level" }}</th>
-                <th>Group A</th>
-                <th>Group B</th>
-                <th>Group C</th>
-                <th>Group D</th>
-                <th style="text-align: end; padding-inline-end: 0.85rem;">{{ index .I18n.T "admin_cohort_total" }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {{ range .LevelCohorts }}
-              <tr>
-                <td style="padding-inline-start: 0.85rem; font-weight: 700; color: var(--text-main); white-space: nowrap;">
-                  <a href="/admin/students?level_id={{ .LevelID }}" style="color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;" title="View all students in Level {{ .LevelID }}">
-                    <span class="badge" style="background: var(--bg); border: 1px solid var(--border); font-size: 0.8rem; font-weight: 700;">L{{ .LevelID }}</span>
-                    <span>{{ index $.I18n.T "level" }} {{ .LevelID }}</span>
-                  </a>
-                </td>
-                {{ range .Groups }}
-                <td>
-                  <a href="/admin/students?level_id={{ $.LevelID }}&group_id={{ .GroupID }}" class="cohort-group-pill" title="Level {{ $.LevelID }} • Group {{ .GroupID }}: {{ .Count }} students">
-                    <strong>{{ .Count }}</strong>
-                    <span>{{ .GroupID }}</span>
-                  </a>
-                </td>
-                {{ end }}
-                <td style="text-align: end; padding-inline-end: 0.85rem; white-space: nowrap;">
-                  <span style="font-weight: 700; color: var(--primary); font-size: 0.88rem;">{{ .Total }}</span>
-                  <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">{{ index $.I18n.T "admin_enrolled" }}</span>
-                </td>
-              </tr>
-              {{ else }}
-              <tr>
-                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem; font-size: 0.9rem;">
-                  {{ index $.I18n.T "admin_no_cohorts" }}
-                </td>
-              </tr>
-              {{ end }}
-            </tbody>
-          </table>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <a href="/admin/students/sample-csv" style="font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 600;">
+            <i class="fa-solid fa-file-arrow-down" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "admin_sample_csv" }}
+          </a>
+          <button type="submit" class="btn btn-primary" style="padding: 0.55rem 1.35rem; font-size: 0.9rem; font-weight: 700;">
+            {{ index .I18n.T "admin_preview_btn" }} <i class="fa-solid fa-arrow-right" style="font-size: 0.75rem; margin-inline-start: 0.25rem;"></i>
+          </button>
         </div>
+      </form>
+    </div>
+
+    <!-- Cohorts Distribution Overview (Full Width) -->
+    <div class="card" style="margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.2rem; color: var(--text-main);">
+            <i class="fa-solid fa-sitemap" style="color: var(--primary); margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_hierarchy_title" }}
+          </h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
+            {{ index .I18n.T "admin_hierarchy_sub" }}
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a href="/admin/students/create" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.45rem 0.95rem; font-weight: 600;">
+            <i class="fa-solid fa-user-plus" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "admin_add_student" }}
+          </a>
+          <a href="/admin/students" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.45rem 0.95rem;">
+            <i class="fa-solid fa-list" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "admin_students_title" }}
+          </a>
+        </div>
+      </div>
+
+      <div style="overflow-x: auto; border: 1px solid var(--border); border-radius: 4px;">
+        <table class="cohort-matrix-table">
+          <thead>
+            <tr>
+              <th style="padding-inline-start: 1rem; width: 180px;">{{ index .I18n.T "level" }}</th>
+              <th>Group A</th>
+              <th>Group B</th>
+              <th>Group C</th>
+              <th>Group D</th>
+              <th style="text-align: end; padding-inline-end: 1rem; width: 140px;">{{ index .I18n.T "admin_cohort_total" }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ range .LevelCohorts }}
+            <tr>
+              <td style="padding-inline-start: 1rem; font-weight: 700; color: var(--text-main); white-space: nowrap;">
+                <a href="/admin/students?level_id={{ .LevelID }}" style="color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 0.45rem;" title="View all students in Level {{ .LevelID }}">
+                  <span class="badge" style="background: var(--bg); border: 1px solid var(--border); font-size: 0.8rem; font-weight: 700;">L{{ .LevelID }}</span>
+                  <span>{{ index $.I18n.T "level" }} {{ .LevelID }}</span>
+                </a>
+              </td>
+              {{ range .Groups }}
+              <td>
+                <a href="/admin/students?level_id={{ $.LevelID }}&group_id={{ .GroupID }}" class="cohort-group-pill" title="Level {{ $.LevelID }} • Group {{ .GroupID }}: {{ .Count }} students">
+                  <strong>{{ .Count }}</strong>
+                  <span>Group {{ .GroupID }}</span>
+                </a>
+              </td>
+              {{ end }}
+              <td style="text-align: end; padding-inline-end: 1rem; white-space: nowrap;">
+                <span style="font-weight: 700; color: var(--primary); font-size: 0.95rem;">{{ .Total }}</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted); display: block;">{{ index $.I18n.T "admin_enrolled" }}</span>
+              </td>
+            </tr>
+            {{ else }}
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem; font-size: 0.9rem;">
+                {{ index $.I18n.T "admin_no_cohorts" }}
+              </td>
+            </tr>
+            {{ end }}
+          </tbody>
+        </table>
       </div>
     </div>
 
