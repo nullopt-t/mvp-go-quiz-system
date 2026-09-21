@@ -71,7 +71,7 @@
             <td>Level {{ $res.LevelID }} • Group {{ $res.GroupID }}</td>
             <td><strong>{{ $res.Score }}</strong> / {{ $res.TotalPoints }}</td>
             <td>{{ $res.CorrectCount }} / {{ $res.TotalQuestions }}</td>
-            <td>{{ $res.SubmittedAt.Format "2006-01-02 15:04:05" }}</td>
+            <td><time class="local-time" datetime="{{ isoTime $res.SubmittedAt }}">{{ formatTime $res.SubmittedAt "2006-01-02 03:04:05 PM" }}</time></td>
           </tr>
           {{ else }}
           <tr>
@@ -82,5 +82,17 @@
       </table>
     </div>
   </div>
+
+  <script>
+    document.querySelectorAll('time.local-time').forEach(el => {
+      const iso = el.getAttribute('datetime');
+      if (!iso) return;
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return;
+      const dateStr = d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' });
+      const timeStr = d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+      el.innerText = dateStr + ' • ' + timeStr;
+    });
+  </script>
 </body>
 </html>

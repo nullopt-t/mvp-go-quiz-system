@@ -55,7 +55,7 @@
       <div style="text-align: inherit; background: #f1f5f9; padding: 1rem 1.25rem; border-radius: var(--radius); font-size: 0.85rem; color: var(--secondary); margin-bottom: 2rem;">
         <div><strong>{{ index .I18n.T "student_label" }}:</strong> {{ .Result.StudentName }} (<code>{{ .Result.StudentCode }}</code>)</div>
         <div style="margin-top: 0.25rem;"><strong>{{ index .I18n.T "cohort_label" }}:</strong> {{ index .I18n.T "level" }} {{ .Result.LevelID }} — {{ index .I18n.T "group" }} {{ .Result.GroupID }}</div>
-        <div style="margin-top: 0.25rem;"><strong>{{ index .I18n.T "table_submitted_at" }}:</strong> {{ .Result.SubmittedAt.Format "Jan 02, 2006 at 15:04:05 MST" }}</div>
+        <div style="margin-top: 0.25rem;"><strong>{{ index .I18n.T "table_submitted_at" }}:</strong> <time class="local-time" datetime="{{ isoTime .Result.SubmittedAt }}">{{ formatTime .Result.SubmittedAt "Jan 02, 2006 at 03:04:05 PM" }}</time></div>
       </div>
 
       <div style="display: flex; gap: 1rem; justify-content: center;">
@@ -63,5 +63,17 @@
       </div>
     </div>
   </div>
+
+  <script>
+    document.querySelectorAll('time.local-time').forEach(el => {
+      const iso = el.getAttribute('datetime');
+      if (!iso) return;
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return;
+      const dateStr = d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' });
+      const timeStr = d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+      el.innerText = dateStr + ' at ' + timeStr;
+    });
+  </script>
 </body>
 </html>

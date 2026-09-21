@@ -81,6 +81,18 @@ func main() {
 			}
 			return b
 		},
+		"formatTime": func(t time.Time, layout string) string {
+			if t.IsZero() {
+				return ""
+			}
+			return t.In(cfg.Location).Format(layout)
+		},
+		"isoTime": func(t time.Time) string {
+			if t.IsZero() {
+				return ""
+			}
+			return t.UTC().Format(time.RFC3339)
+		},
 	}
 
 	tmpl, err := template.New("").Funcs(funcMap).ParseGlob("web/templates/*.html")
@@ -114,7 +126,7 @@ func main() {
 	authPres := presenter.NewAuthPresenter(authService, tmpl)
 	studentPres := presenter.NewStudentPresenter(quizService, resultService, tmpl)
 	quizPres := presenter.NewQuizPresenter(quizService, answerService, resultService, tmpl)
-	adminPres := presenter.NewAdminPresenter(quizService, resultService, studentRepo, importService, tmpl)
+	adminPres := presenter.NewAdminPresenter(quizService, resultService, studentRepo, importService, tmpl, cfg)
 
 	// 7. Setup Router & Routes
 	router := presenter.NewRouter(presenter.RouterDependencies{

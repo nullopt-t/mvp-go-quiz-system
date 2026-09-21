@@ -5,7 +5,7 @@
   <td><span class="badge badge-primary">{{ index .I18n.T "level" }} {{ .Student.LevelID }}</span></td>
   <td><span class="badge badge-muted">{{ index .I18n.T "group" }} {{ .Student.GroupID }}</span></td>
   <td style="font-size: 0.85rem; color: var(--text-muted); white-space: nowrap;">
-    <i class="fa-regular fa-clock" style="margin-inline-end: 0.25rem;"></i>{{ .Student.CreatedAt.Format "2006-01-02 15:04" }}
+    <i class="fa-regular fa-clock" style="margin-inline-end: 0.25rem;"></i><time class="local-time" datetime="{{ isoTime .Student.CreatedAt }}">{{ formatTime .Student.CreatedAt "2006-01-02 03:04 PM" }}</time>
   </td>
   <td>
     {{ if .Student.IsActive }}

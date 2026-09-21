@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sort"
 	"time"
 
 	"quiz-system/internal/model"
@@ -98,27 +99,36 @@ func (s *quizService) GetAvailableQuizzesForStudent(ctx context.Context, student
 			Status: "AVAILABLE",
 		}
 
-		// Check if already completed
+		// If already completed: skip, as it is viewed in Past Results / History dialog
 		res, err := s.resultRepo.GetStudentResult(ctx, q.ID, studentID)
 		if err == nil && res != nil {
-			summary.Status = "COMPLETED"
-			summary.Score = res.Score
-			summary.TotalPoints = res.TotalPoints
+			continue
+		}
+
+		quizEnd := q.StartTime.Add(time.Duration(q.DurationMinutes) * time.Minute)
+		if now.Before(q.StartTime) {
+			summary.Status = "UPCOMING"
+			summary.StartsInSeconds = int(q.StartTime.Sub(now).Seconds())
+		} else if now.After(quizEnd) {
+			// Ended/expired quiz without completion: do not display on student board
+			continue
 		} else {
-			quizEnd := q.StartTime.Add(time.Duration(q.DurationMinutes) * time.Minute)
-			if now.Before(q.StartTime) {
-				summary.Status = "UPCOMING"
-				summary.StartsInSeconds = int(q.StartTime.Sub(now).Seconds())
-			} else if now.After(quizEnd) {
-				// Ended/expired quiz without completion: do not display on student board
-				continue
-			} else {
-				summary.Status = "LIVE"
-			}
+			summary.Status = "LIVE"
 		}
 
 		summaries = append(summaries, summary)
 	}
+
+	// Sort quizzes by what is coming:
+	// Priority 1: LIVE quizzes first (active right now, ordered by ending urgency)
+	// Priority 2: UPCOMING quizzes ordered chronologically by earliest start time (what is coming next)
+	sort.SliceStable(summaries, func(i, j int) bool {
+		if summaries[i].Status != summaries[j].Status {
+			return summaries[i].Status == "LIVE" // LIVE comes before UPCOMING
+		}
+		// Within same status: earliest start time first
+		return summaries[i].Quiz.StartTime.Before(summaries[j].Quiz.StartTime)
+	})
 
 	return summaries, nil
 }
@@ -139,7 +149,7 @@ func (s *quizService) StartOrResumeQuiz(ctx context.Context, quizID, studentID p
 	quizEnd := quiz.StartTime.Add(time.Duration(quiz.DurationMinutes) * time.Minute)
 
 	if now.Before(quiz.StartTime) {
-		return nil, fmt.Errorf("quiz will start at %s for all students", quiz.StartTime.Format("15:04:05 MST"))
+		return nil, fmt.Errorf("quiz will start at %s for all students", quiz.StartTime.Format("03:04:05 PM"))
 	}
 
 	// F-07 FIX: Check completion BEFORE expiration so finished students can always view results

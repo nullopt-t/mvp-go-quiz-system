@@ -27,6 +27,8 @@ services:
       - JWT_SECRET=super-secret-college-quiz-jwt-key-2026
       - JWT_EXPIRY_MINUTES=45
       - ADMIN_PIN=admin123
+      - TIMEZONE=${TIMEZONE:-Africa/Cairo}
+      - TZ=${TIMEZONE:-Africa/Cairo}
     depends_on:
       - mongo
 

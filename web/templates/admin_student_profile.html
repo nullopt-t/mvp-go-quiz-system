@@ -40,7 +40,7 @@
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; font-size: 0.9rem; color: var(--secondary);">
         <div><strong>{{ index .I18n.T "cohort_label" }}:</strong> {{ index .I18n.T "level" }} {{ .Student.LevelID }} • {{ index .I18n.T "group" }} {{ .Student.GroupID }}</div>
-        <div><strong>{{ index .I18n.T "admin_registered_at" }}:</strong> {{ .Student.CreatedAt.Format "2006-01-02 15:04" }}</div>
+        <div><strong>{{ index .I18n.T "admin_registered_at" }}:</strong> <time class="local-time" datetime="{{ isoTime .Student.CreatedAt }}">{{ formatTime .Student.CreatedAt "2006-01-02 03:04 PM" }}</time></div>
         <div><strong>{{ index .I18n.T "admin_completed_quizzes" }}:</strong> {{ len .History }}</div>
       </div>
     </div>
@@ -72,7 +72,7 @@
                 0%
               {{ end }}
             </td>
-            <td>{{ .SubmittedAt.Format "2006-01-02 15:04" }}</td>
+            <td><time class="local-time" datetime="{{ isoTime .SubmittedAt }}">{{ formatTime .SubmittedAt "2006-01-02 03:04 PM" }}</time></td>
           </tr>
           {{ else }}
           <tr>
@@ -85,5 +85,17 @@
       </table>
     </div>
   </div>
+
+  <script>
+    document.querySelectorAll('time.local-time').forEach(el => {
+      const iso = el.getAttribute('datetime');
+      if (!iso) return;
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return;
+      const dateStr = d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' });
+      const timeStr = d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: true });
+      el.innerText = dateStr + ' • ' + timeStr;
+    });
+  </script>
 </body>
 </html>

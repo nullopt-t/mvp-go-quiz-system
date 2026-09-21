@@ -147,7 +147,7 @@
                     0%
                   {{ end }}
                 </td>
-                <td>{{ .SubmittedAt.Format "2006-01-02 15:04" }}</td>
+                <td><time class="local-time" datetime="{{ isoTime .SubmittedAt }}">{{ formatTime .SubmittedAt "2006-01-02 03:04 PM" }}</time></td>
               </tr>
               {{ end }}
             </tbody>
@@ -189,7 +189,7 @@
             <!-- Card Footer: Submission Timestamp -->
             <div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.35rem; font-size: 0.75rem; color: var(--text-muted);">
               <i class="fa-regular fa-clock" style="font-size: 0.75rem;"></i>
-              <span>{{ .SubmittedAt.Format "Jan 02, 2006 • 15:04" }}</span>
+              <time class="local-time" datetime="{{ isoTime .SubmittedAt }}">{{ formatTime .SubmittedAt "Jan 02, 2006 • 03:04 PM" }}</time>
             </div>
           </div>
           {{ end }}
@@ -276,6 +276,33 @@
         setTimeout(() => { window.location.reload(); }, 1200);
       }
     }
+
+    // Automatically convert UTC timestamps to device local timezone in 12-hour format
+    function convertUtcToLocal() {
+      document.querySelectorAll('time.local-time').forEach(el => {
+        const iso = el.getAttribute('datetime');
+        if (!iso) return;
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return;
+
+        const dateStr = d.toLocaleDateString(undefined, {
+          year: 'numeric',
+          month: 'short',
+          day: '2-digit'
+        });
+        const timeStr = d.toLocaleTimeString(undefined, {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
+
+        el.innerText = dateStr + ' • ' + timeStr;
+      });
+    }
+
+    // Run on initial load and after dynamic HTMX updates
+    convertUtcToLocal();
+    document.addEventListener('htmx:afterSwap', convertUtcToLocal);
 
     // Initial pass and 1-second interval
     tickUpcomingTimers();
