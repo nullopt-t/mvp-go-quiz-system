@@ -588,22 +588,41 @@ func (p *AdminPresenter) RenderStudentsList(w http.ResponseWriter, r *http.Reque
 	i18nBundle := GetI18n(r)
 	errMsg, successMsg := GetFlashMessages(w, r)
 
+	activeFilterCount := 0
+	if levelID > 0 {
+		activeFilterCount++
+	}
+	if groupID != "" {
+		activeFilterCount++
+	}
+	if sortBy != "student_code" && sortBy != "" {
+		activeFilterCount++
+	}
+	if orderStr == "desc" {
+		activeFilterCount++
+	}
+	if pageSize != 25 {
+		activeFilterCount++
+	}
+
 	data := map[string]interface{}{
-		"Students":        students,
-		"TotalStudents":   totalStudents,
-		"SelectedLevel":   levelID,
-		"SelectedGroup":   groupID,
-		"SortBy":          sortBy,
-		"SortOrder":       orderStr,
-		"PageSize":        pageSize,
-		"HasPrev":         hasPrev,
-		"HasNext":         hasNext,
-		"PrevCursor":      prevCursorToken,
-		"NextCursor":      nextCursorToken,
-		"CurrentBatchLen": len(students),
-		"Success":         successMsg,
-		"Error":           errMsg,
-		"I18n":            i18nBundle,
+		"Students":          students,
+		"TotalStudents":     totalStudents,
+		"SelectedLevel":     levelID,
+		"SelectedGroup":     groupID,
+		"SortBy":            sortBy,
+		"SortOrder":         orderStr,
+		"PageSize":          pageSize,
+		"HasPrev":           hasPrev,
+		"HasNext":           hasNext,
+		"PrevCursor":        prevCursorToken,
+		"NextCursor":        nextCursorToken,
+		"CurrentBatchLen":   len(students),
+		"Success":           successMsg,
+		"Error":             errMsg,
+		"I18n":              i18nBundle,
+		"HasActiveFilters":  activeFilterCount > 0,
+		"ActiveFilterCount": activeFilterCount,
 	}
 
 	_ = p.templates.ExecuteTemplate(w, "admin_students.html", data)

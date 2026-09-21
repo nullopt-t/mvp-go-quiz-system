@@ -42,7 +42,16 @@
         </p>
       </div>
 
-      <div style="display: flex; gap: 0.75rem;">
+      <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+        <button type="button" id="toggleFilterBtn" class="btn btn-secondary" onclick="toggleStudentFilter()" style="padding: 0.55rem 1rem; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.45rem;">
+          <i class="fa-solid fa-filter"></i>
+          <span>{{ index .I18n.T "filter_btn" }}</span>
+          {{ if .HasActiveFilters }}
+          <span class="filter-badge-pill">{{ .ActiveFilterCount }}</span>
+          {{ end }}
+          <i class="fa-solid fa-chevron-down" id="filterChevron" style="font-size: 0.75rem; transition: transform 0.2s ease;"></i>
+        </button>
+
         <a href="/admin/students/create" class="btn btn-primary" style="padding: 0.55rem 1.15rem; font-size: 0.9rem;">
           <i class="fa-solid fa-user-plus" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_add_student" }}
         </a>
@@ -61,73 +70,93 @@
     </div>
     {{ end }}
 
-    <!-- Filter Bar -->
-    <div class="card" style="padding: 1.25rem; margin-bottom: 1.5rem;">
-      <form action="/admin/students" method="GET" class="admin-filter-bar">
-        <div class="filter-item">
-          <label style="font-size: 0.85rem;">{{ index .I18n.T "level" }}</label>
-          <select name="level_id" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
-            <option value="0">{{ index .I18n.T "all_levels" }}</option>
-            <option value="1" {{ if eq .SelectedLevel 1 }}selected{{ end }}>{{ index .I18n.T "level" }} 1</option>
-            <option value="2" {{ if eq .SelectedLevel 2 }}selected{{ end }}>{{ index .I18n.T "level" }} 2</option>
-            <option value="3" {{ if eq .SelectedLevel 3 }}selected{{ end }}>{{ index .I18n.T "level" }} 3</option>
-            <option value="4" {{ if eq .SelectedLevel 4 }}selected{{ end }}>{{ index .I18n.T "level" }} 4</option>
-            <option value="5" {{ if eq .SelectedLevel 5 }}selected{{ end }}>{{ index .I18n.T "level" }} 5</option>
-          </select>
+    <!-- Collapsible Filter Drawer -->
+    <div id="studentFilterPanel" class="filter-collapse-card {{ if .HasActiveFilters }}is-open{{ end }}">
+      <div class="filter-collapse-header" onclick="toggleStudentFilter()">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-sliders" style="color: var(--primary);"></i>
+          <span>{{ index .I18n.T "admin_filter_cohort" }}</span>
+          {{ if .HasActiveFilters }}
+          <span class="filter-badge-pill">{{ .ActiveFilterCount }} active</span>
+          {{ end }}
         </div>
+        <div style="font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem;">
+          <span id="filterHeaderHint">{{ if .HasActiveFilters }}Hide filters{{ else }}Show filters{{ end }}</span>
+        </div>
+      </div>
 
-        <div class="filter-item">
-          <label style="font-size: 0.85rem;">{{ index .I18n.T "group" }}</label>
-          <select name="group_id" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
-            <option value="">{{ index .I18n.T "all_groups" }}</option>
-            <option value="A" {{ if eq .SelectedGroup "A" }}selected{{ end }}>{{ index .I18n.T "group" }} A</option>
-            <option value="B" {{ if eq .SelectedGroup "B" }}selected{{ end }}>{{ index .I18n.T "group" }} B</option>
-            <option value="C" {{ if eq .SelectedGroup "C" }}selected{{ end }}>{{ index .I18n.T "group" }} C</option>
-            <option value="D" {{ if eq .SelectedGroup "D" }}selected{{ end }}>{{ index .I18n.T "group" }} D</option>
-          </select>
-        </div>
+      <div class="filter-collapse-body">
+        <form action="/admin/students" method="GET" class="admin-filter-bar">
+          <div class="filter-item">
+            <label style="font-size: 0.85rem;">{{ index .I18n.T "level" }}</label>
+            <select name="level_id" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
+              <option value="0">{{ index .I18n.T "all_levels" }}</option>
+              <option value="1" {{ if eq .SelectedLevel 1 }}selected{{ end }}>{{ index .I18n.T "level" }} 1</option>
+              <option value="2" {{ if eq .SelectedLevel 2 }}selected{{ end }}>{{ index .I18n.T "level" }} 2</option>
+              <option value="3" {{ if eq .SelectedLevel 3 }}selected{{ end }}>{{ index .I18n.T "level" }} 3</option>
+              <option value="4" {{ if eq .SelectedLevel 4 }}selected{{ end }}>{{ index .I18n.T "level" }} 4</option>
+              <option value="5" {{ if eq .SelectedLevel 5 }}selected{{ end }}>{{ index .I18n.T "level" }} 5</option>
+            </select>
+          </div>
 
-        <div class="filter-item">
-          <label style="font-size: 0.85rem;">{{ index .I18n.T "sort_by_label" }}</label>
-          <select name="sort_by" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
-            <option value="created_at" {{ if eq .SortBy "created_at" }}selected{{ end }}>{{ index .I18n.T "sort_time" }}</option>
-            <option value="student_code" {{ if eq .SortBy "student_code" }}selected{{ end }}>{{ index .I18n.T "sort_id" }}</option>
-            <option value="name" {{ if eq .SortBy "name" }}selected{{ end }}>{{ index .I18n.T "sort_name" }}</option>
-          </select>
-        </div>
+          <div class="filter-item">
+            <label style="font-size: 0.85rem;">{{ index .I18n.T "group" }}</label>
+            <select name="group_id" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
+              <option value="">{{ index .I18n.T "all_groups" }}</option>
+              <option value="A" {{ if eq .SelectedGroup "A" }}selected{{ end }}>{{ index .I18n.T "group" }} A</option>
+              <option value="B" {{ if eq .SelectedGroup "B" }}selected{{ end }}>{{ index .I18n.T "group" }} B</option>
+              <option value="C" {{ if eq .SelectedGroup "C" }}selected{{ end }}>{{ index .I18n.T "group" }} C</option>
+              <option value="D" {{ if eq .SelectedGroup "D" }}selected{{ end }}>{{ index .I18n.T "group" }} D</option>
+            </select>
+          </div>
 
-        <div class="filter-item">
-          <label style="font-size: 0.85rem;">{{ index .I18n.T "table_status" }}</label>
-          <select name="order" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
-            <option value="desc" {{ if eq .SortOrder "desc" }}selected{{ end }}>{{ index .I18n.T "sort_desc" }}</option>
-            <option value="asc" {{ if eq .SortOrder "asc" }}selected{{ end }}>{{ index .I18n.T "sort_asc" }}</option>
-          </select>
-        </div>
+          <div class="filter-item">
+            <label style="font-size: 0.85rem;">{{ index .I18n.T "sort_by_label" }}</label>
+            <select name="sort_by" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
+              <option value="student_code" {{ if eq .SortBy "student_code" }}selected{{ end }}>{{ index .I18n.T "sort_id" }}</option>
+              <option value="created_at" {{ if eq .SortBy "created_at" }}selected{{ end }}>{{ index .I18n.T "sort_time" }}</option>
+              <option value="name" {{ if eq .SortBy "name" }}selected{{ end }}>{{ index .I18n.T "sort_name" }}</option>
+            </select>
+          </div>
 
-        <div class="filter-item">
-          <label style="font-size: 0.85rem;">Per Page</label>
-          <select name="page_size" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
-            <option value="15" {{ if eq .PageSize 15 }}selected{{ end }}>15</option>
-            <option value="25" {{ if eq .PageSize 25 }}selected{{ end }}>25</option>
-            <option value="50" {{ if eq .PageSize 50 }}selected{{ end }}>50</option>
-            <option value="100" {{ if eq .PageSize 100 }}selected{{ end }}>100</option>
-          </select>
-        </div>
+          <div class="filter-item">
+            <label style="font-size: 0.85rem;">{{ index .I18n.T "table_status" }}</label>
+            <select name="order" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
+              <option value="asc" {{ if eq .SortOrder "asc" }}selected{{ end }}>{{ index .I18n.T "sort_asc" }}</option>
+              <option value="desc" {{ if eq .SortOrder "desc" }}selected{{ end }}>{{ index .I18n.T "sort_desc" }}</option>
+            </select>
+          </div>
 
-        <div class="filter-actions">
-          <button type="submit" class="btn btn-secondary" style="width: 100%; padding: 0.55rem 1.25rem; font-size: 0.9rem;">
-            <i class="fa-solid fa-filter"></i> {{ index .I18n.T "filter_btn" }}
-          </button>
-        </div>
-      </form>
+          <div class="filter-item">
+            <label style="font-size: 0.85rem;">Per Page</label>
+            <select name="page_size" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
+              <option value="15" {{ if eq .PageSize 15 }}selected{{ end }}>15</option>
+              <option value="25" {{ if eq .PageSize 25 }}selected{{ end }}>25</option>
+              <option value="50" {{ if eq .PageSize 50 }}selected{{ end }}>50</option>
+              <option value="100" {{ if eq .PageSize 100 }}selected{{ end }}>100</option>
+            </select>
+          </div>
+
+          <div class="filter-actions">
+            <button type="submit" class="btn btn-secondary" style="flex: 1; padding: 0.55rem 1rem; font-size: 0.9rem;">
+              <i class="fa-solid fa-check"></i> {{ index .I18n.T "filter_btn" }}
+            </button>
+            {{ if .HasActiveFilters }}
+            <a href="/admin/students" class="btn btn-secondary" title="{{ index .I18n.T "admin_clear_filter" }}" style="padding: 0.55rem 0.75rem; font-size: 0.9rem; color: #dc2626;">
+              <i class="fa-solid fa-rotate-left"></i>
+            </a>
+            {{ end }}
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- Students Table & Mobile Card List -->
     <div class="card" style="padding: 0; overflow: hidden;">
       <div class="admin-table-desktop">
-        <table style="width: 100%; border-collapse: collapse;">
+        <table class="roster-table">
           <thead>
-            <tr style="background: #f8fafc; border-bottom: 2px solid var(--border);">
+            <tr>
               <th>
                 <a href="/admin/students?level_id={{ .SelectedLevel }}&group_id={{ .SelectedGroup }}&sort_by=student_code&order={{ if and (eq .SortBy "student_code") (ne .SortOrder "desc") }}desc{{ else }}asc{{ end }}" style="text-decoration: none; color: inherit; display: inline-flex; align-items: center; gap: 0.35rem;">
                   {{ index .I18n.T "student_id_label" }}
@@ -214,5 +243,22 @@
       {{ end }}
     </div>
   </div>
+
+  <script>
+    function toggleStudentFilter() {
+      const panel = document.getElementById('studentFilterPanel');
+      const chevron = document.getElementById('filterChevron');
+      const hint = document.getElementById('filterHeaderHint');
+      if (!panel) return;
+
+      const isOpen = panel.classList.toggle('is-open');
+      if (chevron) {
+        chevron.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+      }
+      if (hint) {
+        hint.textContent = isOpen ? 'Hide filters' : 'Show filters';
+      }
+    }
+  </script>
 </body>
 </html>

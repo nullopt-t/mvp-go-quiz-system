@@ -895,7 +895,7 @@ table {
 .metric-icon-green { background: #ecfdf5; color: #059669; }
 .metric-icon-amber { background: #fef3c7; color: #d97706; }
 
-/* Filter Bar Responsive Grid */
+/* Filter Bar Responsive Grid & Drawer */
 .admin-filter-bar {
   display: flex;
   gap: 1rem;
@@ -909,8 +909,59 @@ table {
 }
 
 .filter-actions {
-  flex: 1 1 120px;
-  min-width: 110px;
+  flex: 1 1 180px;
+  min-width: 150px;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.filter-collapse-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.filter-collapse-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1.25rem;
+  background: #f8fafc;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid transparent;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.filter-collapse-card.is-open .filter-collapse-header {
+  border-bottom-color: var(--border);
+}
+
+.filter-collapse-body {
+  padding: 1.25rem;
+  display: none;
+}
+
+.filter-collapse-card.is-open .filter-collapse-body {
+  display: block;
+}
+
+.filter-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 9999px;
+  background: var(--primary);
+  color: #ffffff;
 }
 
 /* 2-Column Form Row */
@@ -932,6 +983,64 @@ table {
   display: block;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  width: 100%;
+}
+
+.roster-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 780px;
+  table-layout: auto;
+}
+
+.roster-table th,
+.roster-table td {
+  padding: 0.85rem 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border);
+  text-align: start;
+}
+
+.roster-table th {
+  background: #f8fafc;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.roster-table td {
+  font-size: 0.92rem;
+}
+
+.cell-nowrap {
+  white-space: nowrap !important;
+}
+
+.cell-code {
+  white-space: nowrap !important;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+}
+
+.cell-name {
+  white-space: nowrap !important;
+  font-weight: 600;
+  color: var(--text-main);
+  min-width: 140px;
+}
+
+.badge-compact {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap !important;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius);
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .admin-cards-mobile {

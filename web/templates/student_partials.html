@@ -1,20 +1,20 @@
 {{ define "student_row" }}
 <tr id="student-row-{{ .Student.ID.Hex }}">
-  <td><code>{{ .Student.StudentCode }}</code></td>
-  <td><strong>{{ .Student.Name }}</strong></td>
-  <td><span class="badge badge-primary">{{ index .I18n.T "level" }} {{ .Student.LevelID }}</span></td>
-  <td><span class="badge badge-muted">{{ index .I18n.T "group" }} {{ .Student.GroupID }}</span></td>
-  <td style="font-size: 0.85rem; color: var(--text-muted); white-space: nowrap;">
+  <td class="cell-code"><code>{{ .Student.StudentCode }}</code></td>
+  <td class="cell-name"><strong>{{ .Student.Name }}</strong></td>
+  <td class="cell-nowrap"><span class="badge badge-primary badge-compact">{{ index .I18n.T "level" }} {{ .Student.LevelID }}</span></td>
+  <td class="cell-nowrap"><span class="badge badge-muted badge-compact">{{ index .I18n.T "group" }} {{ .Student.GroupID }}</span></td>
+  <td class="cell-nowrap" style="font-size: 0.85rem; color: var(--text-muted);">
     <i class="fa-regular fa-clock" style="margin-inline-end: 0.25rem;"></i><time class="local-time" datetime="{{ isoTime .Student.CreatedAt }}">{{ formatTime .Student.CreatedAt "2006-01-02 03:04 PM" }}</time>
   </td>
-  <td>
+  <td class="cell-nowrap">
     {{ if .Student.IsActive }}
-      <span class="badge badge-success">{{ index .I18n.T "status_active" }}</span>
+      <span class="badge badge-success badge-compact">{{ index .I18n.T "status_active" }}</span>
     {{ else }}
-      <span class="badge badge-muted">{{ index .I18n.T "status_inactive" }}</span>
+      <span class="badge badge-muted badge-compact">{{ index .I18n.T "status_inactive" }}</span>
     {{ end }}
   </td>
-  <td style="white-space: nowrap;">
+  <td class="cell-nowrap">
     <div style="display: flex; gap: 0.5rem; align-items: center;">
       <a href="/admin/students/{{ .Student.ID.Hex }}" class="btn btn-secondary btn-sm" title="{{ index .I18n.T "view_btn" }}">
         <i class="fa-solid fa-id-card" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "view_btn" }}
