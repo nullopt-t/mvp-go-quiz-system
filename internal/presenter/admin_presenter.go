@@ -42,6 +42,17 @@ func NewAdminPresenter(
 	}
 }
 
+type GroupCohort struct {
+	GroupID string
+	Count   int64
+}
+
+type LevelCohort struct {
+	LevelID int
+	Total   int64
+	Groups  []GroupCohort
+}
+
 func (p *AdminPresenter) RenderDashboard(w http.ResponseWriter, r *http.Request) {
 	quizzes, _ := p.quizService.GetAllQuizzes(r.Context())
 	totalStudents, _ := p.studentRepo.Count(r.Context())
@@ -50,6 +61,31 @@ func (p *AdminPresenter) RenderDashboard(w http.ResponseWriter, r *http.Request)
 	groupSummaries, err := p.studentRepo.GetCohortDistribution(r.Context())
 	if err != nil {
 		groupSummaries = nil
+	}
+
+	// Group into structured Levels with their respective Groups
+	levelMap := make(map[int]*LevelCohort)
+	var levelOrder []int
+	for _, item := range groupSummaries {
+		lc, exists := levelMap[item.LevelID]
+		if !exists {
+			lc = &LevelCohort{
+				LevelID: item.LevelID,
+				Groups:  make([]GroupCohort, 0),
+			}
+			levelMap[item.LevelID] = lc
+			levelOrder = append(levelOrder, item.LevelID)
+		}
+		lc.Total += item.Count
+		lc.Groups = append(lc.Groups, GroupCohort{
+			GroupID: item.GroupID,
+			Count:   item.Count,
+		})
+	}
+
+	var levelCohorts []LevelCohort
+	for _, lvl := range levelOrder {
+		levelCohorts = append(levelCohorts, *levelMap[lvl])
 	}
 
 	// Fetch recent students for the dashboard table
@@ -62,6 +98,7 @@ func (p *AdminPresenter) RenderDashboard(w http.ResponseWriter, r *http.Request)
 		"Quizzes":        quizzes,
 		"TotalStudents":  totalStudents,
 		"GroupSummaries": groupSummaries,
+		"LevelCohorts":   levelCohorts,
 		"RecentStudents": recentStudents,
 		"ImportSuccess":  successMsg,
 		"ImportError":    errMsg,

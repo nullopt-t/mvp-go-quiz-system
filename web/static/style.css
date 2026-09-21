@@ -1117,7 +1117,10 @@ table {
 }
 
 .admin-cards-mobile {
-  display: none;
+  display: none !important;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
 }
 
 .mobile-student-card {
@@ -1196,6 +1199,75 @@ table {
   .filter-item {
     flex: 1 1 100%;
   }
+
+.cohort-matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.cohort-matrix-table th {
+  background: var(--bg);
+  padding: 0.5rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+
+.cohort-matrix-table th:first-child {
+  text-align: start;
+}
+
+.cohort-matrix-table td {
+  padding: 0.45rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.cohort-matrix-table tr:last-child td {
+  border-bottom: none;
+}
+
+.cohort-group-pill {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 58px;
+  padding: 0.25rem 0.4rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--text-main);
+  transition: all 0.15s ease;
+}
+
+.cohort-group-pill:hover {
+  border-color: var(--primary);
+  background: #eff6ff;
+  color: var(--primary);
+}
+
+.cohort-group-pill strong {
+  font-size: 0.82rem;
+  color: var(--text-main);
+  line-height: 1.1;
+}
+
+.cohort-group-pill:hover strong {
+  color: var(--primary);
+}
+
+.cohort-group-pill span {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  line-height: 1;
+  margin-top: 1px;
+}
 
 .admin-cohort-grid {
   display: grid;

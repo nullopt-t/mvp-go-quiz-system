@@ -164,21 +164,49 @@
           </div>
         </div>
 
-        <div class="admin-cohort-grid">
-          {{ range .GroupSummaries }}
-          <a href="/admin/students?level_id={{ .LevelID }}&group_id={{ .GroupID }}" style="text-decoration: none; color: inherit; background: var(--bg); border: 1px solid var(--border); padding: 0.65rem 0.8rem; border-radius: 4px; transition: all 0.15s ease; display: block;" onmouseover="this.style.borderColor='var(--primary)'; this.style.background='#eff6ff';" onmouseout="this.style.borderColor='var(--border)'; this.style.background='var(--bg)';">
-            <div style="font-weight: 700; color: var(--primary); font-size: 0.85rem;">
-              {{ index $.I18n.T "level" }} {{ .LevelID }} • {{ index $.I18n.T "group" }} {{ .GroupID }}
-            </div>
-            <div style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.25rem;">
-              <strong>{{ .Count }}</strong> {{ index $.I18n.T "admin_enrolled" }}
-            </div>
-          </a>
-          {{ else }}
-          <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 2rem; background: var(--bg); border-radius: 4px; font-size: 0.9rem;">
-            {{ index $.I18n.T "admin_no_cohorts" }}
-          </div>
-          {{ end }}
+        <div style="overflow-x: auto; border: 1px solid var(--border); border-radius: 4px;">
+          <table class="cohort-matrix-table">
+            <thead>
+              <tr>
+                <th style="padding-inline-start: 0.85rem;">{{ index .I18n.T "level" }}</th>
+                <th>Group A</th>
+                <th>Group B</th>
+                <th>Group C</th>
+                <th>Group D</th>
+                <th style="text-align: end; padding-inline-end: 0.85rem;">{{ index .I18n.T "admin_cohort_total" }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{ range .LevelCohorts }}
+              <tr>
+                <td style="padding-inline-start: 0.85rem; font-weight: 700; color: var(--text-main); white-space: nowrap;">
+                  <a href="/admin/students?level_id={{ .LevelID }}" style="color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;" title="View all students in Level {{ .LevelID }}">
+                    <span class="badge" style="background: var(--bg); border: 1px solid var(--border); font-size: 0.8rem; font-weight: 700;">L{{ .LevelID }}</span>
+                    <span>{{ index $.I18n.T "level" }} {{ .LevelID }}</span>
+                  </a>
+                </td>
+                {{ range .Groups }}
+                <td>
+                  <a href="/admin/students?level_id={{ $.LevelID }}&group_id={{ .GroupID }}" class="cohort-group-pill" title="Level {{ $.LevelID }} • Group {{ .GroupID }}: {{ .Count }} students">
+                    <strong>{{ .Count }}</strong>
+                    <span>{{ .GroupID }}</span>
+                  </a>
+                </td>
+                {{ end }}
+                <td style="text-align: end; padding-inline-end: 0.85rem; white-space: nowrap;">
+                  <span style="font-weight: 700; color: var(--primary); font-size: 0.88rem;">{{ .Total }}</span>
+                  <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">{{ index $.I18n.T "admin_enrolled" }}</span>
+                </td>
+              </tr>
+              {{ else }}
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem; font-size: 0.9rem;">
+                  {{ index $.I18n.T "admin_no_cohorts" }}
+                </td>
+              </tr>
+              {{ end }}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -258,7 +286,7 @@
       </div>
 
       <!-- Mobile Quiz Cards -->
-      <div class="admin-cards-mobile" style="padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
+      <div class="admin-cards-mobile">
         {{ range .Quizzes }}
         <div class="mobile-student-card">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem;">
@@ -377,7 +405,7 @@
       </div>
 
       <!-- Mobile Recent Student Cards -->
-      <div class="admin-cards-mobile" style="padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
+      <div class="admin-cards-mobile">
         {{ range .RecentStudents }}
         <div class="mobile-student-card">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem;">
