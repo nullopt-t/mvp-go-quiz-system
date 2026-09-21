@@ -2,7 +2,7 @@
 <html lang="{{ .I18n.Lang }}" dir="{{ .I18n.Dir }}">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>{{ index .I18n.T "result_title" }} - {{ .Quiz.Title }}</title>
   <link rel="stylesheet" href="/static/style.css">
 </head>
@@ -27,7 +27,7 @@
         {{ .Quiz.Title }}
       </p>
 
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; background: #f8fafc; padding: 1.5rem; border-radius: var(--radius); border: 1px solid var(--border);">
+      <div class="result-stats-grid" style="gap: 1rem; margin-bottom: 2rem; background: #f8fafc; padding: 1.5rem; border-radius: var(--radius); border: 1px solid var(--border);">
         <div>
           <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.35rem;">{{ index .I18n.T "total_score" }}</div>
           <div style="font-size: 1.6rem; font-weight: 800; color: var(--primary);">
