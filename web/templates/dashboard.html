@@ -9,20 +9,22 @@
 </head>
 <body>
   <nav class="navbar">
-    <div style="display: flex; align-items: center; gap: 0.6rem;">
-      <span class="badge badge-primary">{{ index .I18n.T "level" }} {{ .Student.LevelID }} • {{ index .I18n.T "group" }} {{ .Student.GroupID }}</span>
-      <span style="font-weight: 600;">{{ .Student.Name }} ({{ .Student.StudentCode }})</span>
+    <div class="nav-brand-user">
+      <span class="navbar-student-name">{{ .Student.Name }}</span>
     </div>
-    <div class="nav-user" style="gap: 0.75rem;">
-      <button type="button" class="btn btn-secondary" onclick="openHistoryModal()" style="padding: 0.35rem 0.85rem; font-size: 0.85rem; font-weight: 600;">
-        <i class="fa-solid fa-clock-rotate-left" style="margin-inline-end: 0.35rem; color: var(--primary);"></i>
-        {{ index .I18n.T "btn_history" }}
+    <div class="nav-user">
+      <button type="button" class="btn btn-secondary nav-action-btn" onclick="openHistoryModal()" title="{{ index .I18n.T "btn_history" }}">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        <span class="nav-btn-text">{{ index .I18n.T "btn_history" }}</span>
       </button>
-      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 700;">
-        {{ index .I18n.T "lang_switch" }}
+      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary nav-action-btn" title="{{ index .I18n.T "lang_switch" }}">
+        <span style="font-weight: 700;">{{ index .I18n.T "lang_switch" }}</span>
       </a>
       <form action="/logout" method="POST" style="display:inline; margin: 0;">
-        <button type="submit" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">{{ index .I18n.T "logout" }}</button>
+        <button type="submit" class="btn btn-secondary nav-action-btn nav-logout-btn" title="{{ index .I18n.T "logout" }}">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span class="nav-btn-text">{{ index .I18n.T "logout" }}</span>
+        </button>
       </form>
     </div>
   </nav>
