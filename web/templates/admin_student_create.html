@@ -8,16 +8,26 @@
 </head>
 <body>
   <nav class="navbar">
-    <a href="/admin" class="nav-brand">
-      <span>{{ index .I18n.T "admin_portal" }}</span>
-    </a>
-    <div class="nav-user">
-      <a href="/admin/students" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;">{{ index .I18n.T "admin_students_title" }}</a>
-      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 600;">
-        {{ index .I18n.T "lang_switch" }}
+    <div class="nav-brand-user">
+      <a href="/admin" class="nav-brand" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+        <i class="fa-solid fa-graduation-cap" style="color: var(--primary); font-size: 1.25rem;"></i>
+        <span class="navbar-student-name">{{ index .I18n.T "admin_add_student" }}</span>
       </a>
-      <form action="/admin/logout" method="POST" style="display:inline;">
-        <button type="submit" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;">{{ index .I18n.T "logout" }}</button>
+    </div>
+    <div class="nav-user">
+      <a href="/admin/students" class="btn btn-secondary nav-action-btn" title="{{ index .I18n.T "admin_students_title" }}">
+        <i class="fa-solid fa-users"></i>
+        <span class="nav-btn-text">{{ index .I18n.T "admin_students_title" }}</span>
+      </a>
+      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary nav-action-btn" title="{{ index .I18n.T "lang_switch" }}">
+        <i class="fa-solid fa-globe"></i>
+        <span style="font-weight: 700;">{{ index .I18n.T "lang_switch" }}</span>
+      </a>
+      <form action="/admin/logout" method="POST" style="display:inline; margin: 0;">
+        <button type="submit" class="btn btn-secondary nav-action-btn nav-logout-btn" title="{{ index .I18n.T "logout" }}">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span class="nav-btn-text">{{ index .I18n.T "logout" }}</span>
+        </button>
       </form>
     </div>
   </nav>
@@ -46,7 +56,7 @@
           <input type="text" id="name" name="name" placeholder="{{ index .I18n.T "admin_student_name_placeholder" }}" required>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-row-2col">
           <div class="form-group">
             <label for="level_id">{{ index .I18n.T "level" }}</label>
             <select id="level_id" name="level_id" required>

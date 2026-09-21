@@ -9,16 +9,26 @@
 </head>
 <body>
   <nav class="navbar">
-    <a href="/admin" class="nav-brand">
-      <span>{{ index .I18n.T "admin_portal" }}</span>
-    </a>
-    <div class="nav-user">
-      <a href="/admin" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;">{{ index .I18n.T "dashboard" }}</a>
-      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 600;">
-        {{ index .I18n.T "lang_switch" }}
+    <div class="nav-brand-user">
+      <a href="/admin" class="nav-brand" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+        <i class="fa-solid fa-graduation-cap" style="color: var(--primary); font-size: 1.25rem;"></i>
+        <span class="navbar-student-name">{{ index .I18n.T "admin_preview_title" }}</span>
       </a>
-      <form action="/admin/logout" method="POST" style="display:inline;">
-        <button type="submit" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;">{{ index .I18n.T "logout" }}</button>
+    </div>
+    <div class="nav-user">
+      <a href="/admin" class="btn btn-secondary nav-action-btn" title="{{ index .I18n.T "dashboard" }}">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span class="nav-btn-text">{{ index .I18n.T "dashboard" }}</span>
+      </a>
+      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary nav-action-btn" title="{{ index .I18n.T "lang_switch" }}">
+        <i class="fa-solid fa-globe"></i>
+        <span style="font-weight: 700;">{{ index .I18n.T "lang_switch" }}</span>
+      </a>
+      <form action="/admin/logout" method="POST" style="display:inline; margin: 0;">
+        <button type="submit" class="btn btn-secondary nav-action-btn nav-logout-btn" title="{{ index .I18n.T "logout" }}">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span class="nav-btn-text">{{ index .I18n.T "logout" }}</span>
+        </button>
       </form>
     </div>
   </nav>
@@ -45,15 +55,15 @@
 
     <!-- Search & Filter Bar (Works for both server-side full dataset & instant client-side typing) -->
     <div class="card" style="padding: 1.25rem; margin-bottom: 1.5rem;">
-      <form action="/admin/students/preview" method="POST" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+      <form action="/admin/students/preview" method="POST" class="admin-filter-bar">
         <input type="hidden" name="file_token" value="{{ .FileToken }}">
         
-        <div style="flex: 2; min-width: 220px;">
+        <div class="filter-item" style="flex: 2; min-width: 200px;">
           <label style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "student_label" }} / {{ index .I18n.T "student_id_label" }}</label>
           <input type="text" id="preview-search-input" name="search" value="{{ .SearchQuery }}" placeholder="{{ index .I18n.T "admin_search_preview_placeholder" }}" style="padding: 0.55rem 0.75rem; font-size: 0.9rem; width: 100%;">
         </div>
 
-        <div style="flex: 1; min-width: 130px;">
+        <div class="filter-item">
           <label style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "level" }}</label>
           <select name="filter_level" style="padding: 0.55rem 0.75rem; font-size: 0.9rem; width: 100%;">
             <option value="0">{{ index .I18n.T "all_levels" }}</option>
@@ -65,7 +75,7 @@
           </select>
         </div>
 
-        <div style="flex: 1; min-width: 130px;">
+        <div class="filter-item">
           <label style="font-size: 0.85rem; font-weight: 600;">{{ index .I18n.T "group" }}</label>
           <select name="filter_group" style="padding: 0.55rem 0.75rem; font-size: 0.9rem; width: 100%;">
             <option value="">{{ index .I18n.T "all_groups" }}</option>
@@ -76,8 +86,8 @@
           </select>
         </div>
 
-        <div style="display: flex; gap: 0.5rem;">
-          <button type="submit" class="btn btn-primary" style="padding: 0.55rem 1.25rem; font-size: 0.9rem;">
+        <div class="filter-actions" style="display: flex; gap: 0.5rem; flex: 1;">
+          <button type="submit" class="btn btn-primary" style="flex: 1; padding: 0.55rem 1.25rem; font-size: 0.9rem;">
             <i class="fa-solid fa-magnifying-glass"></i> {{ index .I18n.T "admin_search_filter_btn" }}
           </button>
           {{ if or .SearchQuery (or .FilterLevel .FilterGroup) }}
@@ -144,16 +154,16 @@
       </div>
 
       <!-- Action Toolbar -->
-      <div style="display: flex; justify-content: flex-end; align-items: center; gap: 1rem; flex-wrap: wrap;">
-        <a href="/admin" class="btn btn-secondary" style="padding: 0.65rem 1.5rem;">
+      <div class="admin-action-toolbar" style="display: flex; justify-content: flex-end; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+        <a href="/admin" class="btn btn-secondary" style="padding: 0.65rem 1.25rem;">
           {{ index .I18n.T "admin_cancel_import" }}
         </a>
         {{ if .IsTruncated }}
-        <button type="submit" name="import_mode" value="all_file" class="btn btn-primary" style="padding: 0.65rem 1.75rem; font-size: 1rem; font-weight: 700; background: #0284c7;">
+        <button type="submit" name="import_mode" value="all_file" class="btn btn-primary" style="padding: 0.65rem 1.5rem; font-size: 0.95rem; font-weight: 700; background: #0284c7;">
           <i class="fa-solid fa-check"></i> {{ .ConfirmAllBtnText }}
         </button>
         {{ else }}
-        <button type="submit" name="import_mode" value="form_data" class="btn btn-primary" style="padding: 0.65rem 1.75rem; font-size: 1rem; font-weight: 700;">
+        <button type="submit" name="import_mode" value="form_data" class="btn btn-primary" style="padding: 0.65rem 1.5rem; font-size: 0.95rem; font-weight: 700;">
           <i class="fa-solid fa-check"></i> {{ index .I18n.T "admin_confirm_import" }}
         </button>
         {{ end }}

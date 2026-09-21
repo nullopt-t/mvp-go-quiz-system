@@ -7,21 +7,26 @@
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <nav class="navbar" style="padding: 0.85rem 2rem; border-bottom: 1px solid var(--border); background: var(--surface);">
-    <a href="/admin" class="nav-brand" style="display: flex; align-items: center; gap: 0.65rem; text-decoration: none;">
-      <i class="fa-solid fa-graduation-cap" style="color: var(--primary); font-size: 1.25rem;"></i>
-      <span style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">{{ index .I18n.T "admin_portal" }}</span>
-    </a>
-    <div class="nav-user" style="display: flex; align-items: center; gap: 0.75rem;">
-      <a href="/admin" class="btn btn-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.85rem; font-weight: 600;">
-        <i class="fa-solid fa-arrow-left" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "back_dashboard" }}
+  <nav class="navbar">
+    <div class="nav-brand-user">
+      <a href="/admin" class="nav-brand" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+        <i class="fa-solid fa-graduation-cap" style="color: var(--primary); font-size: 1.25rem;"></i>
+        <span class="navbar-student-name">{{ index .I18n.T "admin_create_quiz_title" }}</span>
       </a>
-      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.85rem; font-weight: 700;">
-        <i class="fa-solid fa-globe" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "lang_switch" }}
+    </div>
+    <div class="nav-user">
+      <a href="/admin" class="btn btn-secondary nav-action-btn" title="{{ index .I18n.T "back_dashboard" }}">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span class="nav-btn-text">{{ index .I18n.T "back_dashboard" }}</span>
+      </a>
+      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary nav-action-btn" title="{{ index .I18n.T "lang_switch" }}">
+        <i class="fa-solid fa-globe"></i>
+        <span style="font-weight: 700;">{{ index .I18n.T "lang_switch" }}</span>
       </a>
       <form action="/admin/logout" method="POST" style="display:inline; margin: 0;">
-        <button type="submit" class="btn btn-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.85rem; color: var(--danger); border-color: #fecaca; background: #fff5f5;">
-          <i class="fa-solid fa-arrow-right-from-bracket" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "logout" }}
+        <button type="submit" class="btn btn-secondary nav-action-btn nav-logout-btn" title="{{ index .I18n.T "logout" }}">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span class="nav-btn-text">{{ index .I18n.T "logout" }}</span>
         </button>
       </form>
     </div>
@@ -140,7 +145,7 @@
                 <div class="form-group" style="margin-bottom: 0.75rem; padding-top: 1rem;">
                   <input type="text" name="q_1_text" placeholder="{{ index .I18n.T "quiz_statement_placeholder" }}" required style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;" oninput="updatePreview(this)">
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                <div class="question-options-grid">
                   <div>
                     <label style="font-size: 0.8rem; font-weight: 600;">{{ printf (index .I18n.T "quiz_option_num") 1 }}</label>
                     <input type="text" name="q_1_opt_1" placeholder="{{ printf (index .I18n.T "quiz_option_placeholder") "A" }}" required style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
@@ -275,7 +280,7 @@
           <div class="form-group" style="margin-bottom: 0.75rem; padding-top: 1rem;">
             <input type="text" name="q_${id}_text" placeholder="${statementPlaceholder}" required style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem;" oninput="updatePreview(this)">
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="question-options-grid">
             <div>
               <label style="font-size: 0.8rem; font-weight: 600;">${opt1Label}</label>
               <input type="text" name="q_${id}_opt_1" placeholder="${optAPlaceholder}" required style="width: 100%; padding: 0.45rem 0.65rem; font-size: 0.85rem;">

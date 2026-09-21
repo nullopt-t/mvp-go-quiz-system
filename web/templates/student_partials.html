@@ -62,3 +62,50 @@
   {{ end }}
 </div>
 {{ end }}
+
+{{ define "student_card_mobile" }}
+<div id="student-card-{{ .Student.ID.Hex }}" class="mobile-student-card">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem;">
+    <div>
+      <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-main);">{{ .Student.Name }}</div>
+      <div style="margin-top: 0.2rem;">
+        <code>{{ .Student.StudentCode }}</code>
+      </div>
+    </div>
+    {{ if .Student.IsActive }}
+      <span class="badge badge-success">{{ index .I18n.T "status_active" }}</span>
+    {{ else }}
+      <span class="badge badge-muted">{{ index .I18n.T "status_inactive" }}</span>
+    {{ end }}
+  </div>
+
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.65rem; padding-top: 0.65rem; border-top: 1px solid var(--border); font-size: 0.82rem; color: var(--text-muted);">
+    <div style="display: flex; gap: 0.4rem;">
+      <span class="badge badge-primary">{{ index .I18n.T "level" }} {{ .Student.LevelID }}</span>
+      <span class="badge badge-muted">{{ index .I18n.T "group" }} {{ .Student.GroupID }}</span>
+    </div>
+    <div>
+      <i class="fa-regular fa-clock" style="margin-inline-end: 0.2rem;"></i><time class="local-time" datetime="{{ isoTime .Student.CreatedAt }}">{{ formatTime .Student.CreatedAt "Jan 02 • 03:04 PM" }}</time>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
+    <a href="/admin/students/{{ .Student.ID.Hex }}" class="btn btn-secondary btn-sm" style="flex: 1; justify-content: center; padding: 0.45rem 0.65rem;">
+      <i class="fa-solid fa-id-card" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "view_btn" }}
+    </a>
+    <button type="button"
+            hx-post="/admin/students/toggle-active"
+            hx-vals='{"student_id": "{{ .Student.ID.Hex }}", "is_active": "{{ if .Student.IsActive }}false{{ else }}true{{ end }}", "mode": "card"}'
+            hx-target="#student-card-{{ .Student.ID.Hex }}"
+            hx-swap="outerHTML"
+            class="btn {{ if .Student.IsActive }}btn-outline-danger{{ else }}btn-outline-primary{{ end }} btn-sm"
+            style="flex: 1; justify-content: center; padding: 0.45rem 0.65rem;">
+      {{ if .Student.IsActive }}
+        <i class="fa-solid fa-ban" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "btn_deactivate" }}
+      {{ else }}
+        <i class="fa-solid fa-check" style="margin-inline-end: 0.25rem;"></i> {{ index .I18n.T "btn_activate" }}
+      {{ end }}
+    </button>
+  </div>
+</div>
+{{ end }}

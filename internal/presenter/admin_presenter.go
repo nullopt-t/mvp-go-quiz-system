@@ -701,8 +701,11 @@ func (p *AdminPresenter) HandleToggleStudentActivation(w http.ResponseWriter, r 
 		}
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		if r.FormValue("mode") == "profile" {
+		mode := r.FormValue("mode")
+		if mode == "profile" {
 			_ = p.templates.ExecuteTemplate(w, "profile_status_toggle", data)
+		} else if mode == "card" {
+			_ = p.templates.ExecuteTemplate(w, "student_card_mobile", data)
 		} else {
 			_ = p.templates.ExecuteTemplate(w, "student_row", data)
 		}

@@ -9,16 +9,26 @@
 </head>
 <body>
   <nav class="navbar">
-    <a href="/admin" class="nav-brand">
-      <span>{{ index .I18n.T "admin_portal" }}</span>
-    </a>
-    <div class="nav-user">
-      <a href="/admin/students" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;">{{ index .I18n.T "admin_students_title" }}</a>
-      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 600;">
-        {{ index .I18n.T "lang_switch" }}
+    <div class="nav-brand-user">
+      <a href="/admin" class="nav-brand" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+        <i class="fa-solid fa-graduation-cap" style="color: var(--primary); font-size: 1.25rem;"></i>
+        <span class="navbar-student-name">{{ index .I18n.T "admin_student_profile" }}</span>
       </a>
-      <form action="/admin/logout" method="POST" style="display:inline;">
-        <button type="submit" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;">{{ index .I18n.T "logout" }}</button>
+    </div>
+    <div class="nav-user">
+      <a href="/admin/students" class="btn btn-secondary nav-action-btn" title="{{ index .I18n.T "admin_students_title" }}">
+        <i class="fa-solid fa-users"></i>
+        <span class="nav-btn-text">{{ index .I18n.T "admin_students_title" }}</span>
+      </a>
+      <a href="{{ index .I18n.T "lang_switch_url" }}" class="btn btn-secondary nav-action-btn" title="{{ index .I18n.T "lang_switch" }}">
+        <i class="fa-solid fa-globe"></i>
+        <span style="font-weight: 700;">{{ index .I18n.T "lang_switch" }}</span>
+      </a>
+      <form action="/admin/logout" method="POST" style="display:inline; margin: 0;">
+        <button type="submit" class="btn btn-secondary nav-action-btn nav-logout-btn" title="{{ index .I18n.T "logout" }}">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span class="nav-btn-text">{{ index .I18n.T "logout" }}</span>
+        </button>
       </form>
     </div>
   </nav>
@@ -46,43 +56,85 @@
     </div>
 
     <!-- Student Assessment History -->
-    <div class="card">
-      <h3 style="margin-bottom: 1rem;">{{ index .I18n.T "past_results" }}</h3>
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <div style="padding: 1.25rem 1.25rem 0.5rem;">
+        <h3 style="margin-bottom: 0.25rem; font-size: 1.15rem; font-weight: 700;">{{ index .I18n.T "past_results" }}</h3>
+      </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>{{ index .I18n.T "table_quiz_name" }}</th>
-            <th>{{ index .I18n.T "table_score" }}</th>
-            <th>{{ index .I18n.T "table_correct" }}</th>
-            <th>{{ index .I18n.T "table_percentage" }}</th>
-            <th>{{ index .I18n.T "table_submitted_at" }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {{ range .History }}
-          <tr>
-            <td><strong>{{ if .QuizTitle }}{{ .QuizTitle }}{{ else }}Assessment{{ end }}</strong></td>
-            <td><strong>{{ .Score }}</strong> / {{ .TotalPoints }}</td>
-            <td>{{ .CorrectCount }} / {{ .TotalQuestions }}</td>
-            <td>
+      <div class="admin-table-desktop">
+        <table>
+          <thead>
+            <tr style="background: #f8fafc; border-bottom: 2px solid var(--border);">
+              <th>{{ index .I18n.T "table_quiz_name" }}</th>
+              <th>{{ index .I18n.T "table_score" }}</th>
+              <th>{{ index .I18n.T "table_correct" }}</th>
+              <th>{{ index .I18n.T "table_percentage" }}</th>
+              <th>{{ index .I18n.T "table_submitted_at" }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ range .History }}
+            <tr>
+              <td><strong>{{ if .QuizTitle }}{{ .QuizTitle }}{{ else }}Assessment{{ end }}</strong></td>
+              <td><strong>{{ .Score }}</strong> / {{ .TotalPoints }}</td>
+              <td>{{ .CorrectCount }} / {{ .TotalQuestions }}</td>
+              <td>
+                {{ if gt .TotalPoints 0 }}
+                  <span class="badge badge-success">{{ printf "%.0f" (divFloat .Score .TotalPoints) }}%</span>
+                {{ else }}
+                  0%
+                {{ end }}
+              </td>
+              <td><time class="local-time" datetime="{{ isoTime .SubmittedAt }}">{{ formatTime .SubmittedAt "2006-01-02 03:04 PM" }}</time></td>
+            </tr>
+            {{ else }}
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+                {{ index .I18n.T "admin_no_student_submissions" }}
+              </td>
+            </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mobile History Cards -->
+      <div class="admin-cards-mobile" style="padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
+        {{ range .History }}
+        <div class="mobile-student-card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem;">
+            <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">
+              {{ if .QuizTitle }}{{ .QuizTitle }}{{ else }}Assessment{{ end }}
+            </div>
+            <div>
               {{ if gt .TotalPoints 0 }}
                 <span class="badge badge-success">{{ printf "%.0f" (divFloat .Score .TotalPoints) }}%</span>
               {{ else }}
-                0%
+                <span class="badge badge-muted">0%</span>
               {{ end }}
-            </td>
-            <td><time class="local-time" datetime="{{ isoTime .SubmittedAt }}">{{ formatTime .SubmittedAt "2006-01-02 03:04 PM" }}</time></td>
-          </tr>
-          {{ else }}
-          <tr>
-            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">
-              {{ index .I18n.T "admin_no_student_submissions" }}
-            </td>
-          </tr>
-          {{ end }}
-        </tbody>
-      </table>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 0.6rem 0.75rem; margin-top: 0.6rem; font-size: 0.82rem;">
+            <div>
+              <span style="color: var(--text-muted); display: block; font-size: 0.75rem;">{{ index $.I18n.T "table_score" }}</span>
+              <strong style="color: var(--primary); font-size: 0.9rem;">{{ .Score }}</strong> / {{ .TotalPoints }}
+            </div>
+            <div>
+              <span style="color: var(--text-muted); display: block; font-size: 0.75rem;">{{ index $.I18n.T "table_correct" }}</span>
+              <strong style="color: var(--text-main); font-size: 0.9rem;">{{ .CorrectCount }}</strong> / {{ .TotalQuestions }}
+            </div>
+          </div>
+          <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 0.5rem; font-size: 0.78rem; color: var(--text-muted);">
+            <i class="fa-regular fa-clock" style="margin-inline-end: 0.25rem;"></i>
+            <time class="local-time" datetime="{{ isoTime .SubmittedAt }}">{{ formatTime .SubmittedAt "Jan 02 • 03:04 PM" }}</time>
+          </div>
+        </div>
+        {{ else }}
+        <div style="text-align: center; color: var(--text-muted); padding: 2rem;">
+          {{ index .I18n.T "admin_no_student_submissions" }}
+        </div>
+        {{ end }}
+      </div>
     </div>
   </div>
 
