@@ -68,26 +68,13 @@ func (p *QuizPresenter) RenderQuizRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Determine starting question index:
-	// 1. Check if specific question requested via ?q= index
-	startIndex := -1
-	if qParam := r.URL.Query().Get("q"); qParam != "" {
-		if qIdx, err := strconv.Atoi(qParam); err == nil && qIdx >= 0 && qIdx < len(quizView.Quiz.Questions) {
-			startIndex = qIdx
+	// Start at first unanswered question, or 0
+	startIndex := 0
+	for i, q := range quizView.Quiz.Questions {
+		if _, answered := quizView.PreviousAnswers[q.ID]; !answered {
+			startIndex = i
+			break
 		}
-	}
-	// 2. Fallback to first unanswered question, or 0
-	if startIndex == -1 {
-		startIndex = 0
-		for i, q := range quizView.Quiz.Questions {
-			if _, answered := quizView.PreviousAnswers[q.ID]; !answered {
-				startIndex = i
-				break
-			}
-		}
-		// Redirect to canonical URL with ?q= so refresh always lands on the right question
-		http.Redirect(w, r, fmt.Sprintf("/quizzes/%s/start?q=%d", quizIDHex, startIndex), http.StatusFound)
-		return
 	}
 
 	currentQuestion := quizView.Quiz.Questions[startIndex]

@@ -101,18 +101,6 @@
       htmx.trigger(form, 'submit');
     }
 
-    // Sync browser URL to ?q=N after every HTMX question swap
-    // This ensures page refresh always lands on the exact question being viewed
-    document.addEventListener('htmx:afterSwap', function(evt) {
-      const container = document.getElementById('question-container');
-      if (!container) return;
-      const idx = container.getAttribute('data-current-index');
-      if (idx !== null) {
-        const url = new URL(window.location.href);
-        url.searchParams.set('q', idx);
-        history.replaceState(null, '', url.toString());
-      }
-    });
   </script>
 </body>
 </html>
