@@ -56,7 +56,7 @@
           <div style="font-size: 1.85rem; font-weight: 800; color: var(--text-main); margin-top: 0.15rem; line-height: 1.1;">
             {{ .TotalStudents }}
           </div>
-          <div style="font-size: 0.8rem; color: #2563eb; margin-top: 0.35rem; font-weight: 600;">
+          <div style="font-size: 0.8rem; color: var(--primary); margin-top: 0.35rem; font-weight: 600;">
             <a href="/admin/students" style="color: inherit; text-decoration: none;">
               {{ index .I18n.T "admin_view_roster_btn" }} <i class="fa-solid fa-arrow-right" style="font-size: 0.75rem; margin-inline-start: 0.25rem;"></i>
             </a>
@@ -73,7 +73,7 @@
           <div style="font-size: 1.85rem; font-weight: 800; color: var(--text-main); margin-top: 0.15rem; line-height: 1.1;">
             {{ len .Quizzes }}
           </div>
-          <div style="font-size: 0.8rem; color: #059669; margin-top: 0.35rem; font-weight: 600;">
+          <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.35rem; font-weight: 500;">
             {{ len .Quizzes }} {{ index .I18n.T "admin_managed_quizzes" }}
           </div>
         </div>
@@ -88,7 +88,7 @@
           <div style="font-size: 1.85rem; font-weight: 800; color: var(--text-main); margin-top: 0.15rem; line-height: 1.1;">
             {{ len .GroupSummaries }}
           </div>
-          <div style="font-size: 0.8rem; color: #d97706; margin-top: 0.35rem; font-weight: 600;">
+          <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.35rem; font-weight: 500;">
             5 {{ index .I18n.T "all_levels" }} • A, B, C, D
           </div>
         </div>
@@ -175,17 +175,17 @@
             </tr>
           </thead>
           <tbody>
-            {{ range .LevelCohorts }}
+            {{ range $lvl := .LevelCohorts }}
             <tr>
               <td style="padding-inline-start: 1rem; font-weight: 700; color: var(--text-main); white-space: nowrap;">
-                <a href="/admin/students?level_id={{ .LevelID }}" style="color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 0.45rem;" title="View all students in Level {{ .LevelID }}">
-                  <span class="badge" style="background: var(--bg); border: 1px solid var(--border); font-size: 0.8rem; font-weight: 700;">L{{ .LevelID }}</span>
-                  <span>{{ index $.I18n.T "level" }} {{ .LevelID }}</span>
+                <a href="/admin/students?level_id={{ $lvl.LevelID }}" style="color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 0.45rem;" title="View all students in Level {{ $lvl.LevelID }}">
+                  <span class="badge" style="background: var(--bg); border: 1px solid var(--border); font-size: 0.8rem; font-weight: 700;">L{{ $lvl.LevelID }}</span>
+                  <span>{{ index $.I18n.T "level" }} {{ $lvl.LevelID }}</span>
                 </a>
               </td>
-              {{ range .Groups }}
+              {{ range $lvl.Groups }}
               <td>
-                <a href="/admin/students?level_id={{ $.LevelID }}&group_id={{ .GroupID }}" class="cohort-group-pill" title="Level {{ $.LevelID }} • Group {{ .GroupID }}: {{ .Count }} students">
+                <a href="/admin/students?level_id={{ $lvl.LevelID }}&group_id={{ .GroupID }}" class="cohort-group-pill" title="Level {{ $lvl.LevelID }} • Group {{ .GroupID }}: {{ .Count }} students">
                   <strong>{{ .Count }}</strong>
                   <span>Group {{ .GroupID }}</span>
                 </a>

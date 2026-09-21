@@ -891,9 +891,9 @@ table {
   font-size: 1.3rem;
   flex-shrink: 0;
 }
-.metric-icon-blue  { background: #eff6ff; color: #2563eb; }
-.metric-icon-green { background: #ecfdf5; color: #059669; }
-.metric-icon-amber { background: #fef3c7; color: #d97706; }
+.metric-icon-blue  { background: #eff6ff; color: var(--primary); }
+.metric-icon-green { background: #f1f5f9; color: var(--secondary); }
+.metric-icon-amber { background: #f1f5f9; color: var(--secondary); }
 
 /* Filter Bar Responsive Grid & Drawer */
 .admin-filter-bar {

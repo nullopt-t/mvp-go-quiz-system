@@ -694,6 +694,12 @@ func (p *AdminPresenter) RenderStudentsList(w http.ResponseWriter, r *http.Reque
 	}
 
 	totalStudents, _ := p.studentRepo.Count(r.Context())
+	filteredStudents := totalStudents
+	if levelID > 0 || groupID != "" {
+		if count, err := p.studentRepo.CountByLevelAndGroup(r.Context(), levelID, groupID); err == nil {
+			filteredStudents = count
+		}
+	}
 
 	i18nBundle := GetI18n(r)
 	errMsg, successMsg := GetFlashMessages(w, r)
@@ -718,6 +724,7 @@ func (p *AdminPresenter) RenderStudentsList(w http.ResponseWriter, r *http.Reque
 	data := map[string]interface{}{
 		"Students":          students,
 		"TotalStudents":     totalStudents,
+		"FilteredStudents":  filteredStudents,
 		"SelectedLevel":     levelID,
 		"SelectedGroup":     groupID,
 		"SortBy":            sortBy,

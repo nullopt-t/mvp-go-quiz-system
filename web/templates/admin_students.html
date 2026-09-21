@@ -38,7 +38,12 @@
       <div>
         <h2 style="font-size: 1.5rem; margin-bottom: 0.25rem;">{{ index .I18n.T "admin_students_title" }}</h2>
         <p style="color: var(--text-muted); font-size: 0.9rem;">
-          {{ index .I18n.T "admin_students_sub" }} ({{ .TotalStudents }} {{ index .I18n.T "admin_enrolled" }})
+          {{ index .I18n.T "admin_students_sub" }} &bull;
+          {{ if or (gt .SelectedLevel 0) (ne .SelectedGroup "") }}
+            <strong>{{ .FilteredStudents }}</strong> {{ index .I18n.T "admin_enrolled" }} ({{ index .I18n.T "of" }} {{ .TotalStudents }})
+          {{ else }}
+            <strong>{{ .TotalStudents }}</strong> {{ index .I18n.T "admin_enrolled" }}
+          {{ end }}
         </p>
       </div>
 
@@ -205,11 +210,15 @@
       </div>
 
       {{ if or .HasPrev .HasNext }}
-      <!-- Keyset Cursor Pagination Footer -->
+      <!-- Keyset Pagination Footer -->
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding: 1rem 1.5rem; border-top: 1px solid var(--border); background: #fafafa;">
-        <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem;">
-          <i class="fa-solid fa-bolt" style="color: var(--primary); font-size: 0.8rem;"></i>
-          <span>Keyset Cursor Seeks (O(1) Constant Time)</span>
+        <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
+          <i class="fa-solid fa-users" style="color: var(--secondary); margin-inline-end: 0.35rem;"></i>
+          {{ if or (gt .SelectedLevel 0) (ne .SelectedGroup "") }}
+            <span><strong>{{ .FilteredStudents }}</strong> {{ index .I18n.T "admin_enrolled" }} ({{ index .I18n.T "of" }} {{ .TotalStudents }})</span>
+          {{ else }}
+            <span><strong>{{ .TotalStudents }}</strong> {{ index .I18n.T "admin_enrolled" }}</span>
+          {{ end }}
         </div>
 
         <div style="display: flex; gap: 0.5rem; align-items: center;">
