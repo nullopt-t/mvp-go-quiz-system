@@ -43,14 +43,20 @@
       </div>
 
       <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-        <button type="button" id="toggleFilterBtn" class="btn btn-secondary" onclick="toggleStudentFilter()" style="padding: 0.55rem 1rem; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.45rem;">
-          <i class="fa-solid fa-filter"></i>
-          <span>{{ index .I18n.T "filter_btn" }}</span>
+        <button type="button" id="openFilterDialogBtn" class="btn btn-secondary" onclick="openFilterDialog()" style="padding: 0.55rem 1rem; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.45rem;">
+          <i class="fa-solid fa-sliders"></i>
+          <span>{{ index .I18n.T "filter_and_sort" }}</span>
           {{ if .HasActiveFilters }}
           <span class="filter-badge-pill">{{ .ActiveFilterCount }}</span>
           {{ end }}
-          <i class="fa-solid fa-chevron-down" id="filterChevron" style="font-size: 0.75rem; transition: transform 0.2s ease;"></i>
         </button>
+
+        {{ if .HasActiveFilters }}
+        <a href="/admin/students" class="btn btn-secondary" title="{{ index .I18n.T "admin_clear_filter" }}" style="padding: 0.55rem 0.85rem; font-size: 0.9rem; color: #dc2626; display: inline-flex; align-items: center; gap: 0.35rem;">
+          <i class="fa-solid fa-rotate-left"></i>
+          <span class="nav-btn-text">{{ index .I18n.T "admin_clear_filter" }}</span>
+        </a>
+        {{ end }}
 
         <a href="/admin/students/create" class="btn btn-primary" style="padding: 0.55rem 1.15rem; font-size: 0.9rem;">
           <i class="fa-solid fa-user-plus" style="margin-inline-end: 0.35rem;"></i> {{ index .I18n.T "admin_add_student" }}
@@ -70,86 +76,93 @@
     </div>
     {{ end }}
 
-    <!-- Collapsible Filter Drawer -->
-    <div id="studentFilterPanel" class="filter-collapse-card {{ if .HasActiveFilters }}is-open{{ end }}">
-      <div class="filter-collapse-header" onclick="toggleStudentFilter()">
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
+    <!-- Filter & Ordering Modal Dialog -->
+    <dialog id="filterDialog" class="modal-dialog" closedby="any" aria-labelledby="filterDialogTitle">
+      <div class="modal-header">
+        <h3 id="filterDialogTitle">
           <i class="fa-solid fa-sliders" style="color: var(--primary);"></i>
-          <span>{{ index .I18n.T "admin_filter_cohort" }}</span>
-          {{ if .HasActiveFilters }}
-          <span class="filter-badge-pill">{{ .ActiveFilterCount }} active</span>
-          {{ end }}
-        </div>
-        <div style="font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem;">
-          <span id="filterHeaderHint">{{ if .HasActiveFilters }}Hide filters{{ else }}Show filters{{ end }}</span>
-        </div>
+          <span>{{ index .I18n.T "filter_and_sort" }}</span>
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="closeFilterDialog()" aria-label="{{ index .I18n.T "close_dialog" }}">&times;</button>
       </div>
 
-      <div class="filter-collapse-body">
-        <form action="/admin/students" method="GET" class="admin-filter-bar">
-          <div class="filter-item">
-            <label style="font-size: 0.85rem;">{{ index .I18n.T "level" }}</label>
-            <select name="level_id" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
-              <option value="0">{{ index .I18n.T "all_levels" }}</option>
-              <option value="1" {{ if eq .SelectedLevel 1 }}selected{{ end }}>{{ index .I18n.T "level" }} 1</option>
-              <option value="2" {{ if eq .SelectedLevel 2 }}selected{{ end }}>{{ index .I18n.T "level" }} 2</option>
-              <option value="3" {{ if eq .SelectedLevel 3 }}selected{{ end }}>{{ index .I18n.T "level" }} 3</option>
-              <option value="4" {{ if eq .SelectedLevel 4 }}selected{{ end }}>{{ index .I18n.T "level" }} 4</option>
-              <option value="5" {{ if eq .SelectedLevel 5 }}selected{{ end }}>{{ index .I18n.T "level" }} 5</option>
-            </select>
+      <form action="/admin/students" method="GET">
+        <div class="modal-body">
+          <div class="form-row-2col">
+            <div class="form-group">
+              <label for="modal_level_id">{{ index .I18n.T "level" }}</label>
+              <select id="modal_level_id" name="level_id">
+                <option value="0">{{ index .I18n.T "all_levels" }}</option>
+                <option value="1" {{ if eq .SelectedLevel 1 }}selected{{ end }}>{{ index .I18n.T "level" }} 1</option>
+                <option value="2" {{ if eq .SelectedLevel 2 }}selected{{ end }}>{{ index .I18n.T "level" }} 2</option>
+                <option value="3" {{ if eq .SelectedLevel 3 }}selected{{ end }}>{{ index .I18n.T "level" }} 3</option>
+                <option value="4" {{ if eq .SelectedLevel 4 }}selected{{ end }}>{{ index .I18n.T "level" }} 4</option>
+                <option value="5" {{ if eq .SelectedLevel 5 }}selected{{ end }}>{{ index .I18n.T "level" }} 5</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="modal_group_id">{{ index .I18n.T "group" }}</label>
+              <select id="modal_group_id" name="group_id">
+                <option value="">{{ index .I18n.T "all_groups" }}</option>
+                <option value="A" {{ if eq .SelectedGroup "A" }}selected{{ end }}>{{ index .I18n.T "group" }} A</option>
+                <option value="B" {{ if eq .SelectedGroup "B" }}selected{{ end }}>{{ index .I18n.T "group" }} B</option>
+                <option value="C" {{ if eq .SelectedGroup "C" }}selected{{ end }}>{{ index .I18n.T "group" }} C</option>
+                <option value="D" {{ if eq .SelectedGroup "D" }}selected{{ end }}>{{ index .I18n.T "group" }} D</option>
+              </select>
+            </div>
           </div>
 
-          <div class="filter-item">
-            <label style="font-size: 0.85rem;">{{ index .I18n.T "group" }}</label>
-            <select name="group_id" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
-              <option value="">{{ index .I18n.T "all_groups" }}</option>
-              <option value="A" {{ if eq .SelectedGroup "A" }}selected{{ end }}>{{ index .I18n.T "group" }} A</option>
-              <option value="B" {{ if eq .SelectedGroup "B" }}selected{{ end }}>{{ index .I18n.T "group" }} B</option>
-              <option value="C" {{ if eq .SelectedGroup "C" }}selected{{ end }}>{{ index .I18n.T "group" }} C</option>
-              <option value="D" {{ if eq .SelectedGroup "D" }}selected{{ end }}>{{ index .I18n.T "group" }} D</option>
-            </select>
+          <div class="form-row-2col">
+            <div class="form-group">
+              <label for="modal_sort_by">{{ index .I18n.T "sort_by_label" }}</label>
+              <select id="modal_sort_by" name="sort_by">
+                <option value="student_code" {{ if eq .SortBy "student_code" }}selected{{ end }}>{{ index .I18n.T "sort_id" }}</option>
+                <option value="name" {{ if eq .SortBy "name" }}selected{{ end }}>{{ index .I18n.T "sort_name" }}</option>
+                <option value="created_at" {{ if eq .SortBy "created_at" }}selected{{ end }}>{{ index .I18n.T "sort_time" }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="modal_order">{{ index .I18n.T "table_status" }}</label>
+              <select id="modal_order" name="order">
+                <option value="asc" {{ if eq .SortOrder "asc" }}selected{{ end }}>{{ index .I18n.T "sort_asc" }}</option>
+                <option value="desc" {{ if eq .SortOrder "desc" }}selected{{ end }}>{{ index .I18n.T "sort_desc" }}</option>
+              </select>
+            </div>
           </div>
 
-          <div class="filter-item">
-            <label style="font-size: 0.85rem;">{{ index .I18n.T "sort_by_label" }}</label>
-            <select name="sort_by" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
-              <option value="student_code" {{ if eq .SortBy "student_code" }}selected{{ end }}>{{ index .I18n.T "sort_id" }}</option>
-              <option value="created_at" {{ if eq .SortBy "created_at" }}selected{{ end }}>{{ index .I18n.T "sort_time" }}</option>
-              <option value="name" {{ if eq .SortBy "name" }}selected{{ end }}>{{ index .I18n.T "sort_name" }}</option>
-            </select>
-          </div>
-
-          <div class="filter-item">
-            <label style="font-size: 0.85rem;">{{ index .I18n.T "table_status" }}</label>
-            <select name="order" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
-              <option value="asc" {{ if eq .SortOrder "asc" }}selected{{ end }}>{{ index .I18n.T "sort_asc" }}</option>
-              <option value="desc" {{ if eq .SortOrder "desc" }}selected{{ end }}>{{ index .I18n.T "sort_desc" }}</option>
-            </select>
-          </div>
-
-          <div class="filter-item">
-            <label style="font-size: 0.85rem;">Per Page</label>
-            <select name="page_size" style="width: 100%; padding: 0.55rem 0.75rem; font-size: 0.9rem;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="modal_page_size">Per Page</label>
+            <select id="modal_page_size" name="page_size">
               <option value="15" {{ if eq .PageSize 15 }}selected{{ end }}>15</option>
               <option value="25" {{ if eq .PageSize 25 }}selected{{ end }}>25</option>
               <option value="50" {{ if eq .PageSize 50 }}selected{{ end }}>50</option>
               <option value="100" {{ if eq .PageSize 100 }}selected{{ end }}>100</option>
             </select>
           </div>
+        </div>
 
-          <div class="filter-actions">
-            <button type="submit" class="btn btn-secondary" style="flex: 1; padding: 0.55rem 1rem; font-size: 0.9rem;">
-              <i class="fa-solid fa-check"></i> {{ index .I18n.T "filter_btn" }}
+        <div class="modal-footer">
+          {{ if .HasActiveFilters }}
+          <a href="/admin/students" class="btn btn-secondary btn-sm" style="color: var(--danger);">
+            <i class="fa-solid fa-rotate-left"></i> {{ index .I18n.T "admin_clear_filter" }}
+          </a>
+          {{ else }}
+          <div></div>
+          {{ end }}
+
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="closeFilterDialog()">
+              {{ index .I18n.T "close_dialog" }}
             </button>
-            {{ if .HasActiveFilters }}
-            <a href="/admin/students" class="btn btn-secondary" title="{{ index .I18n.T "admin_clear_filter" }}" style="padding: 0.55rem 0.75rem; font-size: 0.9rem; color: #dc2626;">
-              <i class="fa-solid fa-rotate-left"></i>
-            </a>
-            {{ end }}
+            <button type="submit" class="btn btn-primary btn-sm">
+              <i class="fa-solid fa-check"></i> {{ index .I18n.T "apply_filters" }}
+            </button>
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+      </form>
+    </dialog>
 
     <!-- Students Table & Mobile Card List -->
     <div class="card" style="padding: 0; overflow: hidden;">
@@ -157,26 +170,11 @@
         <table class="roster-table">
           <thead>
             <tr>
-              <th>
-                <a href="/admin/students?level_id={{ .SelectedLevel }}&group_id={{ .SelectedGroup }}&sort_by=student_code&order={{ if and (eq .SortBy "student_code") (ne .SortOrder "desc") }}desc{{ else }}asc{{ end }}" style="text-decoration: none; color: inherit; display: inline-flex; align-items: center; gap: 0.35rem;">
-                  {{ index .I18n.T "student_id_label" }}
-                  <i class="fa-solid fa-sort" style="font-size: 0.75rem; color: var(--text-muted);"></i>
-                </a>
-              </th>
-              <th>
-                <a href="/admin/students?level_id={{ .SelectedLevel }}&group_id={{ .SelectedGroup }}&sort_by=name&order={{ if and (eq .SortBy "name") (ne .SortOrder "desc") }}desc{{ else }}asc{{ end }}" style="text-decoration: none; color: inherit; display: inline-flex; align-items: center; gap: 0.35rem;">
-                  {{ index .I18n.T "student_label" }}
-                  <i class="fa-solid fa-sort" style="font-size: 0.75rem; color: var(--text-muted);"></i>
-                </a>
-              </th>
+              <th>{{ index .I18n.T "student_id_label" }}</th>
+              <th>{{ index .I18n.T "student_label" }}</th>
               <th>{{ index .I18n.T "level" }}</th>
               <th>{{ index .I18n.T "group" }}</th>
-              <th>
-                <a href="/admin/students?level_id={{ .SelectedLevel }}&group_id={{ .SelectedGroup }}&sort_by=created_at&order={{ if and (eq .SortBy "created_at") (ne .SortOrder "desc") }}desc{{ else }}asc{{ end }}" style="text-decoration: none; color: inherit; display: inline-flex; align-items: center; gap: 0.35rem;">
-                  {{ index .I18n.T "admin_registered_at" }}
-                  <i class="fa-solid fa-sort" style="font-size: 0.75rem; color: var(--text-muted);"></i>
-                </a>
-              </th>
+              <th>{{ index .I18n.T "admin_registered_at" }}</th>
               <th>{{ index .I18n.T "table_status" }}</th>
               <th style="text-align: center;">{{ index .I18n.T "table_action" }}</th>
             </tr>
@@ -245,19 +243,35 @@
   </div>
 
   <script>
-    function toggleStudentFilter() {
-      const panel = document.getElementById('studentFilterPanel');
-      const chevron = document.getElementById('filterChevron');
-      const hint = document.getElementById('filterHeaderHint');
-      if (!panel) return;
+    const filterDialog = document.getElementById('filterDialog');
 
-      const isOpen = panel.classList.toggle('is-open');
-      if (chevron) {
-        chevron.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+    function openFilterDialog() {
+      if (filterDialog) {
+        filterDialog.showModal();
       }
-      if (hint) {
-        hint.textContent = isOpen ? 'Hide filters' : 'Show filters';
+    }
+
+    function closeFilterDialog() {
+      if (filterDialog) {
+        filterDialog.close();
       }
+    }
+
+    // Modern Light-Dismiss Fallback (clicks on the backdrop outside dialog content)
+    if (filterDialog && !('closedBy' in HTMLDialogElement.prototype)) {
+      filterDialog.addEventListener('click', (event) => {
+        if (event.target !== filterDialog) return;
+        const rect = filterDialog.getBoundingClientRect();
+        const isDialogContent = (
+          rect.top <= event.clientY &&
+          event.clientY <= rect.top + rect.height &&
+          rect.left <= event.clientX &&
+          event.clientX <= rect.left + rect.width
+        );
+        if (!isDialogContent) {
+          filterDialog.close();
+        }
+      });
     }
   </script>
 </body>
