@@ -85,13 +85,13 @@ func (p *QuizPresenter) RenderQuizRoom(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 		}
+		// Redirect to canonical URL with ?q= so refresh always lands on the right question
+		http.Redirect(w, r, fmt.Sprintf("/quizzes/%s/start?q=%d", quizIDHex, startIndex), http.StatusFound)
+		return
 	}
 
 	currentQuestion := quizView.Quiz.Questions[startIndex]
-	var selectedOptionID int
-	if ans, ok := quizView.PreviousAnswers[currentQuestion.ID]; ok && ans > 0 {
-		selectedOptionID = ans
-	}
+	var selectedOptionID int // Never pre-select answers; always keep radio options clear on fresh load or refresh
 
 	i18nBundle := GetI18n(r)
 
@@ -143,6 +143,14 @@ func (p *QuizPresenter) HandleNextAnswer(w http.ResponseWriter, r *http.Request)
 	currentIndex, _ := strconv.Atoi(r.FormValue("current_index"))
 	isFinalSubmit := r.FormValue("is_submit") == "true"
 
+	targetIndexParam := r.FormValue("target_index")
+
+	// Must select an answer before clicking Next (advancing question)
+	if answerID <= 0 && targetIndexParam == "" && !isFinalSubmit {
+		http.Error(w, "Please select an answer before proceeding", http.StatusBadRequest)
+		return
+	}
+
 	// 1. Append Answer if selected (No SQL update, pure append-only insert)
 	if answerID > 0 && questionID > 0 {
 		if recErr := p.answerService.RecordAnswer(r.Context(), quizObjID, stuObjID, claims.StudentCode, questionID, answerID); recErr != nil {
@@ -176,6 +184,26 @@ func (p *QuizPresenter) HandleNextAnswer(w http.ResponseWriter, r *http.Request)
 		nextIndex = 0
 	}
 
+	// Retrieve updated answers state (needed for back-navigation guard below)
+	latestAnswers, _ := p.answerService.GetStudentAnswerState(r.Context(), quizObjID, stuObjID)
+
+	// Enforce no-backtrack: if target is within bounds and already answered, advance to next unanswered question
+	if nextIndex < len(quiz.Questions) {
+		if q := quiz.Questions[nextIndex]; latestAnswers[q.ID] > 0 {
+			nextIndex = currentIndex + 1 // default forward
+			for i, q := range quiz.Questions {
+				if latestAnswers[q.ID] == 0 {
+					nextIndex = i
+					break
+				}
+			}
+			// All answered → finalize
+			if nextIndex >= len(quiz.Questions) {
+				nextIndex = len(quiz.Questions) // triggers submit path below
+			}
+		}
+	}
+
 	// If last question was submitted or finalize requested
 	if isFinalSubmit || nextIndex >= len(quiz.Questions) {
 		// Calculate final results
@@ -195,18 +223,11 @@ func (p *QuizPresenter) HandleNextAnswer(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	// Retrieve updated answers state
-	latestAnswers, _ := p.answerService.GetStudentAnswerState(r.Context(), quizObjID, stuObjID)
+	// Retrieve updated answers state for rendering the next question
 	nextQuestion := quiz.Questions[nextIndex]
-	var selectedOptionID int
-	if ans, ok := latestAnswers[nextQuestion.ID]; ok && ans > 0 {
-		selectedOptionID = ans
-	}
+	var selectedOptionID int // Never pre-select answers; always keep radio options clear when advancing to next question
 
 	i18nBundle := GetI18n(r)
-
-	// Keep browser URL synchronized with current question index (?q=X)
-	w.Header().Set("HX-Replace-Url", fmt.Sprintf("/quizzes/%s/start?q=%d", quizIDHex, nextIndex))
 
 	data := map[string]interface{}{
 		"Student":          claims,

@@ -1,9 +1,10 @@
-<div id="question-container">
+<div id="question-container" data-current-index="{{ .CurrentIndex }}">
   <!-- Question Form -->
   <form id="quiz-form"
         hx-post="/quizzes/{{ .Quiz.ID.Hex }}/answers"
         hx-target="#question-container"
-        hx-swap="outerHTML">
+        hx-swap="outerHTML"
+        autocomplete="off">
     
     <input type="hidden" name="quiz_id" value="{{ .Quiz.ID.Hex }}">
     <input type="hidden" name="question_id" value="{{ .CurrentQuestion.ID }}">
@@ -11,10 +12,10 @@
     <input type="hidden" name="target_index" id="target_index_field" value="">
     <input type="hidden" name="is_submit" id="is_submit_field" value="false">
 
-    <div class="card" style="margin-bottom: 1.5rem;">
+    <div class="card question-card-animate" style="margin-bottom: 1.5rem;">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem;">
-        <span class="badge badge-primary">
-          {{ index .I18n.T "question_of" }} {{ .CurrentNumber }}
+        <span class="badge badge-primary" style="font-size: 0.85rem; padding: 0.35rem 0.75rem;">
+          {{ index .I18n.T "question_of" }} {{ .CurrentNumber }} / {{ .TotalQuestions }}
         </span>
         <span style="font-size: 0.85rem; font-weight: 600; color: var(--secondary);">
           {{ .CurrentQuestion.Points }} {{ index .I18n.T "pts" }}
@@ -38,11 +39,11 @@
       <!-- Action Button Centered at Card Width -->
       <div style="display: flex; justify-content: center; align-items: center; margin-top: 1.75rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
         {{ if .IsLastQuestion }}
-          <button type="button" class="btn btn-primary" onclick="submitFinalQuestion()" style="font-size: 0.95rem; padding: 0.75rem 3rem; min-width: 200px;">
+          <button type="button" id="next-btn" class="btn btn-primary" onclick="submitFinalQuestion()" disabled style="font-size: 0.95rem; padding: 0.75rem 3rem; min-width: 200px; opacity: 0.5; cursor: not-allowed;">
             {{ index .I18n.T "btn_submit_final" }}
           </button>
         {{ else }}
-          <button type="submit" class="btn btn-primary" style="font-size: 0.95rem; padding: 0.75rem 3rem; min-width: 200px;">
+          <button type="submit" id="next-btn" class="btn btn-primary" disabled style="font-size: 0.95rem; padding: 0.75rem 3rem; min-width: 200px; opacity: 0.5; cursor: not-allowed;">
             {{ index .I18n.T "btn_next" }}
           </button>
         {{ end }}
@@ -81,12 +82,11 @@
             {{ add $idx 1 }}
           </button>
         {{ else if $isAnswered }}
-          <!-- Answered Question -->
+          <!-- Answered Question — locked, cannot go back -->
           <button type="button"
-                  class="btn btn-secondary"
-                  onclick="navigateToQuestion({{ $idx }})"
+                  disabled
                   title="{{ index $.I18n.T "question_of" }} {{ add $idx 1 }}"
-                  style="min-width: 2.5rem; height: 2.5rem; padding: 0; font-size: 0.9rem; font-weight: 600; border-color: #86efac; background: #f0fdf4; color: #166534;">
+                  style="min-width: 2.5rem; height: 2.5rem; padding: 0; font-size: 0.9rem; font-weight: 600; border-color: #86efac; background: #f0fdf4; color: #166534; cursor: not-allowed; opacity: 0.75;">
             {{ add $idx 1 }}
             <i class="fa-solid fa-check" style="font-size: 0.65rem; margin-inline-start: 0.15rem;"></i>
           </button>

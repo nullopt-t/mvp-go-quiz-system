@@ -578,5 +578,24 @@ th {
   }
 }
 
+/* Question Navigation Transition Animations */
+@keyframes questionSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
+.question-card-animate {
+  animation: questionSlideIn 0.22s ease-out forwards;
+}
 
+#quiz-form.htmx-request {
+  opacity: 0.6;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}

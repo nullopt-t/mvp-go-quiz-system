@@ -55,9 +55,14 @@
         return;
       }
 
-      const mins = Math.floor(remainingSeconds / 60);
+      const hrs = Math.floor(remainingSeconds / 3600);
+      const mins = Math.floor((remainingSeconds % 3600) / 60);
       const secs = remainingSeconds % 60;
-      countdownEl.innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      if (hrs > 0) {
+        countdownEl.innerText = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      } else {
+        countdownEl.innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      }
       remainingSeconds--;
     }
 
@@ -67,11 +72,21 @@
     function highlightOption(element) {
       document.querySelectorAll('.option-item').forEach(el => el.classList.remove('selected'));
       element.classList.add('selected');
+
+      const nextBtn = document.getElementById('next-btn');
+      if (nextBtn) {
+        nextBtn.disabled = false;
+        nextBtn.style.opacity = '1';
+        nextBtn.style.cursor = 'pointer';
+      }
     }
 
     function submitFinalQuestion() {
       const form = document.getElementById('quiz-form');
-      // F-10: Allow blank submission on last question (consistent with all other questions)
+      const radioChecked = form.querySelector('input[name="answer_id"]:checked');
+      if (!radioChecked) {
+        return;
+      }
       document.getElementById('is_submit_field').value = "true";
       htmx.trigger(form, 'submit');
     }
@@ -86,6 +101,19 @@
       // If a choice is selected, submitting form auto-saves it before jumping
       htmx.trigger(form, 'submit');
     }
+
+    // Sync browser URL to ?q=N after every HTMX question swap
+    // This ensures page refresh always lands on the exact question being viewed
+    document.addEventListener('htmx:afterSwap', function(evt) {
+      const container = document.getElementById('question-container');
+      if (!container) return;
+      const idx = container.getAttribute('data-current-index');
+      if (idx !== null) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('q', idx);
+        history.replaceState(null, '', url.toString());
+      }
+    });
   </script>
 </body>
 </html>
