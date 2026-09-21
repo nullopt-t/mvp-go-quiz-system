@@ -1,14 +1,23 @@
 package presenter
 
 import (
+	"io/fs"
 	"net/http"
 	"strings"
+
+	"quiz-system/web"
 )
 
 // RegisterAuthRoutes configures public authentication, language switcher, and static asset routes
 func RegisterAuthRoutes(mux *http.ServeMux, authPres *AuthPresenter, authLimiter *IPRateLimiter) {
-	// Static Assets
-	fileServer := http.FileServer(http.Dir("./web/static"))
+	// Static Assets served from embedded filesystem
+	staticSubFS, err := fs.Sub(web.StaticFS, "static")
+	var fileServer http.Handler
+	if err == nil {
+		fileServer = http.FileServer(http.FS(staticSubFS))
+	} else {
+		fileServer = http.FileServer(http.Dir("./web/static"))
+	}
 	mux.Handle("GET /static/", http.StripPrefix("/static/", fileServer))
 
 	// Root redirect

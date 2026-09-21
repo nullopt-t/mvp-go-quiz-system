@@ -15,6 +15,7 @@ import (
 	"quiz-system/internal/presenter"
 	"quiz-system/internal/repository"
 	"quiz-system/internal/service"
+	"quiz-system/web"
 )
 
 func main() {
@@ -95,7 +96,7 @@ func main() {
 		},
 	}
 
-	tmpl, err := template.New("").Funcs(funcMap).ParseGlob("web/templates/*.html")
+	tmpl, err := template.New("").Funcs(funcMap).ParseFS(web.TemplatesFS, "templates/*.html")
 	if err != nil {
 		log.Fatalf("Failed to parse templates: %v", err)
 	}
