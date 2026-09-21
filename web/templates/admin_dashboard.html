@@ -265,10 +265,15 @@
                   <span class="badge badge-muted">{{ index $.I18n.T "status_expired" }}</span>
                 {{ end }}
               </td>
-              <td style="padding: 0.85rem 1rem; text-align: center;">
-                <a href="/admin/quizzes/{{ .ID.Hex }}/analytics" class="btn btn-secondary" style="padding: 0.4rem 0.85rem; font-size: 0.85rem; font-weight: 600;">
-                  <i class="fa-solid fa-chart-simple" style="margin-inline-end: 0.25rem;"></i> {{ index $.I18n.T "analytics_btn" }}
-                </a>
+              <td style="padding: 0.85rem 1rem; text-align: center; white-space: nowrap;">
+                <div style="display: inline-flex; gap: 0.4rem; align-items: center;">
+                  <a href="/admin/quizzes/{{ .ID.Hex }}/analytics" class="btn btn-secondary" style="padding: 0.4rem 0.85rem; font-size: 0.85rem; font-weight: 600;">
+                    <i class="fa-solid fa-chart-simple" style="margin-inline-end: 0.25rem;"></i> {{ index $.I18n.T "analytics_btn" }}
+                  </a>
+                  <a href="/admin/quizzes/{{ .ID.Hex }}/export" class="btn btn-secondary" style="padding: 0.4rem 0.65rem; font-size: 0.85rem;" title="{{ if $.I18n }}{{ index $.I18n.T "analytics_export_csv" }}{{ else }}Export CSV{{ end }}">
+                    <i class="fa-solid fa-file-csv" style="color: var(--primary);"></i>
+                  </a>
+                </div>
               </td>
             </tr>
             {{ else }}
@@ -312,9 +317,14 @@
               <span>• {{ .DurationMinutes }} {{ index $.I18n.T "minutes" }}</span>
               <span>• {{ len .Questions }} Qs</span>
             </div>
-            <a href="/admin/quizzes/{{ .ID.Hex }}/analytics" class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.65rem; font-size: 0.8rem; font-weight: 600;">
-              <i class="fa-solid fa-chart-simple"></i> {{ index $.I18n.T "analytics_btn" }}
-            </a>
+            <div style="display: inline-flex; gap: 0.35rem; align-items: center;">
+              <a href="/admin/quizzes/{{ .ID.Hex }}/analytics" class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.65rem; font-size: 0.8rem; font-weight: 600;">
+                <i class="fa-solid fa-chart-simple"></i> {{ index $.I18n.T "analytics_btn" }}
+              </a>
+              <a href="/admin/quizzes/{{ .ID.Hex }}/export" class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.55rem; font-size: 0.8rem;" title="{{ if $.I18n }}{{ index $.I18n.T "analytics_export_csv" }}{{ else }}Export CSV{{ end }}">
+                <i class="fa-solid fa-file-csv" style="color: var(--primary);"></i>
+              </a>
+            </div>
           </div>
         </div>
         {{ else }}

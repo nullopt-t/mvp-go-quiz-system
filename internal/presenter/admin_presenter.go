@@ -1,6 +1,8 @@
 package presenter
 
 import (
+	"bytes"
+	"encoding/csv"
 	"fmt"
 	"html/template"
 	"io"
@@ -538,6 +540,77 @@ func (p *AdminPresenter) RenderQuizAnalytics(w http.ResponseWriter, r *http.Requ
 	}
 
 	_ = p.templates.ExecuteTemplate(w, "admin_analytics.html", data)
+}
+
+func (p *AdminPresenter) HandleExportQuizResultsCSV(w http.ResponseWriter, r *http.Request) {
+	quizIDHex := strings.TrimPrefix(r.URL.Path, "/admin/quizzes/")
+	quizIDHex = strings.TrimSuffix(quizIDHex, "/export")
+
+	quizObjID, err := primitive.ObjectIDFromHex(quizIDHex)
+	if err != nil {
+		http.Error(w, "Invalid Quiz ID", http.StatusBadRequest)
+		return
+	}
+
+	quiz, err := p.quizService.GetQuizByID(r.Context(), quizObjID)
+	if err != nil || quiz == nil {
+		http.Error(w, "Quiz not found", http.StatusNotFound)
+		return
+	}
+
+	results, err := p.resultService.GetQuizLeaderboard(r.Context(), quizObjID)
+	if err != nil {
+		http.Error(w, "Failed to retrieve quiz submissions", http.StatusInternalServerError)
+		return
+	}
+
+	var buf bytes.Buffer
+	// UTF-8 BOM so Excel opens Arabic and international characters correctly
+	buf.WriteString("\xEF\xBB\xBF")
+
+	writer := csv.NewWriter(&buf)
+	header := []string{
+		"Rank",
+		"Student Code",
+		"Student Name",
+		"Level",
+		"Group",
+		"Score",
+		"Total Points",
+		"Percentage",
+		"Correct Count",
+		"Total Questions",
+		"Submitted At (UTC)",
+	}
+	_ = writer.Write(header)
+
+	for i, res := range results {
+		pct := 0.0
+		if res.TotalPoints > 0 {
+			pct = (float64(res.Score) / float64(res.TotalPoints)) * 100.0
+		}
+		row := []string{
+			strconv.Itoa(i + 1),
+			res.StudentCode,
+			res.StudentName,
+			strconv.Itoa(res.LevelID),
+			res.GroupID,
+			strconv.Itoa(res.Score),
+			strconv.Itoa(res.TotalPoints),
+			fmt.Sprintf("%.1f%%", pct),
+			strconv.Itoa(res.CorrectCount),
+			strconv.Itoa(res.TotalQuestions),
+			res.SubmittedAt.UTC().Format("2006-01-02 15:04:05"),
+		}
+		_ = writer.Write(row)
+	}
+	writer.Flush()
+
+	filename := fmt.Sprintf("quiz_results_%s.csv", quizObjID.Hex())
+	w.Header().Set("Content-Type", "text/csv; charset=utf-8")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename))
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write(buf.Bytes())
 }
 
 func (p *AdminPresenter) RenderStudentsList(w http.ResponseWriter, r *http.Request) {

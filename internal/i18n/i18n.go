@@ -192,6 +192,7 @@ var translations = map[Language]map[string]string{
 		"analytics_rank":           "Rank",
 		"analytics_correct_total":  "Correct / Total",
 		"analytics_submitted_at":   "Completion Time",
+		"analytics_export_csv":     "Export CSV",
 		"analytics_no_submissions": "No submissions recorded yet for this quiz.",
 
 		// Admin dashboard
@@ -397,6 +398,7 @@ var translations = map[Language]map[string]string{
 		"analytics_rank":           "الترتيب",
 		"analytics_correct_total":  "الصحيح / الإجمالي",
 		"analytics_submitted_at":   "وقت التسليم",
+		"analytics_export_csv":     "تصدير النتائج (CSV)",
 		"analytics_no_submissions": "لا توجد تسليمات مسجلة لهذا الاختبار بعد.",
 
 		// Admin dashboard

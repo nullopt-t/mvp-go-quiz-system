@@ -47,10 +47,14 @@ func RegisterAdminRoutes(
 	mux.Handle("GET /admin/quizzes/create", adminAuth(http.HandlerFunc(adminPres.RenderCreateQuiz)))
 	mux.Handle("POST /admin/quizzes/create", adminAuth(http.HandlerFunc(adminPres.HandleCreateQuiz)))
 
-	// Analytics & Leaderboards
+	// Analytics & Leaderboards & Results Export
 	mux.Handle("GET /admin/quizzes/", adminAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasSuffix(r.URL.Path, "/analytics") {
 			adminPres.RenderQuizAnalytics(w, r)
+			return
+		}
+		if strings.HasSuffix(r.URL.Path, "/export") {
+			adminPres.HandleExportQuizResultsCSV(w, r)
 			return
 		}
 		http.NotFound(w, r)
