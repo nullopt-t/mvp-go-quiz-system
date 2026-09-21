@@ -56,22 +56,26 @@
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
             <h3 style="font-size: 1.15rem;">{{ .Quiz.Title }}</h3>
             {{ if eq .Status "COMPLETED" }}
-              <span class="badge badge-success">{{ index $.I18n.T "status_completed" }}</span>
+              <span class="status-indicator status-dot-completed"></span>
             {{ else if eq .Status "LIVE" }}
-              <span class="badge badge-primary">{{ index $.I18n.T "status_live" }}</span>
+              <span class="status-indicator status-dot-live"></span>
             {{ else if eq .Status "UPCOMING" }}
-              <span class="badge badge-warning">{{ index $.I18n.T "status_upcoming" }}</span>
+              <span class="status-indicator status-dot-upcoming"></span>
             {{ else if eq .Status "EXPIRED" }}
-              <span class="badge badge-muted">{{ index $.I18n.T "status_expired" }}</span>
+              <span class="status-indicator status-dot-expired"></span>
             {{ else }}
-              <span class="badge badge-primary">{{ index $.I18n.T "status_live" }}</span>
+              <span class="status-indicator status-dot-live"></span>
             {{ end }}
           </div>
           <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
             {{ .Quiz.Description }}
           </p>
           <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.35rem;">
-            <div><strong>{{ index $.I18n.T "start_time" }}:</strong> {{ .Quiz.StartTime.Format "15:04:05 MST" }}</div>
+            {{ if eq .Status "UPCOMING" }}
+              <div><strong>{{ index $.I18n.T "starts_in" }}:</strong> <span class="starts-in-timer" data-seconds="{{ .StartsInSeconds }}">--:--</span></div>
+            {{ else if eq .Status "LIVE" }}
+              <div><strong style="color: #22c55e;">{{ index $.I18n.T "status_live" }}</strong></div>
+            {{ end }}
             <div><strong>{{ index $.I18n.T "duration" }}:</strong> {{ .Quiz.DurationMinutes }} {{ index $.I18n.T "minutes" }}</div>
             <div><strong>{{ index $.I18n.T "questions" }}:</strong> {{ len .Quiz.Questions }}</div>
           </div>
@@ -86,7 +90,9 @@
           {{ else if eq .Status "LIVE" }}
             <a href="/quizzes/{{ .Quiz.ID.Hex }}/start" class="btn btn-primary btn-block">{{ index $.I18n.T "btn_enter_live" }}</a>
           {{ else if eq .Status "UPCOMING" }}
-            <button class="btn btn-secondary btn-block" disabled style="opacity: 0.6; cursor: not-allowed;">{{ index $.I18n.T "btn_starts_at" }} {{ .Quiz.StartTime.Format "15:04" }}</button>
+            <button class="btn btn-secondary btn-block starts-in-btn" data-seconds="{{ .StartsInSeconds }}" data-quiz-id="{{ .Quiz.ID.Hex }}" disabled style="opacity: 0.7; cursor: not-allowed;">
+              {{ index $.I18n.T "starts_in" }} <span class="btn-countdown">--:--</span>
+            </button>
           {{ else if eq .Status "EXPIRED" }}
             <button class="btn btn-secondary btn-block" disabled style="opacity: 0.6; cursor: not-allowed;">{{ index $.I18n.T "btn_ended" }}</button>
           {{ else }}
@@ -239,6 +245,55 @@
         closeHistoryModal();
       }
     });
+
+    // Format seconds into HH:MM:SS or MM:SS
+    function formatTimeRemaining(seconds) {
+      if (seconds <= 0) return "00:00";
+      const h = Math.floor(seconds / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+      const s = seconds % 60;
+      const mm = m < 10 ? '0' + m : m;
+      const ss = s < 10 ? '0' + s : s;
+      if (h > 0) {
+        return h + ':' + mm + ':' + ss;
+      }
+      return mm + ':' + ss;
+    }
+
+    // Live countdown ticker for "Starts in"
+    function tickUpcomingTimers() {
+      let needsReload = false;
+      document.querySelectorAll('.starts-in-timer').forEach(el => {
+        let sec = parseInt(el.getAttribute('data-seconds'), 10);
+        if (isNaN(sec)) return;
+        sec = Math.max(0, sec - 1);
+        el.setAttribute('data-seconds', sec);
+        el.innerText = formatTimeRemaining(sec);
+        if (sec === 0) needsReload = true;
+      });
+
+      document.querySelectorAll('.starts-in-btn').forEach(btn => {
+        let sec = parseInt(btn.getAttribute('data-seconds'), 10);
+        if (isNaN(sec)) return;
+        sec = Math.max(0, sec - 1);
+        btn.setAttribute('data-seconds', sec);
+        const span = btn.querySelector('.btn-countdown');
+        if (span) {
+          span.innerText = formatTimeRemaining(sec);
+        }
+        if (sec === 0) {
+          needsReload = true;
+        }
+      });
+
+      if (needsReload) {
+        setTimeout(() => { window.location.reload(); }, 1200);
+      }
+    }
+
+    // Initial pass and 1-second interval
+    tickUpcomingTimers();
+    setInterval(tickUpcomingTimers, 1000);
   </script>
 </body>
 </html>

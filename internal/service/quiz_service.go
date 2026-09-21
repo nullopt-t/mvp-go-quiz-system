@@ -38,10 +38,11 @@ type QuizService interface {
 }
 
 type StudentQuizSummary struct {
-	Quiz        model.Quiz
-	Status      string // "AVAILABLE", "IN_PROGRESS", "COMPLETED"
-	Score       int
-	TotalPoints int
+	Quiz            model.Quiz
+	Status          string // "AVAILABLE", "IN_PROGRESS", "COMPLETED"
+	Score           int
+	TotalPoints     int
+	StartsInSeconds int
 }
 
 type quizService struct {
@@ -107,6 +108,7 @@ func (s *quizService) GetAvailableQuizzesForStudent(ctx context.Context, student
 			quizEnd := q.StartTime.Add(time.Duration(q.DurationMinutes) * time.Minute)
 			if now.Before(q.StartTime) {
 				summary.Status = "UPCOMING"
+				summary.StartsInSeconds = int(q.StartTime.Sub(now).Seconds())
 			} else if now.After(quizEnd) {
 				// Ended/expired quiz without completion: do not display on student board
 				continue
