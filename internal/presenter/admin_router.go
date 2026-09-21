@@ -11,10 +11,11 @@ func RegisterAdminRoutes(
 	authMiddleware func(http.Handler) http.Handler,
 	authPres *AuthPresenter,
 	adminPres *AdminPresenter,
+	adminAuthLimiter *IPRateLimiter,
 ) {
 	// 1. Dedicated Admin Authentication Endpoints (Hidden from student login)
 	mux.HandleFunc("GET /admin/login", authPres.RenderAdminLogin)
-	mux.HandleFunc("POST /admin/login", authPres.HandleAdminLogin)
+	mux.Handle("POST /admin/login", adminAuthLimiter.LimitMiddleware(http.HandlerFunc(authPres.HandleAdminLogin)))
 	mux.HandleFunc("POST /admin/logout", authPres.HandleAdminLogout)
 
 	// 2. Guard Protected Admin Routes

@@ -6,7 +6,7 @@ import (
 )
 
 // RegisterAuthRoutes configures public authentication, language switcher, and static asset routes
-func RegisterAuthRoutes(mux *http.ServeMux, authPres *AuthPresenter) {
+func RegisterAuthRoutes(mux *http.ServeMux, authPres *AuthPresenter, authLimiter *IPRateLimiter) {
 	// Static Assets
 	fileServer := http.FileServer(http.Dir("./web/static"))
 	mux.Handle("GET /static/", http.StripPrefix("/static/", fileServer))
@@ -27,6 +27,7 @@ func RegisterAuthRoutes(mux *http.ServeMux, authPres *AuthPresenter) {
 			Value:    lang,
 			Path:     "/",
 			MaxAge:   365 * 24 * 3600,
+			Secure:   IsHTTPS(r),
 			SameSite: http.SameSiteLaxMode,
 		})
 		redirectURL := r.URL.Query().Get("redirect")
@@ -39,6 +40,6 @@ func RegisterAuthRoutes(mux *http.ServeMux, authPres *AuthPresenter) {
 
 	// Public Auth Endpoints
 	mux.HandleFunc("GET /login", authPres.RenderLogin)
-	mux.HandleFunc("POST /login", authPres.HandleLogin)
+	mux.Handle("POST /login", authLimiter.LimitMiddleware(http.HandlerFunc(authPres.HandleLogin)))
 	mux.HandleFunc("POST /logout", authPres.HandleLogout)
 }

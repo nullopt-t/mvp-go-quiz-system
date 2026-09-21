@@ -46,8 +46,9 @@ var translations = map[Language]map[string]string{
 		"err_admin_pin_invalid": "Invalid PIN code",
 
 		// Student Dashboard
-		"assigned_quizzes":    "Your Quizzes",
-		"dashboard_subtitle":  "Quizzes available for your level and group",
+		"assigned_quizzes":          "Your Quizzes",
+		"dashboard_subtitle":        "Quizzes available for your level and group",
+		"search_quizzes_placeholder": "Search quizzes...",
 		"level":               "Level",
 		"group":               "Group",
 		"duration":            "Duration",
@@ -246,8 +247,9 @@ var translations = map[Language]map[string]string{
 		"err_admin_pin_invalid": "رمز المرور غير صحيح",
 
 		// Student Dashboard
-		"assigned_quizzes":    "اختباراتك",
-		"dashboard_subtitle":  "الاختبارات المتاحة لمستواك ومجموعتك",
+		"assigned_quizzes":          "اختباراتك",
+		"dashboard_subtitle":        "الاختبارات المتاحة لمستواك ومجموعتك",
+		"search_quizzes_placeholder": "ابحث عن اختبار...",
 		"level":               "المستوى",
 		"group":               "المجموعة",
 		"duration":            "المدة",

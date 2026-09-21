@@ -27,6 +27,7 @@ func I18nMiddleware() func(http.Handler) http.Handler {
 					Value:    qLang,
 					Path:     "/",
 					MaxAge:   365 * 24 * 3600,
+					Secure:   IsHTTPS(r),
 					SameSite: http.SameSiteLaxMode,
 				})
 			}
@@ -85,6 +86,7 @@ func AuthMiddleware(authService service.AuthService) func(http.Handler) http.Han
 					Path:     "/",
 					MaxAge:   -1,
 					HttpOnly: true,
+					Secure:   IsHTTPS(r),
 				})
 				SetFlashError(w, "Session expired. Please log in again.")
 				http.Redirect(w, r, loginPath, http.StatusSeeOther)

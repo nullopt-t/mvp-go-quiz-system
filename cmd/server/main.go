@@ -85,7 +85,7 @@ func main() {
 			if t.IsZero() {
 				return ""
 			}
-			return t.In(cfg.Location).Format(layout)
+			return t.UTC().Format(layout)
 		},
 		"isoTime": func(t time.Time) string {
 			if t.IsZero() {
@@ -126,7 +126,7 @@ func main() {
 	authPres := presenter.NewAuthPresenter(authService, tmpl)
 	studentPres := presenter.NewStudentPresenter(quizService, resultService, tmpl)
 	quizPres := presenter.NewQuizPresenter(quizService, answerService, resultService, tmpl)
-	adminPres := presenter.NewAdminPresenter(quizService, resultService, studentRepo, importService, tmpl, cfg)
+	adminPres := presenter.NewAdminPresenter(quizService, resultService, studentRepo, importService, tmpl)
 
 	// 7. Setup Router & Routes
 	router := presenter.NewRouter(presenter.RouterDependencies{

@@ -51,6 +51,7 @@ func GetFlashMessages(w http.ResponseWriter, r *http.Request) (errorMsg, success
 			Path:     "/",
 			MaxAge:   -1,
 			HttpOnly: true,
+			Secure:   IsHTTPS(r),
 			SameSite: http.SameSiteLaxMode,
 		})
 	}
@@ -68,6 +69,7 @@ func GetFlashMessages(w http.ResponseWriter, r *http.Request) (errorMsg, success
 			Path:     "/",
 			MaxAge:   -1,
 			HttpOnly: true,
+			Secure:   IsHTTPS(r),
 			SameSite: http.SameSiteLaxMode,
 		})
 	}

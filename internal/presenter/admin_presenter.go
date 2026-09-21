@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"quiz-system/internal/config"
 	"quiz-system/internal/model"
 	"quiz-system/internal/repository"
 	"quiz-system/internal/service"
@@ -25,7 +24,6 @@ type AdminPresenter struct {
 	studentRepo   repository.StudentRepository
 	importService service.ImportService
 	templates     *template.Template
-	cfg           *config.Config
 }
 
 func NewAdminPresenter(
@@ -34,7 +32,6 @@ func NewAdminPresenter(
 	studentRepo repository.StudentRepository,
 	importService service.ImportService,
 	tmpl *template.Template,
-	cfg *config.Config,
 ) *AdminPresenter {
 	return &AdminPresenter{
 		quizService:   quizService,
@@ -42,7 +39,6 @@ func NewAdminPresenter(
 		studentRepo:   studentRepo,
 		importService: importService,
 		templates:     tmpl,
-		cfg:           cfg,
 	}
 }
 
@@ -428,14 +424,10 @@ func (p *AdminPresenter) HandleCreateQuiz(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	// Parse Exam Official Scheduled Start Time in configured timezone
+	// Parse Exam Official Scheduled Start Time
 	startTime := time.Now().UTC()
-	loc := time.UTC
-	if p.cfg != nil && p.cfg.Location != nil {
-		loc = p.cfg.Location
-	}
 	if startVal := strings.TrimSpace(r.FormValue("start_time")); startVal != "" {
-		if t, err := time.ParseInLocation("2006-01-02T15:04", startVal, loc); err == nil {
+		if t, err := time.Parse("2006-01-02T15:04", startVal); err == nil {
 			startTime = t.UTC()
 		}
 	}

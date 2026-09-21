@@ -13,8 +13,6 @@ type Config struct {
 	JWTSecret        []byte
 	JWTExpiry        time.Duration
 	AdminPIN         string
-	TimeZone         string
-	Location         *time.Location
 }
 
 func Load() *Config {
@@ -30,13 +28,6 @@ func Load() *Config {
 		expiryMinutes = 45
 	}
 
-	timeZone := getEnv("TIMEZONE", getEnv("TZ", "UTC"))
-	loc, err := time.LoadLocation(timeZone)
-	if err != nil {
-		loc = time.UTC
-		timeZone = "UTC"
-	}
-
 	return &Config{
 		Port:             port,
 		MongoURI:         mongoURI,
@@ -44,8 +35,6 @@ func Load() *Config {
 		JWTSecret:        []byte(jwtSecret),
 		JWTExpiry:        time.Duration(expiryMinutes) * time.Minute,
 		AdminPIN:         adminPIN,
-		TimeZone:         timeZone,
-		Location:         loc,
 	}
 }
 

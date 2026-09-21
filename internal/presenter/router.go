@@ -2,6 +2,7 @@ package presenter
 
 import (
 	"net/http"
+	"time"
 
 	"quiz-system/internal/service"
 )
@@ -18,8 +19,14 @@ type RouterDependencies struct {
 func NewRouter(deps RouterDependencies) http.Handler {
 	mux := http.NewServeMux()
 
+	// Rate limiters:
+	// - Student login: 5 req/s with burst of 10
+	// - Admin login: 2 req/s with burst of 5 (strictly protects against PIN brute force)
+	studentLoginLimiter := NewIPRateLimiter(5, 10, 10*time.Minute)
+	adminLoginLimiter := NewIPRateLimiter(2, 5, 10*time.Minute)
+
 	// 1. Register Public & Shared Auth Routes (Student Login at /login)
-	RegisterAuthRoutes(mux, deps.AuthPresenter)
+	RegisterAuthRoutes(mux, deps.AuthPresenter, studentLoginLimiter)
 
 	// Protected Auth Middleware
 	authMiddleware := AuthMiddleware(deps.AuthService)
@@ -28,8 +35,9 @@ func NewRouter(deps RouterDependencies) http.Handler {
 	RegisterStudentRoutes(mux, authMiddleware, deps.StudentPres, deps.QuizPresenter)
 
 	// 3. Register Admin / Staff-Specific Routes (/admin/login, /admin, /admin/quizzes/*)
-	RegisterAdminRoutes(mux, authMiddleware, deps.AuthPresenter, deps.AdminPresenter)
+	RegisterAdminRoutes(mux, authMiddleware, deps.AuthPresenter, deps.AdminPresenter, adminLoginLimiter)
 
-	// 4. Apply Global Internationalization & Language Switcher Middleware
-	return I18nMiddleware()(mux)
+	// 4. Wrap with Internationalization and Security Middleware
+	handler := I18nMiddleware()(mux)
+	return SecurityMiddleware()(handler)
 }

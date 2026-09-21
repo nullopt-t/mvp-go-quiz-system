@@ -43,7 +43,7 @@
       <div style="min-width: 260px; max-width: 360px; flex: 1;">
         <input type="text"
                id="quiz-search"
-               placeholder="Search quizzes / ابحث عن اختبار..."
+               placeholder="{{ index .I18n.T "search_quizzes_placeholder" }}"
                oninput="filterQuizzes(this.value)"
                style="width: 100%; padding: 0.55rem 1rem; border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.9rem; background: var(--surface); color: var(--text-main); outline: none;">
       </div>

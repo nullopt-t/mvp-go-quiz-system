@@ -63,6 +63,7 @@ func (p *AuthPresenter) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		Value:    token,
 		Path:     "/",
 		HttpOnly: true,
+		Secure:   IsHTTPS(r),
 		SameSite: http.SameSiteLaxMode,
 	})
 	http.Redirect(w, r, "/quizzes", http.StatusSeeOther)
@@ -102,6 +103,7 @@ func (p *AuthPresenter) HandleAdminLogin(w http.ResponseWriter, r *http.Request)
 		Value:    token,
 		Path:     "/",
 		HttpOnly: true,
+		Secure:   IsHTTPS(r),
 		SameSite: http.SameSiteLaxMode,
 	})
 	http.Redirect(w, r, "/admin", http.StatusSeeOther)
@@ -114,6 +116,7 @@ func (p *AuthPresenter) HandleLogout(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 		MaxAge:   -1,
 		HttpOnly: true,
+		Secure:   IsHTTPS(r),
 	})
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
@@ -125,6 +128,7 @@ func (p *AuthPresenter) HandleAdminLogout(w http.ResponseWriter, r *http.Request
 		Path:     "/",
 		MaxAge:   -1,
 		HttpOnly: true,
+		Secure:   IsHTTPS(r),
 	})
 	http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
 }
